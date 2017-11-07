@@ -4,17 +4,19 @@
 \alias{tvVAR}
 \alias{tvvar-class}
 \alias{tvvar}
-\title{Time-varying Vector Autoregressive}
+\title{Time-varying Vector Autoregressive Models}
 \usage{
-tvVAR(y, p = 1, bw = NULL, type = c("const", "none"), exogen = NULL,
-  tkernel = "Epa", est = "lc", singular.ok = TRUE, ci = 0,
-  tboot = "wild", runs = 100, R = NULL, r = NULL)
+tvVAR(y, p = 1, z = NULL, bw = NULL, type = c("const", "none"),
+  exogen = NULL, est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"),
+  singular.ok = TRUE)
 }
 \arguments{
 \item{y}{A matrix with dimention obs x neq (obs = number of observations and
 neq = number of equations)}
 
 \item{p}{A scalar indicating the number of lags in the model}
+
+\item{z}{A vector containing the smoothing variable.}
 
 \item{bw}{An opcional scalar or vector of length the number of equations. It represents the bandwidth in
 the estimation of trend coefficients. If NULL, it is selected by cross validation.}
@@ -23,23 +25,11 @@ the estimation of trend coefficients. If NULL, it is selected by cross validatio
 
 \item{exogen}{A matrix or data.frame with the exogenous variables (optional)}
 
-\item{tkernel}{The type of kernel used in the coefficients estimation method, one of Epanesnikov ("Epa") or "Gaussian".}
-
 \item{est}{The nonparametric estimation method, one of "lc" (default) for linear constant or "ll" for local linear.}
 
+\item{tkernel}{The type of kernel used in the coefficients estimation method, one of Epanesnikov ("Epa") or "Gaussian".}
+
 \item{singular.ok}{Logical. If FALSE, a singular model is an error.}
-
-\item{ci}{A number between 0 and 1. It represents the confidence interval range, if ci = 0 (default) then confidence intervals are not
-calculated. Function \code{\link{CI}} may be used at any time to calculate the CI.}
-
-\item{tboot}{The bootstrap type, one of "wild" (default) or "wild2".}
-
-\item{runs}{The number of bootstrap repetitiona, 100 by default.}
-
-\item{R}{An optional nrest x nvar x neq (nrest =  number of restrictions, nvar = number of variables in each equation,
-neq = number of equations).}
-
-\item{r}{An optional vector of length the number of restrictions. By default it contains zeros.}
 }
 \value{
 An object of class 'tvvar'
@@ -47,7 +37,7 @@ The object of class \code{tvvar} have the following components:
 \item{tvcoef}{An array of dimension obs x neq (obs = number of observations,
 neq = number of equations in the system) with the time-varying coefficients estimates.}
 \item{fitted}{The fitted values.}
-\item{resid}{Estimation residuals.}
+\item{residuals}{Estimation residuals.}
 \item{x}{A list with the regressors data and the dependent variable.}
 \item{y}{A matrix with the dependent variable data.}
 \item{bw}{Bandwidth of mean estimation.}
@@ -57,15 +47,10 @@ neq = number of equations in the system) with the time-varying coefficients esti
 \item{neq}{Number of equations}
 \item{obs}{Number of observations in estimation.}
 \item{totobs}{Number of observations in the original set.}
-\item{ci}{Confidence interval range.}
-\item{tboot}{Type of bootstrap.}
-\item{runs}{Number of bootstrap replications.}
-\item{R}{Restrictions matrix.}
-\item{r}{Restrictions vector.}
 \item{call}{Matched call.}
 }
 \description{
-Fits a time varying coefficients vector autorregressive model with p lags.
+Fits a time-varying coefficients vector autorregressive model with p lags.
 }
 \examples{
 
@@ -79,5 +64,5 @@ plot(model.tvVAR)
 
 }
 \seealso{
-\code{\link{tvAR}}, \code{\link{tvSURE}}, \code{\link{bw}}, \code{\link{tvOLS}}
+\code{\link{CI}}, \code{\link{plot}}
 }

@@ -2,9 +2,9 @@
 % Please edit documentation in R/tvCov.R
 \name{tvCov}
 \alias{tvCov}
-\title{Time varying covariance estimation}
+\title{Time-varying Variance-Covariance Estimation}
 \usage{
-tvCov(x, bw, est = "lc", tkernel = "Epa")
+tvCov(x, bw, est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"))
 }
 \arguments{
 \item{x}{A matrix.}
@@ -19,7 +19,7 @@ tvCov(x, bw, est = "lc", tkernel = "Epa")
 A matrix of dimension obs x neq x neq.
 }
 \description{
-Estimation of a time varying Sigma using the local constant or the local linear kernel
+Estimation of a time-varying variance-covariance matrix using the local constant or the local linear kernel
 smoothing methodologies.
 }
 \examples{

@@ -4,57 +4,49 @@
 \alias{tvLM}
 \alias{tvlm-class}
 \alias{tvlm}
-\title{Time-varying linear models}
+\title{Time-Varying Coefficients Linear Models}
 \usage{
-tvLM(formula, z = NULL, data, bw = NULL, tkernel = "Epa", est = "lc",
-  singular.ok = TRUE, ci = 0, tboot = "wild", runs = 100)
+tvLM(formula, z = NULL, data, bw = NULL, est = c("lc", "ll"),
+  tkernel = c("Epa", "Gaussian"), singular.ok = TRUE)
 }
 \arguments{
 \item{formula}{An object of class formula.}
 
-\item{z}{A vector with the variable over which coefficients are smooth over.}
+\item{z}{A vector with the smoothing variable.}
 
 \item{data}{An optional data frame or matrix.}
 
 \item{bw}{An opcional scalar. It represents the bandwidth in
 the estimation of trend coefficients. If NULL, it is selected by cross validation.}
 
-\item{tkernel}{The type of kernel used in the coefficients estimation method,
-one of Epanesnikov ("Epa") or "Gaussian".}
-
 \item{est}{The nonparametric estimation method, one of "lc" (default) for linear constant
 or "ll" for local linear.}
 
+\item{tkernel}{The type of kernel used in the coefficients estimation method,
+one of Epanesnikov ("Epa") or "Gaussian".}
+
 \item{singular.ok}{Logical. If FALSE, a singular model is an error.}
-
-\item{ci}{A number between 0 and 1. It represents the confidence interval range,
-if ci=0 (default) then confidence intervals are not
-calculated. Function \code{\link{CI}} may be used at any time to calculate the CI.}
-
-\item{tboot}{The bootstrap type, one of "wild" (default) or "wild2".}
-
-\item{runs}{The number of bootstrap repetitiona, 100 by default.}
 }
 \value{
 An object of class \code{tvlm}
 The object of class \code{tvlm} have the following components:
 \item{tvcoef}{A matrix of dimensions}
 \item{fitted}{The fitted values.}
-\item{resid}{Estimation residuals.}
+\item{residuals}{Estimation residuals.}
 \item{x}{A matrix with the regressors data.}
 \item{y}{A vector with the dependent variable data.}
-\item{z}{A vector with the variable over which coefficients are smooth over.}
+\item{z}{A vector with the smoothing variable.}
 \item{bw}{Bandwidth of mean estimation.}
 \item{est}{Nonparametric estimation methodology.}
 \item{tkernel}{Kernel used in estimation.}
-\item{ci}{Confidence interval range.}
-\item{tboot}{Type of bootstrap.}
+\item{level}{Confidence interval range.}
 \item{runs}{Number of bootstrap replications.}
+\item{tboot}{Type of bootstrap.}
 \item{BOOT}{List with all bootstrap replications of \code{tvcoef}, if done.}
 \item{call}{Matched call.}
 }
 \description{
-\code{tvLM} is used to fit a time varying coefficients linear model
+\code{tvLM} is used to fit a time-varying coefficients linear model
 }
 \details{
 Models for \code{tvLM} are specified symbolically using the same formula
@@ -72,7 +64,7 @@ y ~ x - 1 or y ~ 0 + x.
 }
 \examples{
 ## Simulate a linear process with time-varying coefficient
-## as functions of time.
+## as functions of scaled time.
 
 tau <- seq(1:1000)/1000
 beta <- data.frame(beta1 = sin(2 * pi * tau), beta2 = 2 * tau)
@@ -96,7 +88,7 @@ legend("topright", c(expression(beta[1]), "lm", "tvlm"),
 col = c(1, 2, 4), bty = "n", lty = 1)
 
 ##Obtain the 90\% confidence interval of the coefficients
-model.tvlm <- CI (model.tvlm, ci = 0.90, runs = 50)
+model.tvlm <- CI (model.tvlm, level = 0.90, runs = 50)
 plot(model.tvlm)
 
 ## Simulate a linear process with time-varying coefficient
@@ -112,7 +104,7 @@ data<-data.frame(y = y, X1 = X1, X2 = X2, z = z)
 coef.lm <- stats::lm(y ~ 0 + X1 + X2, data = data)$coef
 model.tvlm2 <- tvLM(y ~ 0 + X1 + X2, z = z, data = data,
 bw = 0.5, est = "ll")
-model.tvlm2 <- CI(model.tvlm2)
+model.tvlm2 <- CI(model.tvlm2, runs = 30)
 
 ##plot the estimates of beta1
 sort.index <- sort.int(z, index.return = TRUE)$ix
@@ -124,9 +116,18 @@ lines(z[sort.index], model.tvlm2$tvcoef[sort.index, 1], col = 4)
 legend("topleft", c(expression(beta[1]), "lm", "tvlm"),
 col = c(1, 2, 4), bty = "n", lty = 1)
 
+}
+\references{
+Cai, Z., Li, Q., Park, J. Y. (2009) Functional-coefficient models for nonstationary 
+time series data, \emph{Journal of Econometrics}, Volume 148, pp. 101-113.
 
+Robinson, P. (1989) Nonparametric estimation of time-varying parameters.  In
+Hackl, P., editor, \emph{Statistical Analysis and Forecasting of Economic Structural
+Change}. Springer, Berlin.
 }
 \seealso{
+\code{\link{CI}}, \code{\link{plot}}
+
 \code{\link{bw}} for bandwidth selection, \code{\link{tvOLS}} for the
 estimation procedure and \code{\link{CI}} for confidence intervals.
 }

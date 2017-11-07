@@ -1,9 +1,8 @@
-
 #' Confidence Intervals for Model Parameters of Objects in tvReg
 #'
 #' CI is used to estimate the bootstrap confidence intervals for objects with class
 #' attribute \code{tvlm}, \code{tvar}, \code{tvirf}, \code{tvsure}.
-#'
+#' @rdname CI
 #' @param object Object of class \code{tvsure}, class \code{tvvar} or class \code{tvirf}.
 #' @param level Numeric, the confidence level required (between 0 and 1). 
 #' @param runs (optional) Number of bootstrap replications.
@@ -11,6 +10,8 @@
 #' distribution suggested by Mammen (1993) in the wild resampling, while 'wild2' uses the standard
 #' normal.
 #' @param ... Other parameters passed to specific methods.
+#' @seealso \code{\link{tvLM}}, \code{\link{tvAR}}, \code{\link{tvVAR}},
+#' \code{\link{tvSURE}}
 #'
 #' @return an object of class \code{tvsure} with BOOT, Lower and Upper different from NULL.
 #'
@@ -24,7 +25,7 @@
 #'
 #' @examples
 #' 
-#' ## CI  for class 'tvlm'
+#' ##Calculation of confidence intervals for a tvLM model
 #' tau <- seq(1:1000)/1000
 #' beta <- data.frame(beta1 = sin(2*pi*tau), beta2= 2*tau)
 #' X1 <- rnorm(1000)
@@ -34,27 +35,23 @@
 #' data <- data.frame(y = y, X1 = X1, X2 = X2)
 #' model.tvlm <-  tvLM(y~0+X1+X2, data = data)
 #' tvci <- CI(model.tvlm, level = 0.95, runs = 30)
+#' ##Once the first confidence interval is calculated, the same resamples are used for other
+#' ##confidence intervals, which makes the process faster for consecutives calls of function CI.
 #' tvci2 <- CI (tvci, level = 0.80)
-#' tvci3 <- CI (tvci, level =0.80 , runs = 60)
 #' plot(tvci)
-#' 
-#' ## CI for class 'tvsure'
+#'
+#' ##Calculation of confidence intervals for a tvSURE model
 #' data( "Kmenta", package="systemfit" )
 #' eqDemand <- consump ~ price + income
 #' eqSupply <- consump ~ price + farmPrice + trend
 #' system <- list( demand = eqDemand, supply = eqSupply )
-#'
 #' tvfgls1.fit <- tvSURE(system, data = Kmenta, method="tvFGLS")
 #'
 #' ##Calculate 95% confidence interval of our object using a resampling of size 100
-#' tvfgls1.fit <- CI (tvfgls1.fit, level = 0.95, runs = 100)
-#'
-#' ##Once the first confidence interval is calculated, the same resamples are used for other
-#' ##confidence intervals, which makes the process faster for consecutives calls of function CI.
-#' tvfgls1.fit <- CI (tvfgls1.fit, level = 0.90)
+#' tvfgls95.fit <- CI (tvfgls1.fit, level = 0.95, runs = 50)
+#' 
 #' @export
 CI <- function(object, ...) UseMethod("CI", object)
-
 
 #' @rdname CI
 #' @method CI default
@@ -62,7 +59,7 @@ CI <- function(object, ...) UseMethod("CI", object)
 #'
 CI.default <- function(object, level = 0, runs = 0, tboot = NULL, ...)
 {
-  if (class(object) != "tvlm" & class(object) != "tvar" & class(object) != "tvsure")
+  if (!(class(object) %in% c("tvlm", "tvar", "tvsure")))
     stop("\nConfidence intervals not implemented for this class.\n")
   if (level < 0 | level > 1)
     stop("\nVariable 'level' accepts values between 0 and 1.\n")
@@ -115,6 +112,7 @@ CI.default <- function(object, level = 0, runs = 0, tboot = NULL, ...)
   mat.l <- matrix(0, nrow = obs, ncol = sum(nvar))
   mat.u <- matrix(0, nrow = obs, ncol = sum(nvar))
   temp <- matrix(NA, nrow = obs, ncol = runs)
+
   if(class(object) == "tvsure")
   {
     for (m in 1:neq)
@@ -155,13 +153,11 @@ CI.default <- function(object, level = 0, runs = 0, tboot = NULL, ...)
   object$Upper <- Upper
   return(object)
 }
-
-
 #' @rdname CI
 #' @method CI tvirf
 #' @export
 #'
-CI.tvirf <- function(object, level = 0, runs = 0, tboot = NULL, ...)
+CI.tvirf <- function(object, level = 0, runs = 0, tboot = NULL , ...)
 {
   if (class(object) != "tvirf")
     stop("\nConfidence intervals not implemented for this class.\n")

@@ -30,7 +30,8 @@ tvPhi.tvvar <- function (x, nstep = 10, ...)
   if (nstep >= p)
   {
     As <-  array(0, dim = c(obs,neq, neq, nstep + 1))
-    for (i in (p + 1):(nstep + 1)) {
+    for (i in (p + 1):(nstep + 1)) 
+    {
       As[,, , i] <- array(0, dim=c(obs,neq, neq))
     }
   }
@@ -48,11 +49,13 @@ tvPhi.tvvar <- function (x, nstep = 10, ...)
     Phi[t, , , 1] <- diag(neq)
     Phi[t, , , 2] <- Phi[t,,,1] %*% As[t, , , 1]
     if (nstep > 1) {
-      for (i in 3:(nstep + 1)) {
+      for (i in 3:(nstep + 1)) 
+      {
         tmp1 <- Phi[t, , , 1] %*% As[t,,,i-1]
         tmp2 <- matrix(0, nrow = neq, ncol = neq)
         idx <- (i - 2):1
-        for (j in 1:(i - 2)) {
+        for (j in 1:(i - 2)) 
+        {
           tmp2 <- tmp2 + Phi[t,, , j + 1] %*% As[t,, , idx[j]]
         }
         Phi[t, , , i] <- tmp1 + tmp2

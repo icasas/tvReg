@@ -3,7 +3,7 @@
 \name{tvBcoef}
 \alias{tvBcoef}
 \alias{tvBcoef.tvvar}
-\title{Coefficient array of an estimated tvVAR}
+\title{Coefficient Array of an Estimated tvVAR}
 \usage{
 tvBcoef(x)
 

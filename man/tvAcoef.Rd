@@ -3,7 +3,7 @@
 \name{tvAcoef}
 \alias{tvAcoef}
 \alias{tvAcoef.tvvar}
-\title{Time varying coefficient arrays of the lagged endogenous variables (no intercept).}
+\title{Time-Varying Coefficient Arrays of the Lagged Endogenous Variables of a tv-VAR (no intercept).}
 \usage{
 tvAcoef(x)
 

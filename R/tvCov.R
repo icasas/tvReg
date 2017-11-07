@@ -3,9 +3,7 @@
 #' Estimation of a time-varying variance-covariance matrix using the local constant or the local linear kernel
 #' smoothing methodologies.
 #'
-#' @references Aslanidis, N. and Casas, I (2013) Nonparametric correlation models for portfolio
-#' allocation. \emph{Journal of Banking \& Finance}, 37, 2268-2283
-#'
+#' @importFrom MASS mvrnorm
 #' @param x A matrix.
 #' @param bw A scalar.
 #' @param est A character, either "lc" or "ll" for local constant or local linear.
@@ -13,6 +11,8 @@
 #'
 #' @return A matrix of dimension obs x neq x neq.
 #'
+#' @references Aslanidis, N. and Casas, I (2013) Nonparametric correlation models for portfolio
+#' allocation. \emph{Journal of Banking \& Finance}, 37, 2268-2283
 #' @examples
 #' ##Generate two independent (uncorrelated series)
 #' y <- cbind(rnorm(200, sd = 4), rnorm(200, sd = 1))
@@ -39,11 +39,13 @@
 #'
 #' @export tvCov
 #'
-tvCov <- function(x, bw, est = "lc", tkernel = "Epa")
+tvCov <- function(x, bw, est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"))
 {
   x <- as.matrix(x)
   obs <- nrow(x)
   neq <- ncol(x)
+  tkernel <- match.arg(tkernel)
+  est <- match.arg(est)
   Sigma <- array(0, dim = c(neq,neq, obs))
   resid.2 <- numeric(obs)
   if(length(bw) > 1)
@@ -78,7 +80,7 @@ tvCov <- function(x, bw, est = "lc", tkernel = "Epa")
   return(Sigma)
 }
 
-#' @name tvsure-internals
+#' @name tvReg-internals
 #' @param x A matrix.
 #' @param bw A scalar.
 #' @param est A character, either "lc" or "ll" for local constant or local linear.
@@ -87,11 +89,13 @@ tvCov <- function(x, bw, est = "lc", tkernel = "Epa")
 #' @return A scalar with the mean squared error.
 #' @keywords internal
 #'
-.tvCov.cv <- function(bw, x, est = "lc", tkernel = "Epa")
+.tvCov.cv <- function(bw, x, est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"))
 {
   x <- as.matrix(x)
   obs <- nrow(x)
   neq <- ncol(x)
+  tkernel <- match.arg(tkernel)
+  est <- match.arg(est)
   Sigma <-  array(0, dim = c(neq, neq, obs))
   resid.2 <- numeric(obs)
   if(length(bw)>1) bw <- stats::median(bw)

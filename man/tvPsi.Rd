@@ -3,7 +3,7 @@
 \name{tvPsi}
 \alias{tvPsi}
 \alias{tvPsi.tvvar}
-\title{Time varying coefficient arrays of the orthogonalised MA represention}
+\title{Time-Varying Coefficient Arrays of the Orthogonalised MA Represention}
 \usage{
 tvPsi(x, nstep = 10, ...)
 
@@ -29,6 +29,6 @@ time varying coefficients of the moving average representation, and the bandwidt
 the covariance matrix (optional).
 }
 \description{
-Returns the estimated orthogonalised time varying coefficient arrays of the
-moving average representation of a stable tvVAR as an array.
+Returns the estimated orthogonalised time-varying coefficient arrays of the
+moving average representation of a stable \code{tvvar} object obtained with function \code{tvVAR}.
 }

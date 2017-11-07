@@ -1,13 +1,13 @@
-# @name tvReg-internals
-# @aliases .kernel
-# @title tvReg internal and secondary functions
-# @description Listed below are supporting functions for the major methods in tvReg.
-# @details .kernel calculates the kernel values of a vector and a given bandwidth
-# @param x A numeric vector.
-# @param bw A scalar.
-# @param tkernel A character, either "Epa" (default) or "Gaussian".
-# @param N A scalar, in case we want to make the bandwidth smaller.
-# @return A numeric vector.
+#' @name tvReg-internals
+#' @aliases .kernel
+#' @title tvReg internal and secondary functions
+#' @description Listed below are supporting functions for the major methods in tvReg.
+#' @details .kernel calculates the kernel values of a vector and a given bandwidth
+#' @param x A numeric vector.
+#' @param bw A scalar.
+#' @param tkernel A character, either "Epa" (default) or "Gaussian".
+#' @param N A scalar, in case we want to make the bandwidth smaller.
+#' @return A numeric vector.
 #' @keywords internal
 .kernel <- function(x, bw, tkernel = "Epa", N = 1)
 {

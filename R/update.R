@@ -1,13 +1,13 @@
-##' Update and Re-fit the Models of package tvReg
-##'
-##' Update and Re-fit the Models of package tvReg
-##' @rdname update.tvReg
-##' @param object An object used to select a method.
-##' @param ... Other parameters passed to specific methods.
-##' @param y The dependent variable to update the model.
-##' @return An object of class \code{tvsure}.
-##' @method update tvsure
-##' @export
+#' Update and Re-fit the Models of package tvReg
+#'
+#' Update and Re-fit the Models of package tvReg
+#' @rdname update.tvReg
+#' @param object An object used to select a method.
+#' @param ... Other parameters passed to specific methods.
+#' @param y The dependent variable to update the model.
+#' @return An object of class \code{tvsure}.
+#' @method update tvsure
+#' @export
 update.tvsure <- function(object, y = NULL, ...)
 {
   neq <- object$neq
@@ -27,10 +27,10 @@ update.tvsure <- function(object, y = NULL, ...)
   class(object) <- "tvsure"
   return(object)
 }
-##' @rdname update.tvReg
-##' @return An object of class \code{tvlm}.
-##' @method update tvlm
-##' @export
+#' @rdname update.tvReg
+#' @return An object of class \code{tvlm}.
+#' @method update tvlm
+#' @export
 update.tvlm <- function(object, y = NULL, ...)
 {
   if(!is.null(y))
@@ -43,11 +43,26 @@ update.tvlm <- function(object, y = NULL, ...)
   class(object) <- "tvlm"
   return(object)
 }
-
-##' @rdname update.tvReg
-##' @return An object of class \code{tvvar}.
-##' @method update tvvar
-##' @export
+#' @rdname update.tvReg
+#' @return An object of class \code{tvar}.
+#' @method update tvar
+#' @export
+update.tvar <- function(object, y = NULL, ...)
+{
+  if(!is.null(y))
+    object$y <- y
+  result <- tvOLS(x = object$x, y = object$y, z = object$z,
+                  bw = object$bw, est = object$est, tkernel = object$tkernel)
+  object$tvcoef <- result$tvcoef
+  object$fitted <- result$fitted
+  object$residuals <- result$residuals
+  class(object) <- "tvar"
+  return(object)
+}
+#' @rdname update.tvReg
+#' @return An object of class \code{tvvar}.
+#' @method update tvvar
+#' @export
 update.tvvar <- function(object, y = NULL, ...)
 {
   neq <- object$neq

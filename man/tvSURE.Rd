@@ -4,23 +4,26 @@
 \alias{tvSURE}
 \alias{tvsure-class}
 \alias{tvsure}
-\title{Time-varying Seemingly Unrelated Regression Equations}
+\title{Time-Varying Seemingly Unrelated Regression Equations Model}
 \usage{
-tvSURE(formula, z = NULL, data, method = "identity", Sigma = NULL,
-  cor.method = "constant", est = "lc", tkernel = "Epa", bw = NULL,
-  bw.cov = NULL, singular.ok = TRUE, ci = 0, tboot = "wild",
-  runs = 100, R = NULL, r = NULL, control = tvsure.control(...), ...)
+tvSURE(formula, z = NULL, bw = NULL, data, method = c("tvOLS", "tvFGLS",
+  "tvGLS"), Sigma = NULL, est = c("lc", "ll"), tkernel = c("Epa",
+  "Gaussian"), bw.cov = NULL, singular.ok = TRUE, R = NULL, r = NULL,
+  control = tvsure.control(...), ...)
 }
 \arguments{
 \item{formula}{A list of formulas, one for each equation.}
 
-\item{z}{A vector with the variable over which coefficients are smooth over.}
+\item{z}{A vector containing the smoothing variable.}
+
+\item{bw}{An opcional scalar or vector of length the number of equations. It represents the bandwidth in
+the estimation of trend coefficients. If NULL, it is selected by cross validation.}
 
 \item{data}{A matrix or data frame containing variables in the formula.}
 
 \item{method}{A character, a matrix of dimensions neq x neq or an array of dimensions obs x neq x neq, where
 \code{obs} is the number of observations and \code{neq} is the number of equations.
-If method = \code{identity}(default) or \code{tvOLS} then the method used is a time-varying OLS.
+If method = \code{identity} or \code{tvOLS} (default) then the method used is a time-varying OLS.
 If method is a matrix (constant over time) or an array, then the \code{tvGLS} is called.
 If method = \code{tvFGLS}, then the covariance matrix is estimated nonparametrically and the
 estimation of the system is done as a whole.}
@@ -29,27 +32,14 @@ estimation of the system is done as a whole.}
 (neq = number of equations, obs = number of observations). It represents
 the covariance matrix of the error term. Only necessary for method \code{tvGLS}.}
 
-\item{cor.method}{The estimation method of the error covariance matrix, one of "constant" (default) is
-a sample covariance matrix or "time-varying" which uses function \code{\link{tvCov}}.}
-
 \item{est}{The nonparametric estimation method, one of "lc" (default) for linear constant or "ll" for local linear.}
 
 \item{tkernel}{The type of kernel used in the coefficients estimation method, one of Epanesnikov ("Epa") or "Gaussian".}
-
-\item{bw}{An opcional scalar or vector of length the number of equations. It represents the bandwidth in
-the estimation of trend coefficients. If NULL, it is selected by cross validation.}
 
 \item{bw.cov}{An optional scalar. It represents the bandwidth in the "lc" nonparametric estimation of the
 time-varying covariance matrix. If NULL, it is selected by cross validation.}
 
 \item{singular.ok}{Logical. If FALSE, a singular model is an error.}
-
-\item{ci}{A number between 0 and 1. It represents the confidence interval range, if ci = 0 (default) then confidence intervals are not
-calculated. Function \code{\link{CI}} may be used at any time to calculate the CI.}
-
-\item{tboot}{The bootstrap type, one of "wild" (default) or "wild2".}
-
-\item{runs}{The number of bootstrap repetitiona, 100 by default.}
 
 \item{R}{An optional nrest x nvar x neq (nrest =  number of restrictions, nvar = number of variables in each equation,
 neq = number of equations).}
@@ -66,27 +56,29 @@ the function \code{\link{tvsure.control}}.  See the documentation of
 \code{tvSURE} returns a list of the class \code{tvsure} containing the results of the whole system, results of the estimation
 and confidence instervals if chosen.
 The object of class \code{tvsure} have the following components:
-\item{tvcoef}{An array of dimension obs  nvar x neq (obs = number of observations, nvar = number of variables
+\item{tvcoef}{An array of dimension obs x nvar x neq (obs = number of observations, nvar = number of variables
 in each equation, neq = number of equations in the system) with the time-varying coefficients estimates.}
-\item{Lower}{If ci non equal zero, an array of dimension obs x nvar x neq containing the confidence interval lower band.}
-\item{Upper}{If ci non equal zero, an array of dimension obs x nvar x neq containing the confidence interval upper band.}
+\item{Lower}{If \code{level} non equal zero, an array of dimension obs x nvar x neq containing the confidence 
+interval lower band.}
+\item{Upper}{If \code{level} non equal zero, an array of dimension obs x nvar x neq containing the confidence 
+interval upper band.}
 \item{Sigma}{An array of dimension obs x neq x neq with the estimates of the errors covariance matrix.}
 \item{fitted}{The fitted values.}
-\item{resid}{Estimation residuals.}
+\item{residuals}{Estimation residuals.}
 \item{x}{A list with the regressors data.}
 \item{y}{A matrix with the dependent variable data.}
+\item{z}{A vector with the smoothing variable.}
+\item{bw}{Bandwidth of mean estimation.}
 \item{obs}{Integer specifying the number of observations in each equation (balanced sample).}
 \item{neq}{Integer specifying the number of equations.}
 \item{nvar}{Vector of integers specifying the number of variables in each equation.}
 \item{method}{Estimation method.}
 \item{est}{Nonparemtric estimation methodology.}
 \item{tkernel}{Kernel type.}
-\item{cor.method}{Error covariance estimation method.}
-\item{bw}{Bandwidth of mean estimation.}
 \item{bw.cov}{Bandwidht of Sigma estimation.}
-\item{tboot}{Type of bootstrap.}
-\item{ci}{Confidence interval range.}
+\item{level}{Confidence interval range.}
 \item{runs}{Number of bootstrap replications.}
+\item{tboot}{Type of bootstrap.}
 \item{BOOT}{List with all bootstrap replications of \code{tvcoef}, if done.}
 \item{R}{Restrictions matrix.}
 \item{r}{Restrictions vector.}
@@ -94,16 +86,17 @@ in each equation, neq = number of equations in the system) with the time-varying
 \item{call}{Matched call.}
 }
 \description{
-Fits a set of balanced linear structural equations using Time-varying Ordinary Least Squares (tvOLS),
-Time-varying Seemingly Unrelated Regression (tvGLS) when the error variance-covariance matrix is known or Time-varying
-Feasible Seemingly Unrelated Regression (tvFGL) when the error variance-covariance matrix is unknown.
+Fits a set of balanced linear structural equations using Time-varying Ordinary Least 
+Squares (tvOLS), Time-varying Seemingly Unrelated Regression (tvGLS), when the error 
+variance-covariance matrix is known, or Time-varying Feasible Seemingly Unrelated 
+Regression (tvFGLS), when the error variance-covariance matrix is unknown.
 }
 \details{
 This function wraps up the kernel smoothing "tvOLS" and "tvGLS" estimators. The former is used when
 equations are considered independent while the later assumes that the error term is correlated
 amongst equations. This relation is given in matrix "Sigma" which is used in the estimation. When
 "Sigma" is known, the estimates are calculated via the "tvGLS", and via the "tvFGLS" when "Sigma"
-is known and must be estimated.
+is unknown and must be estimated.
 
 Bandwidth selection is of great importance in kernel smoothing methodologies and it is done
 automatically by cross-validation. One important aspect in the current packages is that the
@@ -128,15 +121,10 @@ eqSupply <- consump ~ price + farmPrice + trend
 system <- list(demand = eqDemand, supply = eqSupply)
 
 ## OLS estimation
-ols.fit <- systemfit::systemfit(system, data = Kmenta)
+ols.fit <- systemfit::systemfit(system, method = "SUR", data = Kmenta)
 
 ## tvOLS estimation with the local linear estimator
 tvols.fit <- tvSURE(system, data = Kmenta,  est = "ll")
-
-## Confidence intervals are not estimated by default in the 'tvSURE' function,
-## unless parameter 'ci' is set to nonzero
-## 95\% confidence interval using Mammen's wild bootstrap.
-tvols.fit <- CI(tvols.fit, ci = 0.95, est = "ll")
 
 ## FGLS estimation - SURE estimation
 fgls1.fit <- systemfit::systemfit(system, data = Kmenta, method = "SUR")
@@ -144,7 +132,7 @@ fgls1.fit <- systemfit::systemfit(system, data = Kmenta, method = "SUR")
 ## tvFGLS estimation - tvSURE estimation
 tvfgls1.fit <- tvSURE(system, data = Kmenta, method = "tvFGLS")
 
-## iterative FGLS estimation - SUR estimation
+## iterative FGLS estimation - SURE estimation
 fgls2.fit <- systemfit::systemfit(system, data = Kmenta, method = "SUR", maxit = 100)
 
 ## iterative tvFGLS estimation - SUR estimation using the local linear
@@ -164,29 +152,27 @@ R = Rrestr, r = qrestr, bw = tvfgls1.fit$bw, bw.cov = tvfgls1.fit$bw.cov)
 
 }
 \references{
-Chen, X. B., Gao, J., Li, D., and Silvapulle, P (2013) Nonparametric estimation and
-parametric calibration of time-varying coefficient realized volatility models.
-\emph{Monash Econometrics and Business StatisticsWorking Papers 21/13}
-URL:https://ideas.repec.org/p/msh/ebswps/2013-21.html.
+Casas, I., Ferreira, E., and Orbe, S. (2017) Time-Varying Coefficient Estimation 
+in SURE Models: Application to Portfolio Management. Available at SSRN: 
+https://ssrn.com/abstract=3043137
+
+Chen, X. B., Gao, J., Li, D., and Silvapulle, P (2017) Nonparametric Estimation and 
+Forecasting for Time-Varying Coefficient Realized Volatility Models.
+\emph{Journal of Business \& Economic Statistics}, pp.1-13
 
 Granger, C. W (2008) Non-Linear Models: Where Do We Go Next - Time Varying
-Parameter Models? \emph{Studies in Nonlinear Dynamics \& Econometrics}, 12, 1-11.
+Parameter Models? \emph{Studies in Nonlinear Dynamics \& Econometrics}, 12, pp. 1-11.
 
 Kristensen, D (2012) Non-parametric detection and estimation of structural change.
-\emph{Econometrics Journal}, 15, 420-461.
+\emph{Econometrics Journal}, 15, pp. 420-461.
 
 Orbe, S., Ferreira, E., and Rodriguez-Poo, J (2004) On the estimation and testing of
 time varying constraints in econometric models, \emph{Statistica Sinica}.
-
-Robinson, P (1989) Nonparametric estimation of time-varying parameters.  In
-Hackl, P., editor, \emph{Statistical Analysis and Forecasting of Economic Structural
-Change}. Springer, Berlin.
-
-Zongwu, C. (2007) Trending time-varying coefficient time series with serially
-correlated errors, \emph{Journal of Econometrics}, 136, 163-188.
 }
 \seealso{
 \code{\link{systemfit}}
+
+\code{\link{CI}}, \code{\link{plot}}
 
 \code{\link{bw}} for bandwidth calculation, \code{\link{tvGLS}} for nonparametric
 estimator and \code{\link{CI}} for confidence intervals.

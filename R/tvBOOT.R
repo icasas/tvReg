@@ -3,14 +3,13 @@
 #'
 .tvboot<-function (x , ...) UseMethod(".tvboot", x)
 
-
 # @rdname tvReg-internals
 #' @method .tvboot default
 #' @keywords internal
 #'
-.tvboot.default<-function (x, runs = 100, tboot="wild")
+.tvboot.default<-function (x, runs = 100, tboot = "wild")
 {
-  if (class(x) == "tvsure" | class(x) == "tvlm")
+  if (class(x) %in% c("tvlm", "tvar", "tvsure"))
   {
     MODEL <- eval.parent(x)
   }
@@ -21,7 +20,7 @@
   obs <- MODEL$obs
   nvar<- MODEL$nvar
   neq <- MODEL$neq
-  if(class(x) == "tvlm")
+  if(class(x) %in% c("tvlm", "tvar"))
   {
     obs <- length(x$y)
     neq <- 1
@@ -55,7 +54,7 @@
 # @rdname tvReg-internals
 #' @method .tvboot tvirf
 #' @keywords internal
-.tvboot.tvirf<-function (x, runs=0, tboot="wild")
+.tvboot.tvirf<-function (x, runs = 0, tboot = "wild")
 {
   ortho <- x$ortho
   cumulative <- x$cumulative

@@ -1,50 +1,51 @@
-##' Plot Methods for objects in tvReg
-##'
-##' Plot methods for objects with class attribute \code{tvlm}, \code{tvar}, \code{tvvar},
-##' \code{tvirf}, \code{tvsure}.
-##' @rdname plot.tvsure
-##' @method plot tvsure
-##' @param x An x used to select a method.
-##' @param ... Other parameters passed to specific methods.
-##' @param eqs Character vector (optional) with the equation(s) number(s) or
-##' equation name(s) of the coefficients to be plotted.
-##' @param vars Character vector (optional) with the variable number(s) or
-##' variable name(s) of the coefficients to be plotted.
-##' @seealso \code{\link{tvLM}}, \code{\link{tvAR}}, \code{\link{tvVAR}},
-##' \code{\link{tvSURE}}
-##' @examples
-##'
-##' data( "Kmenta", package = "systemfit" )
-##' eqDemand <- consump ~ price + income
-##' eqSupply <- consump ~ price + farmPrice + trend
-##' system <- list( demand = eqDemand, supply = eqSupply )
-##'
-##' ## tvOLS estimation
-##' tvols.fit <- tvSURE(system, data = Kmenta)
-##' ## 95% confidence interval using Mammen's wild bootstrap.
-##' tvols.fit <- CI(tvols.fit, level = 0.95)
-##' plot(tvols.fit)
-##'
-##' ## Time-varying Five Factor Model
-##' data(FF5F)
-##' ## SMALL/LoBM porfolios time-varying three factor model
-##' eqNA<-NA.SMALL.LoBM ~ NA.Mkt.RF + NA.SMB+ NA.HML
-##' eqJP<-JP.SMALL.LoBM ~ JP.Mkt.RF + JP.SMB+ JP.HML
-##' eqAP<-AP.SMALL.LoBM ~ AP.Mkt.RF + AP.SMB+ AP.HML
-##' eqEU<-EU.SMALL.LoBM ~ EU.Mkt.RF + EU.SMB+ EU.HML
-##' system<-list(NorthA = eqNA, JP = eqJP, AP = eqAP, EU = eqEU)
-##'
-##' ## Fit a time-varying coefficients SURE model
-##' ff5f.tv<-tvSURE(system, data = FF5F, method = "tvFGLS", est = "ll",
-##' bw = c(0.11, 0.43, 0.49, 0.27))
-##' ## 95% confidence interval using Mammen's wild bootstrap.
-##' ff5f.tv <- CI(ff5f.tv, level = 0.95, runs = 30)
-##'
-##' ## Plot the intercepts
-##' plot(ff5f.tv, vars = 1)
-##'
-##' @export
-##'
+#' Plot Methods for objects in tvReg
+#'
+#' Plot methods for objects with class attribute \code{tvlm}, \code{tvar}, \code{tvvar},
+#' \code{tvirf}, \code{tvsure}.
+#' @rdname plot.tvReg
+#' @method plot tvsure
+#' @param x An x used to select a method.
+#' @param ... Other parameters passed to specific methods.
+#' @param eqs Character vector (optional) with the equation(s) number(s) or
+#' equation name(s) of the coefficients to be plotted.
+#' @param vars Character vector (optional) with the variable number(s) or
+#' variable name(s) of the coefficients to be plotted.
+#' @seealso \code{\link{tvLM}}, \code{\link{tvAR}}, \code{\link{tvVAR}},
+#' \code{\link{tvSURE}}
+#' @examples
+#'
+#' data( "Kmenta", package = "systemfit" )
+#' eqDemand <- consump ~ price + income
+#' eqSupply <- consump ~ price + farmPrice + trend
+#' system <- list( demand = eqDemand, supply = eqSupply )
+#'
+#' ## tvOLS estimation
+#' tvols.fit <- tvSURE(system, data = Kmenta)
+#' ## 95% confidence interval using Mammen's wild bootstrap.
+#' tvols.fit <- CI(tvols.fit, level = 0.95)
+#' plot(tvols.fit)
+#'
+#' ## Time-varying Five Factor Model
+#' data(FF5F)
+#' ## SMALL/LoBM porfolios time-varying three factor model
+#' eqNA<-NA.SMALL.LoBM ~ NA.Mkt.RF + NA.SMB+ NA.HML
+#' eqJP<-JP.SMALL.LoBM ~ JP.Mkt.RF + JP.SMB+ JP.HML
+#' eqAP<-AP.SMALL.LoBM ~ AP.Mkt.RF + AP.SMB+ AP.HML
+#' eqEU<-EU.SMALL.LoBM ~ EU.Mkt.RF + EU.SMB+ EU.HML
+#' system<-list(NorthA = eqNA, JP = eqJP, AP = eqAP, EU = eqEU)
+#'
+#' ## Fit a time-varying coefficients SURE model
+#' ff5f.tv<-tvSURE(system, data = FF5F, method = "tvFGLS", est = "ll",
+#' bw = c(0.11, 0.43, 0.49, 0.27))
+#' 
+#' ## 95% confidence interval using Mammen's wild bootstrap.
+#' ff5f.tv <- CI(ff5f.tv, level = 0.95, runs = 30)
+#'
+#' ## Plot the intercepts
+#' plot(ff5f.tv, vars = 1)
+#'
+#' @export
+#'
 plot.tvsure <- function(x, eqs = NULL, vars = NULL, ...)
 {
   if (class(x) != "tvsure")
@@ -102,15 +103,33 @@ plot.tvsure <- function(x, eqs = NULL, vars = NULL, ...)
     }
   }
 }
-
-##' @rdname plot.tvsure
-##' @method plot tvlm
-##' @export
-##'
+#' @rdname plot.tvReg
+#' @method plot tvlm
+#' @export
+#'
 plot.tvlm <- function(x, ...)
 {
   if (!any(class(x) == "tvlm"))
     stop("\nPlot not implemented for this class.\n")
+  .univariatePlot (x)
+}
+#' @rdname plot.tvReg
+#' @method plot tvar
+#' @export
+#'
+plot.tvar <- function(x, ...)
+{
+  if (!any(class(x) == "tvar"))
+    stop("\nPlot not implemented for this class.\n")
+  .univariatePlot (x)
+}
+
+#' @name tvReg-internals
+#' @aliases .univariatePlot
+#' @title tvReg internal and secondary functions
+#' @keywords internal
+.univariatePlot <-function(x)
+{
   tvcoef <- x$tvcoef
   if(is.null(tvcoef))
     stop("\nThe time-varying coefficients matrix is NULL. \n")
@@ -155,10 +174,10 @@ plot.tvlm <- function(x, ...)
   }
 }
 
-##' @rdname plot.tvsure
-##' @method plot tvvar
-##' @export
-##'
+#' @rdname plot.tvReg
+#' @method plot tvvar
+#' @export
+#'
 plot.tvvar <- function(x, ...)
 {
   if (class(x) != "tvvar")
@@ -187,55 +206,54 @@ plot.tvvar <- function(x, ...)
   }
 }
 
-
-##' @rdname plot.tvsure
-##' @method plot tvirf
-##' @param impulse	Character  vector (optional) of the impulses, default is all variables.
-##' @param response Character vector (optional) of the responses, default is all variables.
-##' @param adj.mtext	Adjustment for mtext(), only applicable if plot.type = "multiple".
-##' @param obs.index  Scalar (optional), the time at which the impulse response is plotted.
-##' If left NULL, the mean over the whole period is plotted (this values should be similar to
-##' the estimation using a non time-varying VAR method).
-##' @param main Character vector, the titles of the plot.
-##' @param mar.multi	Setting of margins, if plot.type = "multiple".
-##' @param names	Character vector (optional), the variables names to be plotted.
-##' If left NULL, all variables are plotted.
-##' @param sub Character, sub title in plot.
-##' @param nc Integer, number of columns for multiple plot.
-##' @param oma.multi	Setting of margins, if plot.type = "multiple".
-##' @param padj.mtext Adjustment for mtext(), only applicable if plot.type = "multiple".
-##' @param plot.type	Character, if multiple all plots are drawn in a single device,
-##' otherwise the plots are shown consecutively.
-##' @param xlab	Character vector signifying the labels for the x-axis.
-##' @param ylab Character vector signifying the labels for the y-axis.
-##'
-##' @examples
-##' ## Inflation rate, unemployment rate and treasury bill interest rate for the US,
-##' ## as used by Primiceri (2005).
-##'
-##' data(usmacro, package = "bvarsv")
-##'
-##' ##Estimate a time-varying coefficients vector autoregressive and its
-##' ##impulse response function
-##' model.tvVAR <- tvVAR(usmacro, p = 6, type = "const")
-##' model.tvIRF <- tvIRF(model.tvVAR)
-##'
-##' ## Plot residuals and fitted values of tvVAR
-##'
-##' ##Obtain 95% confidence interval of the impulse response function
-##' model.tvIRF <- CI(model.tvIRF)
-##'
-##' ##plot the mean tvIRF over the whole period
-##' plot(model.tvIRF)
-##'
-##' ##plot the tvIRF at time 50
-##' plot(model.tvIRF, obs.index = 50)
-##'
-##' ##plot the effect of a shock in inflation on unemployment
-##' plot(model.tvIRF, impulse = "inf", response = "une")
-##'
-##' @export
-##'
+#' @rdname plot.tvReg
+#' @method plot tvirf
+#' @param impulse	Character  vector (optional) of the impulses, default is all variables.
+#' @param response Character vector (optional) of the responses, default is all variables.
+#' @param adj.mtext	Adjustment for mtext(), only applicable if plot.type = "multiple".
+#' @param obs.index  Scalar (optional), the time at which the impulse response is plotted.
+#' If left NULL, the mean over the whole period is plotted (this values should be similar to
+#' the estimation using a non time-varying VAR method).
+#' @param main Character vector, the titles of the plot.
+#' @param mar.multi	Setting of margins, if plot.type = "multiple".
+#' @param names	Character vector (optional), the variables names to be plotted.
+#' If left NULL, all variables are plotted.
+#' @param sub Character, sub title in plot.
+#' @param nc Integer, number of columns for multiple plot.
+#' @param oma.multi	Setting of margins, if plot.type = "multiple".
+#' @param padj.mtext Adjustment for mtext(), only applicable if plot.type = "multiple".
+#' @param plot.type	Character, if multiple all plots are drawn in a single device,
+#' otherwise the plots are shown consecutively.
+#' @param xlab	Character vector signifying the labels for the x-axis.
+#' @param ylab Character vector signifying the labels for the y-axis.
+#'
+#' @examples
+#' ## Inflation rate, unemployment rate and treasury bill interest rate for the US,
+#' ## as used by Primiceri (2005).
+#'
+#' data(usmacro, package = "bvarsv")
+#'
+#' ##Estimate a time-varying coefficients vector autoregressive and its
+#' ##impulse response function
+#' model.tvVAR <- tvVAR(usmacro, p = 6, type = "const")
+#' model.tvIRF <- tvIRF(model.tvVAR)
+#'
+#' ## Plot residuals and fitted values of tvVAR
+#'
+#' ##Obtain 95% confidence interval of the impulse response function
+#' model.tvIRF <- CI(model.tvIRF)
+#'
+#' ##plot the mean tvIRF over the whole period
+#' plot(model.tvIRF)
+#'
+#' ##plot the tvIRF at time 50
+#' plot(model.tvIRF, obs.index = 50)
+#'
+#' ##plot the effect of a shock in inflation on unemployment
+#' plot(model.tvIRF, impulse = "inf", response = "une")
+#'
+#' @export
+#'
 plot.tvirf <- function (x, obs.index = NULL, impulse = NULL, response = NULL,
                         plot.type = c("multiple", "single"),
                         names = NULL, main = NULL, sub = NULL, ylab = NULL,
@@ -244,8 +262,8 @@ plot.tvirf <- function (x, obs.index = NULL, impulse = NULL, response = NULL,
 {
   if(is.null(obs.index))
   {
-    cat("\nThe mean of tvIRF over all time period will be plotted. Enter a row number in obs.index
-        to plot a particular point in time\n")
+    cat("\nThe plot represents the mean of tvIRF over every time period. Enter a row number in obs.index
+        to plot the tvIRF of a particular point in time.\n")
   }
   else if (!is.null(obs.index) & length (obs.index) > 1)
     stop("\nPlease enter only one value in 'obs.index' or nothing to get the average of
@@ -263,16 +281,20 @@ plot.tvirf <- function (x, obs.index = NULL, impulse = NULL, response = NULL,
     inames <- x$impulse
   if (is.null(response))
     rnames <- x$response
-  if (is.null(names)) {
+  if (is.null(names)) 
+  {
     names <- inames
   }
-  else {
+  else 
+  {
     names <- as.character(names)
-    if (!(all(names %in% inames))) {
+    if (!(all(names %in% inames))) 
+    {
       warning("\nInvalid variable name(s) supplied, using first variable.\n")
       inames <- inames[1]
     }
-    else {
+    else 
+    {
       inames <- names
     }
   }
@@ -288,7 +310,8 @@ plot.tvirf <- function (x, obs.index = NULL, impulse = NULL, response = NULL,
     impulses <- apply (impulses, 2:3, mean)
     upper <- NULL
     lower <- NULL
-    if (x$level != 0) {
+    if (x$level != 0) 
+    {
       upper <- x$Upper[[iname]][obs.index2, rnames, , drop = FALSE]
       lower <- x$Lower[[iname]][obs.index2, rnames, , drop = FALSE]
       upper <- apply (upper, 2:3, mean)
@@ -388,7 +411,8 @@ plot.tvirf <- function (x, obs.index = NULL, impulse = NULL, response = NULL,
       graphics::mtext(sub, 1, line = 4, outer = TRUE, adj = adj.mtext,
             padj = padj.mtext, ...)
     }
-    else {
+    else 
+    {
       for (j in 1:nvr)
       {
         ifelse(is.null(ylab), ylabel <- rownames(x)[j],

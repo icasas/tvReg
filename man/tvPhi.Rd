@@ -3,7 +3,7 @@
 \name{tvPhi}
 \alias{tvPhi}
 \alias{tvPhi.tvvar}
-\title{Time varying coefficient arrays of the MA represention}
+\title{Time-Varying Coefficient Arrays of the MA Represention}
 \usage{
 tvPhi(x, nstep = 10, ...)
 
@@ -17,6 +17,6 @@ tvPhi(x, nstep = 10, ...)
 \item{...}{Other parameters passed to specific methods.}
 }
 \description{
-Returns the estimated time varying coefficient arrays of the moving average representation
-of a stable tvVAR.
+Returns the estimated time-varying coefficient arrays of the moving average representation
+of a stable \code{tvvar} object obtained with function \code{tvVAR}.
 }

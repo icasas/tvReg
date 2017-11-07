@@ -8,11 +8,11 @@
 \usage{
 bw(x, ...)
 
-\method{bw}{default}(x, y, z = NULL, tkernel = "Epa", est = "lc",
-  singular.ok = TRUE, ...)
+\method{bw}{default}(x, y, z = NULL, est = c("lc", "ll"),
+  tkernel = c("Epa", "Gaussian"), singular.ok = TRUE, ...)
 
-\method{bw}{list}(x, y, z = NULL, est = "lc", tkernel = "Epa",
-  singular.ok = singular.ok, ...)
+\method{bw}{list}(x, y, z = NULL, est = c("lc", "ll"), tkernel = c("Epa",
+  "Gaussian"), singular.ok = singular.ok, ...)
 }
 \arguments{
 \item{x}{an object used to select a method.}
@@ -23,11 +23,11 @@ bw(x, ...)
 
 \item{z}{A vector with the variable over which coefficients are smooth over.}
 
-\item{tkernel}{The type of kernel used in the coefficients estimation method,
-one of Epanesnikov ("Epa") or "Gaussian".}
-
 \item{est}{The nonparametric estimation method, one of "lc" (default) for linear constant
 or "ll" for local linear.}
+
+\item{tkernel}{The type of kernel used in the coefficients estimation method,
+one of Epanesnikov ("Epa") or "Gaussian".}
 
 \item{singular.ok}{Logical. If FALSE, a singular model is an error.}
 }

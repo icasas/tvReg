@@ -4,16 +4,18 @@
 \alias{tvAR}
 \alias{tvar-class}
 \alias{tvar}
-\title{Time-varying Autoregressive model}
+\title{Time-Varying Autoregressive Model}
 \usage{
-tvAR(y, p = 1, bw = NULL, type = c("const", "none"), exogen = NULL,
-  fixed = NULL, tkernel = "Epa", est = "lc", singular.ok = TRUE,
-  ci = 0, tboot = "wild", runs = 100)
+tvAR(y, p = 1, z = NULL, bw = NULL, type = c("const", "none"),
+  exogen = NULL, fixed = NULL, est = c("lc", "ll"), tkernel = c("Epa",
+  "Gaussian"), singular.ok = TRUE)
 }
 \arguments{
 \item{y}{A vector with the dependent variable.}
 
 \item{p}{A scalar indicating the number of lags in the model.}
+
+\item{z}{A vector with the smoothing variable.}
 
 \item{bw}{An opcional scalar or vector of length the number of equations. It represents
 the bandwidth in the estimation of coefficients. If NULL, it is selected
@@ -26,18 +28,13 @@ by cross validation.}
 \item{fixed}{(optional) numeric vector of the same length as the total number of parameters.
 If supplied, only NA entries in fixed will be varied.}
 
-\item{tkernel}{The type of kernel used in the coefficients estimation method, one of Epanesnikov ("Epa") or "Gaussian".}
+\item{est}{The nonparametric estimation method, one of "lc" (default) for linear constant
+or "ll" for local linear.}
 
-\item{est}{The nonparametric estimation method, one of "lc" (default) for linear constant or "ll" for local linear.}
+\item{tkernel}{The type of kernel used in the coefficients estimation method,
+one of Epanesnikov ("Epa") or "Gaussian".}
 
 \item{singular.ok}{Logical. If FALSE, a singular model is an error.}
-
-\item{ci}{A number between 0 and 1. It represents the confidence interval range, if ci = 0 (default) then confidence intervals are not
-calculated. Function \code{\link{CI}} may be used at any time to calculate the CI.}
-
-\item{tboot}{The bootstrap type, one of "wild" (default) or "wild2".}
-
-\item{runs}{The number of bootstrap repetitiona, 100 by default.}
 }
 \value{
 An object of class 'tvar'
@@ -45,29 +42,37 @@ The object of class \code{tvar} have the following components:
 \item{tvcoef}{A vector of dimension obs (obs = number of observations - number lags),
  with the time-varying coefficients estimates.}
 \item{fitted}{The fitted values.}
-\item{resid}{Estimation residuals.}
+\item{residuals}{Estimation residuals.}
 \item{x}{A matrix of model data, with lagged y and exogenous variables.}
-\item{y}{A vector with the original data.}
+\item{y}{A vector with the dependent data used in the model.}
+\item{z}{A vector with the smoothing variable in the model.}
 \item{bw}{Bandwidth of mean estimation.}
 \item{type}{Whether the model has a constant or not.}
 \item{exogen}{A matrix or data.frame with other exogenous variables.}
 \item{p}{Number of lags}
 \item{obs}{Number of observations in estimation.}
 \item{totobs}{Number of observations in the original set.}
-\item{ci}{Confidence interval range.}
-\item{tboot}{Type of bootstrap.}
+\item{level}{Confidence interval range.}
 \item{runs}{Number of bootstrap replications.}
+\item{tboot}{Type of bootstrap.}
+\item{BOOT}{List with all bootstrap replications of \code{tvcoef}, if done.}
 \item{call}{Matched call.}
 }
 \description{
-Fits an autorregressive model with time varying coefficients
+\code{tvAR} is used to fit an autorregressive model with time varying coefficients.
+}
+\details{
+It is a special case of linear model in which the regressors are lags of the
+dependent variable. If any variable is included in the \code{xreg} term, these are added 
+to the regressors matrix. A time-varying coefficients linear regression (with an
+intercept if type = "const") is fitted.
 }
 \examples{
 ## Simulate an tvAR(2) process
 
-tt<-(1:1000)/1000
+tt <- (1:1000)/1000
 beta <- cbind( 0.5 * cos (2 * pi * tt), (tt - 0.5)^2)
-y<-numeric(1000)
+y <- numeric(1000)
 y[1] <- 0.5
 y[2] <- -0.2
 
@@ -95,8 +100,45 @@ lty = 1, bty = "n")
 tvAR.6p <- tvAR(Y, p = 6, type = "const",
 fixed = c(NA, 0, NA, 0, NA, 0, NA), est = "ll")
 
+#' ## Generation of model with coefficients depending of a random variable
+z <- arima.sim(n = 1000, list(ma = c(-0.2279, 0.2488)))
+beta <- (z - 0.5)^2
+y <- numeric(1000)
+y[1] <- -1
+
+##y(t) = beta1(z(t)) y(t-1) + ut
+ 
+for (t in 3:1000)
+{
+  y[t] <- y[(t-1)] \%*\% beta[t] + rnorm(1)
+}
+Y <- tail (y, 500)
+Z <- tail(z, 500)
+
+## Estimate coefficients of process Y with ar.ols and tvAR
+## and compare them in a plot
+
+tvAR.2p.z <- tvAR(Y, z = Z, p = 1, type = "none", est = "ll")
+AR.2p <- ar.ols(Y, aic = FALSE, order = 1, intercept = FALSE, demean = FALSE )
+index <- sort.int (tvAR.2p.z$z, index.return = TRUE)$ix
+z.sort <- tvAR.2p.z$z[index]
+beta <- tail(beta, length(z.sort))[index]
+beta.hat <- tvAR.2p.z$tvcoef[index]
+plot(z.sort, beta, ylim=range(beta.hat, beta),
+   xlab = "", ylab = "", type="l")
+abline(h = AR.2p$ar[1], col = 2)
+lines(z.sort, beta.hat, col = 4)
+legend("top", c(expression(beta),"AR", "tvAR"), col = c(1, 2, 4),
+       lty = 1, bty = "n")
+
+}
+\references{
+Cai, Z. (2007) Trending time-varying coefficient time series with serially
+correlated errors, \emph{Journal of Econometrics}, 136, pp. 163-188.
 }
 \seealso{
+\code{\link{CI}}, \code{\link{plot}}
+
 \code{\link{tvLM}} for estimation of time-varying coefficients linear models,
  and \code{\link{CI}} for confidence intervals.
 }

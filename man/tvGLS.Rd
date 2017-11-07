@@ -10,12 +10,12 @@
 tvGLS(x, ...)
 
 \method{tvGLS}{list}(x, y, z = NULL, bw, Sigma = NULL, R = NULL,
-  r = NULL, est = "lc", tkernel = "Epa", ...)
+  r = NULL, est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"), ...)
 
 \method{tvGLS}{tvsure}(x, ...)
 
 \method{tvGLS}{matrix}(x, y, z = NULL, bw, Sigma = NULL, R = NULL,
-  r = NULL, est = "lc", tkernel = "Epa", ...)
+  r = NULL, est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"), ...)
 }
 \arguments{
 \item{x}{an object used to select a method.}
@@ -36,21 +36,20 @@ tvGLS(x, ...)
 
 \item{est}{Either "lc" or "ll".}
 
-\item{tkernel}{Either "Gaussian" or "Epa".
-##'@inheritParams tvGLS}
+\item{tkernel}{Either "Gaussian" or "Epa".}
 }
 \value{
 \code{tvGLS} returns a list containing:
 \item{tvcoef}{An array of dimension obs x nvar x neq (obs = number of observations, nvar = number of variables
 in each equation, neq = number of equations in the system) with the time-varying coefficients estimates.}
 \item{fited}{A matrix of dimension obs x neq with the fited values from the estimation.}
-\item{resid}{A matrix of dimension obs x neq with the residuals from the estimation.}
+\item{residuals}{A matrix of dimension obs x neq with the residuals from the estimation.}
 
-A list with the estimates, fited and residuals values.
+A list with the estimates, fitted and residuals values.
 
-A list with the estimates, the fited values and the residuals.
+A list with the estimates, the fitted values and the residuals.
 
-A list with the estimates, fited and residuals values.
+A list with the estimates, fitted and residuals values.
 }
 \description{
 \code{tvGLS} estimates time-varying coefficients of SURE using the kernel smoothing GLS.

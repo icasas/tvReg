@@ -1,69 +1,70 @@
-##' Time-varying Generalised Least Squares
-##'
-##' \code{tvGLS} estimates time-varying coefficients of SURE using the kernel smoothing GLS.
-##'
-##'
-##' @param x an object used to select a method.
-##' @param ... Other parameters passed to specific methods.
-##' @return \code{tvGLS} returns a list containing:
-##' \item{tvcoef}{An array of dimension obs x nvar x neq (obs = number of observations, nvar = number of variables
-##' in each equation, neq = number of equations in the system) with the time-varying coefficients estimates.}
-##' \item{fited}{A matrix of dimension obs x neq with the fited values from the estimation.}
-##' \item{residuals}{A matrix of dimension obs x neq with the residuals from the estimation.}
-##' @export
-##' @import Matrix
+#' Time-varying Generalised Least Squares
+#'
+#' \code{tvGLS} estimates time-varying coefficients of SURE using the kernel smoothing GLS.
+#'
+#'
+#' @param x an object used to select a method.
+#' @param ... Other parameters passed to specific methods.
+#' @return \code{tvGLS} returns a list containing:
+#' \item{tvcoef}{An array of dimension obs x nvar x neq (obs = number of observations, nvar = number of variables
+#' in each equation, neq = number of equations in the system) with the time-varying coefficients estimates.}
+#' \item{fited}{A matrix of dimension obs x neq with the fited values from the estimation.}
+#' \item{residuals}{A matrix of dimension obs x neq with the residuals from the estimation.}
+#' @export
+#' @import Matrix
 
 tvGLS<- function(x, ...) UseMethod("tvGLS", x)
 
-##' Estimate Time-varying Coefficients
-##'
-##' \code{tvGLS} is used to estimate time-varying coefficients SURE using the kernel smoothing
-##' generalised least square.
-##'
-##' The classical GLS estimator must be modified to generate a set of coefficients changing over time.
-##' The \code{tvGLS} finds a GLS estimate at a given point in time \emph{t} using the data near by.
-##' The size of the data window used is given by the bandwidth. The closest a point is to \emph{t},
-##' the larger is its effect on the estimation which is given by the kernel. In this programme,
-##' the two possible kernels are the Epanechnikov and Gaussian. As in the classical GLS, the covariance
-##' matrix is involved in the estimation formula. If this matrix is NULL or the identity, then the
-##' programme returns the OLS estimates for time-varying coefficients.
-##'
-##' Note, that unless with the tvSURE, the tvGLS may run with one common bandwidth for all
-##' equations or with a different bandwidths for each equation.
-##'
-##' @rdname tvGLS
-##' @param y A matrix.
-##' @param z A vector with the variable over which coefficients are smooth over.
-##' @param bw A numeric vector.
-##' @param Sigma An array.
-##' @param R A matrix.
-##' @param r A numeric vector.
-##' @param est Either "lc" or "ll".
-##' @param tkernel Either "Gaussian" or "Epa".
-##' ##'@inheritParams tvGLS
-##' @return A list with the estimates, fitted and residuals values.
-##'
-##' @examples
-##' data(FF5F)
-##' x <- list()
-##' ## SMALL/LoBM porfolios time-varying three factor model
-##' x[[1]] <- FF5F[, c("NA.Mkt.RF", "NA.SMB",  "NA.HML", "NA.RMW", "NA.CMA")]
-##' x[[2]] <- FF5F[, c("JP.Mkt.RF", "JP.SMB",  "JP.HML", "JP.RMW", "JP.CMA")]
-##' x[[3]] <- FF5F[, c("AP.Mkt.RF", "AP.SMB",  "AP.HML", "AP.RMW", "AP.CMA")]
-##' x[[4]] <- FF5F[, c("EU.Mkt.RF", "EU.SMB",  "EU.HML", "EU.RMW", "EU.CMA")]
-##' y <- cbind(FF5F$NA.SMALL.LoBM, FF5F$JP.SMALL.LoBM, FF5F$AP.SMALL.LoBM,
-##' FF5F$EU.SMALL.LoBM)
-##' ##I fit the data with one bandwidth for each equation
-##' ff5f.fit <- tvGLS(x = x, y = y, bw = c(0.89, 1.55, 0.78, 0.31))
-##'
-##' @method tvGLS list
-##' @export
+#' Estimate Time-varying Coefficients
+#'
+#' \code{tvGLS} is used to estimate time-varying coefficients SURE using the kernel smoothing
+#' generalised least square.
+#'
+#' The classical GLS estimator must be modified to generate a set of coefficients changing over time.
+#' The \code{tvGLS} finds a GLS estimate at a given point in time \emph{t} using the data near by.
+#' The size of the data window used is given by the bandwidth. The closest a point is to \emph{t},
+#' the larger is its effect on the estimation which is given by the kernel. In this programme,
+#' the two possible kernels are the Epanechnikov and Gaussian. As in the classical GLS, the covariance
+#' matrix is involved in the estimation formula. If this matrix is NULL or the identity, then the
+#' programme returns the OLS estimates for time-varying coefficients.
+#'
+#' Note, that unless with the tvSURE, the tvGLS may run with one common bandwidth for all
+#' equations or with a different bandwidths for each equation.
+#'
+#' @rdname tvGLS
+#' @param y A matrix.
+#' @param z A vector with the variable over which coefficients are smooth over.
+#' @param bw A numeric vector.
+#' @param Sigma An array.
+#' @param R A matrix.
+#' @param r A numeric vector.
+#' @param est Either "lc" or "ll".
+#' @param tkernel Either "Gaussian" or "Epa".
+#' @return A list with the estimates, fitted and residuals values.
+#'
+#' @examples
+#' data(FF5F)
+#' x <- list()
+#' ## SMALL/LoBM porfolios time-varying three factor model
+#' x[[1]] <- FF5F[, c("NA.Mkt.RF", "NA.SMB",  "NA.HML", "NA.RMW", "NA.CMA")]
+#' x[[2]] <- FF5F[, c("JP.Mkt.RF", "JP.SMB",  "JP.HML", "JP.RMW", "JP.CMA")]
+#' x[[3]] <- FF5F[, c("AP.Mkt.RF", "AP.SMB",  "AP.HML", "AP.RMW", "AP.CMA")]
+#' x[[4]] <- FF5F[, c("EU.Mkt.RF", "EU.SMB",  "EU.HML", "EU.RMW", "EU.CMA")]
+#' y <- cbind(FF5F$NA.SMALL.LoBM, FF5F$JP.SMALL.LoBM, FF5F$AP.SMALL.LoBM,
+#' FF5F$EU.SMALL.LoBM)
+#' ##I fit the data with one bandwidth for each equation
+#' ff5f.fit <- tvGLS(x = x, y = y, bw = c(0.89, 1.55, 0.78, 0.31))
+#'
+#' @method tvGLS list
+#' @export
 
 tvGLS.list <- function(x, y, z = NULL, bw, Sigma = NULL, R = NULL, r = NULL,
-                       est = "lc", tkernel = "Epa", ...)
+                       est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"), ...)
 {
   if(!is.list(x))
     stop("\n'x' should be a list of matrices. \n")
+  tkernel <- match.arg(tkernel)
+  est <- match.arg(est)
   if(tkernel != "Epa" & tkernel != "Gaussian")
     tkernel <- "Epa"
   if(est != "lc" & est != "ll")
@@ -135,13 +136,13 @@ tvGLS.list <- function(x, y, z = NULL, bw, Sigma = NULL, R = NULL, r = NULL,
   return(list( tvcoef = theta, fitted = y.hat, residuals = resid ))
 }
 
-##' Estimate Time-varying Coefficients
-##'
-##' \code{tvGLS} is used to estimate time-varying coefficients SURE using the kernel smoothing GLS
-##' @return A list with the estimates, the fitted values and the residuals.
-##' @rdname tvGLS
-##' @method tvGLS tvsure
-##' @export
+#' Estimate Time-varying Coefficients
+#'
+#' \code{tvGLS} is used to estimate time-varying coefficients SURE using the kernel smoothing GLS
+#' @return A list with the estimates, the fitted values and the residuals.
+#' @rdname tvGLS
+#' @method tvGLS tvsure
+#' @export
 tvGLS.tvsure <- function(x, ...)
 {
   if(class(x) != "tvsure")
@@ -233,14 +234,14 @@ tvGLS.tvsure <- function(x, ...)
   return(list( tvcoef = theta, fitted = y.hat, residuals = resid ))
 }
 
-##' @rdname tvGLS
-##' @inheritParams tvGLS
-##' @return A list with the estimates, fitted and residuals values.
-##' @method tvGLS matrix
-##' @export
+#' @rdname tvGLS
+#' @inheritParams tvGLS
+#' @return A list with the estimates, fitted and residuals values.
+#' @method tvGLS matrix
+#' @export
 
-tvGLS.matrix <- function(x, y, z = NULL, bw, Sigma = NULL, R = NULL, r = NULL, est="lc",
-                         tkernel = "Epa", ...)
+tvGLS.matrix <- function(x, y, z = NULL, bw, Sigma = NULL, R = NULL, r = NULL, 
+                         est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"), ...)
 {
   if(!is.matrix(x))
     stop("\n'x' should be a matrix. \n")
@@ -253,8 +254,8 @@ tvGLS.matrix <- function(x, y, z = NULL, bw, Sigma = NULL, R = NULL, r = NULL, e
     Sigma <- array(rep(diag(1, neq), obs), dim = c(neq, neq, obs))
   if(length(bw) != 1 & length(bw) != neq)
     stop("\nThere must be a single bandwith or a bandwidth for each equation.\n")
-  tkernel <- x$tkernel
-  est <- x$est
+  tkernel <- match.arg(tkernel)
+  est <- match.arg(est)
   if(tkernel != "Epa" & tkernel != "Gaussian")
     tkernel <- "Epa"
   if(est != "lc" & est != "ll")

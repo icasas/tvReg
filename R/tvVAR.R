@@ -1,47 +1,47 @@
-##' Time-varying Vector Autoregressive Models
-##'
-##' Fits a time-varying coefficients vector autorregressive model with p lags.
-##' @aliases tvvar-class tvvar
-##' @rdname tvVAR
-##' @param y A matrix with dimention obs x neq (obs = number of observations and
-##' neq = number of equations)
-##' @param p A scalar indicating the number of lags in the model
-##' @param type A character 'const' if the model contains an intercept and 'none' otherwise.
-##' @param exogen A matrix or data.frame with the exogenous variables (optional)
-##' @inheritParams tvSURE
-##' @param singular.ok	Logical. If FALSE, a singular model is an error.
-##' @return An object of class 'tvvar'
-##' The object of class \code{tvvar} have the following components:
-##' \item{tvcoef}{An array of dimension obs x neq (obs = number of observations,
-##' neq = number of equations in the system) with the time-varying coefficients estimates.}
-##' \item{fitted}{The fitted values.}
-##' \item{residuals}{Estimation residuals.}
-##' \item{x}{A list with the regressors data and the dependent variable.}
-##' \item{y}{A matrix with the dependent variable data.}
-##' \item{bw}{Bandwidth of mean estimation.}
-##' \item{type}{Whether the model has a constant or not.}
-##' \item{exogen}{A matrix or data.frame with other exogenous variables.}
-##' \item{p}{Number of lags}
-##' \item{neq}{Number of equations}
-##' \item{obs}{Number of observations in estimation.}
-##' \item{totobs}{Number of observations in the original set.}
-##' \item{call}{Matched call.}
-##'
-##' @examples
-##'
-##' ## Inflation rate, unemployment rate and treasury bill interest rate for the US,
-##' ## as used by Primiceri (2005).
-##' data(usmacro, package = "bvarsv")
-##'
-##' model.VAR <- vars::VAR(usmacro, p = 6, type = "const")
-##' model.tvVAR <- tvVAR(usmacro, p = 6, type = "const")
-##' plot(model.tvVAR)
-##'
-##' @seealso \code{\link{tvAR}}, \code{\link{tvSURE}}, \code{\link{bw}}, \code{\link{tvOLS}}
-##' @export
+#' Time-varying Vector Autoregressive Models
+#'
+#' Fits a time-varying coefficients vector autorregressive model with p lags.
+#' @aliases tvvar-class tvvar
+#' @rdname tvVAR
+#' @import bvarsv
+#' @param y A matrix with dimention obs x neq (obs = number of observations and
+#' neq = number of equations)
+#' @param p A scalar indicating the number of lags in the model
+#' @param type A character 'const' if the model contains an intercept and 'none' otherwise.
+#' @param exogen A matrix or data.frame with the exogenous variables (optional)
+#' @inheritParams tvSURE
+#' @param singular.ok	Logical. If FALSE, a singular model is an error.
+#' @return An object of class 'tvvar'
+#' The object of class \code{tvvar} have the following components:
+#' \item{tvcoef}{An array of dimension obs x neq (obs = number of observations,
+#' neq = number of equations in the system) with the time-varying coefficients estimates.}
+#' \item{fitted}{The fitted values.}
+#' \item{residuals}{Estimation residuals.}
+#' \item{x}{A list with the regressors data and the dependent variable.}
+#' \item{y}{A matrix with the dependent variable data.}
+#' \item{bw}{Bandwidth of mean estimation.}
+#' \item{type}{Whether the model has a constant or not.}
+#' \item{exogen}{A matrix or data.frame with other exogenous variables.}
+#' \item{p}{Number of lags}
+#' \item{neq}{Number of equations}
+#' \item{obs}{Number of observations in estimation.}
+#' \item{totobs}{Number of observations in the original set.}
+#' \item{call}{Matched call.}
+#' @seealso \code{\link{CI}}, \code{\link{plot}}
+#' @examples
+#'
+#' ## Inflation rate, unemployment rate and treasury bill interest rate for the US,
+#' ## as used by Primiceri (2005).
+#' data(usmacro, package = "bvarsv")
+#'
+#' model.VAR <- vars::VAR(usmacro, p = 6, type = "const")
+#' model.tvVAR <- tvVAR(usmacro, p = 6, type = "const")
+#' plot(model.tvVAR)
+#'
+#' @export
 
 tvVAR <- function (y, p = 1, z = NULL, bw = NULL, type = c("const", "none"), exogen = NULL,
-                 tkernel = "Epa", est = "lc", singular.ok = TRUE)
+                   est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"), singular.ok = TRUE)
 {
   y <- as.matrix(y)
   if (any(is.na(y)))
@@ -49,10 +49,15 @@ tvVAR <- function (y, p = 1, z = NULL, bw = NULL, type = c("const", "none"), exo
   if (ncol(y) < 2)
     stop("\nMatrix 'y' should contain at least two variables. For univariate
           analysis consider the 'tvAR' function.\n")
-  if(tkernel != "Epa" & tkernel != "Gaussian")
-    tkernel <- "Epa"
-  if(est != "lc" & est != "ll")
+  est <- match.arg(est)
+  tkernel <- match.arg(tkernel)
+  if(est %in% c("lc", "ll"))
     est <- "lc"
+  if(tkernel %in% c("Epa","Gaussian"))
+    tkernel <- "Epa"
+  type <- match.arg(type)
+  if(type %in% c("const", "none"))
+    type <- "const"
   if (is.null(colnames(y)))
   {
     colnames(y) <- paste("y", 1:ncol(y), sep = "")

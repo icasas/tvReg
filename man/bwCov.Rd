@@ -6,16 +6,16 @@
 \emph{bwCov} calculates a single bandwidth to estimate the time-varying variance-
 covariance matrix.}
 \usage{
-bwCov(x, tkernel = "Epa", est = "lc")
+bwCov(x, est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"))
 }
 \arguments{
 \item{x}{A matrix or a data frame.}
 
-\item{tkernel}{The type of kernel used in the coefficients estimation method,
-one of Epanesnikov ("Epa") or "Gaussian".}
-
 \item{est}{The nonparametric estimation method, one of "lc" (default) for linear constant
 or "ll" for local linear.}
+
+\item{tkernel}{The type of kernel used in the coefficients estimation method,
+one of Epanesnikov ("Epa") or "Gaussian".}
 }
 \value{
 A scalar.

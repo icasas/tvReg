@@ -2,10 +2,10 @@
 % Please edit documentation in R/tvOLS.R
 \name{tvOLS}
 \alias{tvOLS}
-\title{Fitting Time Varying Linear Models}
+\title{Time-Varying Ordinary Least Squares}
 \usage{
-tvOLS(x, y, z = NULL, bw, est = "lc", tkernel = "Epa",
-  singular.ok = singular.ok)
+tvOLS(x, y, z = NULL, bw, est = c("lc", "ll"), tkernel = c("Epa",
+  "Gaussian"), singular.ok = singular.ok)
 }
 \arguments{
 \item{x}{A matrix with all regressors.}
@@ -26,7 +26,7 @@ tvOLS(x, y, z = NULL, bw, est = "lc", tkernel = "Epa",
 A list with the estimates, fitted and residuals values.
 }
 \description{
-\code{tvOLS} is used to fit univariate linear models with time varying coefficients.
+\code{tvOLS} is used to fit univariate linear models with time-varying coefficients.
 }
 \examples{
 tau <- seq(1:1000)/1000
