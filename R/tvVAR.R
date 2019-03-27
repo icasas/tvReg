@@ -27,17 +27,26 @@
 #' \item{obs}{Number of observations in estimation.}
 #' \item{totobs}{Number of observations in the original set.}
 #' \item{call}{Matched call.}
-#' @seealso \code{\link{CI}}, \code{\link{plot}}
+#' 
+#' @seealso \code{\link{bw}}, \code{\link{tvIRF}}, \code{\link{plot}}, 
+#' \code{\link{print}} and \code{\link{summary}}
+#' 
 #' @examples
-#'
-#' ## Inflation rate, unemployment rate and treasury bill interest rate for the US,
-#' ## as used by Primiceri (2005).
+#' ##Inflation rate, unemployment rate and treasury bill interest rate for 
+#' ##the US, as used in Primiceri (2005).
 #' data(usmacro, package = "bvarsv")
-#'
 #' model.VAR <- vars::VAR(usmacro, p = 6, type = "const")
-#' model.tvVAR <- tvVAR(usmacro, p = 6, type = "const")
+#' model.tvVAR <- tvVAR(usmacro, p = 6, type = "const", bw = c(1.8, 20, 20))
 #' plot(model.tvVAR)
-#'
+#' 
+#' @references 
+#' Casas, I., Ferreira, E., and Orbe, S. (2017) Time-Varying Coefficient Estimation 
+#' in SURE Models: Application to Portfolio Management. Available at SSRN: 
+#' https://ssrn.com/abstract=3043137
+#' 
+#' Primiceri, G.E. (2005) Time varying structural vector autoregressions 
+#' and monetary policy. \emph{Review of Economic Studies}, 72, 821-852.
+#' 
 #' @export
 
 tvVAR <- function (y, p = 1, z = NULL, bw = NULL, type = c("const", "none"), exogen = NULL,
@@ -49,14 +58,14 @@ tvVAR <- function (y, p = 1, z = NULL, bw = NULL, type = c("const", "none"), exo
   if (ncol(y) < 2)
     stop("\nMatrix 'y' should contain at least two variables. For univariate
           analysis consider the 'tvAR' function.\n")
-  est <- match.arg(est)
   tkernel <- match.arg(tkernel)
-  if(est %in% c("lc", "ll"))
-    est <- "lc"
-  if(tkernel %in% c("Epa","Gaussian"))
-    tkernel <- "Epa"
+  est <- match.arg(est)
   type <- match.arg(type)
-  if(type %in% c("const", "none"))
+  if(!(tkernel %in% c("Epa","Gaussian")))
+    tkernel <- "Epa"
+  if(!(est %in% c("lc", "ll")))
+    est <- "lc"
+  if(!(type %in% c("const", "none")))
     type <- "const"
   if (is.null(colnames(y)))
   {
@@ -110,21 +119,22 @@ tvVAR <- function (y, p = 1, z = NULL, bw = NULL, type = c("const", "none"), exo
   if(is.null(bw))
    bw <- bw(y = yend, x = datamat, tkernel = tkernel, est = est, singular = singular.ok)
   resid = fitted <- matrix(0, nrow = sample, ncol = neq)
-  if(length(bw) == 1)
-    names(bw) <- "bw.mean"
-  else
-    names(bw) <- paste("bw.", names(equation), sep = "")
   for (i in 1:neq)
   {
       y <- yend[, i]
       results <- tvOLS(x = datamat, y = y, bw = bw[i], est = est, tkernel = tkernel,
                        singular.ok = singular.ok)
       equation[[colnames(yend)[i]]] <- results$tvcoef
+      colnames(equation[[colnames(yend)[i]]]) <- colnames(rhs)
       resid[,i] <- results$residuals
       fitted[, i] <- results$fitted
   }
   colnames(resid) <- names(equation)
   colnames(fitted) <- colnames(resid)
+  if(length(bw) == 1)
+    names(bw) <- "bw.mean"
+  else
+    names(bw) <- paste("bw.", names(equation), sep = "")
   result <- list(tvcoef = equation, Lower = NULL, Upper = NULL,  fitted = fitted,
                  residuals = resid, datamat = data.frame(cbind(yend,rhs)), y = y.orig,
                  exogen = exogen, p = p, type = type, obs = sample, totobs = sample + p,

@@ -21,11 +21,8 @@
 #' @inheritParams tvLM
 #' @param fixed (optional) numeric vector of the same length as the total number of parameters.
 #' If supplied, only NA entries in fixed will be varied.
-#'
-#' @keywords time-varying coefficients, nonparametric statistics
-#' @aliases tvar-class tvar
-#'
-#' @return An object of class 'tvar'
+#' 
+#' @return An object of class 'tvar' 
 #' The object of class \code{tvar} have the following components:
 #' \item{tvcoef}{A vector of dimension obs (obs = number of observations - number lags),
 #'  with the time-varying coefficients estimates.}
@@ -45,10 +42,13 @@
 #' \item{tboot}{Type of bootstrap.}
 #' \item{BOOT}{List with all bootstrap replications of \code{tvcoef}, if done.}
 #' \item{call}{Matched call.}
-#' @seealso \code{\link{CI}}, \code{\link{plot}}
+#' 
+#' @seealso  \code{\link{bw}}, \code{\link{tvLM}}, \code{\link{confint}}, 
+#' \code{\link{plot}}, \code{\link{print}} and \code{\link{summary}}
+#' 
 #' @examples
 #' ## Simulate an tvAR(2) process
-#'
+#' \dontrun{
 #' tt <- (1:1000)/1000
 #' beta <- cbind( 0.5 * cos (2 * pi * tt), (tt - 0.5)^2)
 #' y <- numeric(1000)
@@ -61,15 +61,17 @@
 #' {
 #'   y[t] <- y[(t-1):(t-2)] %*% beta[t,] + rnorm(1)
 #' }
-#' Y <- tail (y, 500)
+#' Y <- tail (y, 600)
 #'
-#' ## Estimate coefficients of process Y with ar.ols and tvAR
-#' ## and compare them in a plot
+#' ## Estimate coefficients of Y with ar.ols and tvAR
 #'
 #' tvAR.2p <- tvAR(Y, p = 2, type = "none", est = "ll")
-#' AR.2p <- ar.ols(Y, aic = FALSE, order = 2, intercept = FALSE, demean = FALSE )
-#' plot(tail(beta[, 1], 500), ylim=range(tvAR.2p$tvcoef[, 1], tail(beta[, 1], 500)),
-#' xlab = "", ylab = "", cex = 0.5, pch = 20)
+#' AR.2p <- ar.ols(Y, aic = FALSE, order = 2, 
+#' intercept = FALSE, demean = FALSE )
+#' 
+#' ##Compare methodologies in a plot
+#' ylim <- range(tvAR.2p$tvcoef[, 1], tail(beta[, 1], 600))
+#' plot(tail(beta[, 1], 600), ylim = ylim, xlab = "", ylab = "", cex = 0.5)
 #' abline(h = AR.2p$ar[1], col = 2)
 #' lines(tvAR.2p$tvcoef[, 1], col = 4)
 #' legend("topleft", c(expression(beta[1]),"AR", "tvAR"), col = c(1, 2, 4),
@@ -78,8 +80,9 @@
 #' ## Estimate only coefficient from odd lags and the intercept
 #' tvAR.6p <- tvAR(Y, p = 6, type = "const",
 #' fixed = c(NA, 0, NA, 0, NA, 0, NA), est = "ll")
-#' 
-#' #' ## Generation of model with coefficients depending of a random variable
+#'
+#' ## Generation of model with coefficients depending 
+#' ## on a random variable
 #' z <- arima.sim(n = 1000, list(ma = c(-0.2279, 0.2488)))
 #' beta <- (z - 0.5)^2
 #' y <- numeric(1000)
@@ -91,27 +94,43 @@
 #' {
 #'   y[t] <- y[(t-1)] %*% beta[t] + rnorm(1)
 #' }
-#' Y <- tail (y, 500)
-#' Z <- tail(z, 500)
+#' Y <- tail (y, 600)
+#' Z <- tail(z, 600)
 #' 
 #' ## Estimate coefficients of process Y with ar.ols and tvAR
-#' ## and compare them in a plot
 #' 
 #' tvAR.2p.z <- tvAR(Y, z = Z, p = 1, type = "none", est = "ll")
-#' AR.2p <- ar.ols(Y, aic = FALSE, order = 1, intercept = FALSE, demean = FALSE )
-#' index <- sort.int (tvAR.2p.z$z, index.return = TRUE)$ix
-#' z.sort <- tvAR.2p.z$z[index]
-#' beta <- tail(beta, length(z.sort))[index]
-#' beta.hat <- tvAR.2p.z$tvcoef[index]
-#' plot(z.sort, beta, ylim=range(beta.hat, beta),
-#'    xlab = "", ylab = "", type="l")
-#' abline(h = AR.2p$ar[1], col = 2)
-#' lines(z.sort, beta.hat, col = 4)
-#' legend("top", c(expression(beta),"AR", "tvAR"), col = c(1, 2, 4),
-#'        lty = 1, bty = "n")
+#' AR.2p <- ar.ols(Y, aic = FALSE, order = 1, intercept = FALSE, 
+#'          demean = FALSE)
 #'
-#' @seealso \code{\link{tvLM}} for estimation of time-varying coefficients linear models,
-#'  and \code{\link{CI}} for confidence intervals.
+#'#' ## Estimate coefficients of different realized variance models
+#' data("RV")
+#' Date <- tail(as.Date(RV$Date), 2000)
+#' RVt <- tail(RV$RVt, 2000)
+#' RV_week <- tail(RV$RVt_1_5, 2000)
+#' RV_month <- tail(RV$RVt_1_22, 2000)
+#' RQ <- 1/tail(RV$RQt_1_sqrt, 2000)
+#
+#' ##Corsi (2009) HAR model
+#' HAR <- arima(RVt, order = c(1, 0, 0), xreg = cbind (RV_week, RV_month))
+#' summary(HAR)
+#' 
+#' ##Chen et al (2017) TVC-HAR model 
+#' TVCHAR <- tvAR (RVt, p = 1, exogen = cbind (RV_week, RV_month), bw = 1.83)
+#' plot(TVCHAR)
+#' summary(TVCHAR)
+#' }
+#' 
+#' @aliases tvar-class tvar
+#' @references
+#' 
+#' Chen, X. B., Gao, J., Li, D., and Silvapulle, P (2017) Nonparametric estimation and 
+#' forecasting for time-varying coefficient realized volatility models,
+#' \emph{Journal of Business \& Economic Statistics}, online, 1-13.
+#' 
+#' Corsi, F. (2009) A simple approximate long-memory model of realized 
+#' volatility. \emph{Journal of Financial Econometrics}, 7, 174-196.
+#'
 #' @rdname tvAR
 #' @inheritParams tvVAR
 #' @export
@@ -122,12 +141,12 @@ tvAR <- function (y, p = 1, z = NULL, bw = NULL, type = c("const", "none"), exog
     stop("\nNAs in y.\n")
   if (p < 1)
     stop("p should be a positive number. \n")
-  est <- match.arg(est)
   tkernel <- match.arg(tkernel)
-  if(est %in% c("lc", "ll"))
-    est <- "lc"
-  if(tkernel %in% c("Epa","Gaussian"))
+  est <- match.arg(est)
+  if(!(tkernel %in% c("Epa","Gaussian")))
     tkernel <- "Epa"
+  if(!(est %in% c("lc", "ll")))
+    est <- "lc"
   y.orig <- y
   type <- match.arg(type)
   obs <- length(y)
@@ -179,7 +198,7 @@ tvAR <- function (y, p = 1, z = NULL, bw = NULL, type = c("const", "none"), exog
                  mask = mask, exogen = exogen, p = p, type = type, obs = sample, 
                  totobs = sample + p, est = est, tkernel = tkernel, bw = bw, level = 0,
                  runs = 0, tboot = NULL, BOOT = NULL, call = match.call())
-  class(result) <- c("tvar")
+  class(result) <- c("tvar", "tvlm")
   return(result)
 }
 

@@ -45,82 +45,66 @@
 #' \item{tboot}{Type of bootstrap.}
 #' \item{BOOT}{List with all bootstrap replications of \code{tvcoef}, if done.}
 #' \item{call}{Matched call.}
-#' @seealso \code{\link{CI}}, \code{\link{plot}}
+#' 
+#' @seealso \code{\link{bw}}, \code{\link{tvAR}}, \code{\link{confint}}, 
+#' \code{\link{plot}}, \code{\link{print}} and \code{\link{summary}}
 #' @examples
 #' ## Simulate a linear process with time-varying coefficient
 #' ## as functions of scaled time.
 #'
-#' tau <- seq(1:1000)/1000
+#' tau <- seq(0, 1, length.out = 200)
 #' beta <- data.frame(beta1 = sin(2 * pi * tau), beta2 = 2 * tau)
-#' X1 <- rnorm(1000)
-#' X2 <- rchisq(1000, df = 4)
-#' error <- rt(1000, df = 10)
+#' X1 <- rnorm(200)
+#' X2 <- rchisq(200, df = 4)
+#' error <- rt(200, df = 10)
 #' y <- apply(cbind(X1, X2) * beta, 1, sum) + error
 #' data <-data.frame(y = y, X1 = X1, X2 = X2)
 #'
 #' ## Estimate coefficients with lm and tvLM for comparison
 #'
 #' coef.lm <- stats::lm(y ~ 0 + X1 + X2, data = data)$coef
-#' model.tvlm <- tvLM(y ~ 0 + X1 + X2, data = data)
+#' model.tvlm <- tvLM(y ~ 0 + X1 + X2, data = data, bw = 0.2)
 #'
-#' ## Plot the estimates of beta1
-#' plot(tau,beta[, 1], type = "l", main = "", ylab = expression(beta[1]),
-#' xlab = expression(tau), ylim = range(beta[,1], model.tvlm$tvcoef[, 1]))
-#' abline(h = coef.lm[1], col = 2)
-#' lines(tau, model.tvlm$tvcoef[, 1], col=4)
-#' legend("topright", c(expression(beta[1]), "lm", "tvlm"),
-#' col = c(1, 2, 4), bty = "n", lty = 1)
-#'
-#' ##Obtain the 90% confidence interval of the coefficients
-#' model.tvlm <- CI (model.tvlm, level = 0.90, runs = 50)
-#' plot(model.tvlm)
-#'
-#' ## Simulate a linear process with time-varying coefficient
-#' ## as functions of a random variable z
-#'
-#' set.seed (42)
-#' z <- stats::arima.sim (n = 1000, list(ar = c(0.3, -0.2),
-#' ma = c(-0.1, 0.2)), sd = sqrt(0.2))
-#' beta <- data.frame(beta1 = sin(2 * pi * z), beta2 = 2 * z)
-#' y <- apply(cbind(X1, X2) * beta, 1, sum) + error
-#' data<-data.frame(y = y, X1 = X1, X2 = X2, z = z)
-#'
-#' coef.lm <- stats::lm(y ~ 0 + X1 + X2, data = data)$coef
-#' model.tvlm2 <- tvLM(y ~ 0 + X1 + X2, z = z, data = data,
-#' bw = 0.5, est = "ll")
-#' model.tvlm2 <- CI(model.tvlm2, runs = 30)
-#'
-#' ##plot the estimates of beta1
-#' sort.index <- sort.int(z, index.return = TRUE)$ix
-#' plot(z[sort.index], beta[sort.index, 1], type = "l", main = "",
-#' ylab = expression(beta[1]), xlab = expression(z[t]),
-#' ylim = range(beta[,1], model.tvlm2$tvcoef[, 1]))
-#' abline(h = coef.lm[1], col = 2)
-#' lines(z[sort.index], model.tvlm2$tvcoef[sort.index, 1], col = 4)
-#' legend("topleft", c(expression(beta[1]), "lm", "tvlm"),
-#' col = c(1, 2, 4), bty = "n", lty = 1)
+#' ## Estimate coefficients of different realized variance models
+#' data("RV")
+#
+#' ##Bollerslev et al. (2016) SHARQ model
+#' SHARQ <- lm (RVt ~ RVt_1_pos + RVt_1_neg + I(RVt_1_pos * RQt_1_sqrt) +
+#' I(RVt_1_neg * RQt_1_sqrt) + RVt_1_5 + RVt_1_22, data = tail(RV, 2000))
+#' 
+#' #Casas et al. (2018) tvSHARQ model
+#' tvSHARQ <- tvLM (RVt ~ RVt_1_pos + RVt_1_neg + RVt_1_5 + RVt_1_22, 
+#' z = tail(RV$RQt_1_sqrt, 2000), data = tail(RV, 2000), bw = 0.002)
+#' 
+#' boxplot(data.frame(tvSHARQ = tvSHARQ$tvcoef[,2],
+#' SHARQ = SHARQ$coef[2]+ SHARQ$coef[4] * tail(RV$RQt_1_sqrt, 2000)),
+#' main = expression (RV[t-1]^{"+"}), outline = FALSE)
+#' boxplot(data.frame(tvSHARQ = tvSHARQ$tvcoef[,3], 
+#' SHARQ = SHARQ$coef[3]+ SHARQ$coef[5] * tail(RV$RQt_1_sqrt, 2000)),
+#' main = expression (RV[t-1]^{"-"}), outline = FALSE)
 #'
 #' @references 
-#' Cai, Z., Li, Q., Park, J. Y. (2009) Functional-coefficient models for nonstationary 
-#' time series data, \emph{Journal of Econometrics}, Volume 148, pp. 101-113.
+#'  
+#' Bollerslev, T., Patton, A. J. and Quaedvlieg, R. (2016) Exploiting the 
+#' errors: A simple approach for improved volatility forecasting. 
+#' \emph{Journal of Econometrics}, 192, 1-18.
 #' 
-#' Robinson, P. (1989) Nonparametric estimation of time-varying parameters.  In
-#' Hackl, P., editor, \emph{Statistical Analysis and Forecasting of Economic Structural
-#' Change}. Springer, Berlin.
-#' @seealso \code{\link{bw}} for bandwidth selection, \code{\link{tvOLS}} for the
-#' estimation procedure and \code{\link{CI}} for confidence intervals.
+#' Casas, I., Mao, X. and Vega, H. (2018) Reexamining financial and economic 
+#' predictability with new estimators of realized variance and variance 
+#' risk premium. Url= http://pure.au.dk/portal/files/123066669/rp18_10.pdf
+#' 
 #' @keywords time-varying coefficients regression, nonparametric
 #' @export
 
 tvLM<-function (formula, z = NULL, data, bw = NULL, est = c("lc", "ll"), 
                 tkernel = c("Epa", "Gaussian"), singular.ok = TRUE)
 {
-  est <- match.arg(est)
   tkernel <- match.arg(tkernel)
-  if(est %in% c("lc", "ll"))
-    est <- "lc"
-  if(tkernel %in% c("Epa","Gaussian"))
+  est <- match.arg(est)
+  if(!(tkernel %in% c("Epa","Gaussian")))
     tkernel <- "Epa"
+  if(!(est %in% c("lc", "ll")))
+    est <- "lc"
   cl <- match.call()
   mf <- match.call(expand.dots = FALSE)
   m <- match(c("formula", "data"), names(mf), 0L)

@@ -3,11 +3,7 @@
 \docType{data}
 \name{CEES}
 \alias{CEES}
-\title{Aslanidis and Casas (2013) consider a portfolio of daily US dollar exchange rates of the Australian
-dollar (AUS), Swiss franc (CHF), euro (EUR), British pound (GBP), South African rand (RAND),
-Brazilian real (REALB), and Japanese yen (YEN) over the period from January 1, 1999
-until May 7, 2010 (T=2856 observations). This dataset contains the standarised rates after
-"devolatilisation", i.e. standarising the rates using a GARCH(1,1) estimate of the volatility.}
+\title{Standarised rates from a currency portfolio.}
 \format{A data frame with 2856 rows and 7 variables. Below the standarised rates of daily US dollar
 exchange rates of
 \describe{
@@ -23,7 +19,7 @@ exchange rates of
 Aslanidis and Casas (2013) consider a portfolio of daily US dollar exchange rates of the Australian
 dollar (AUS), Swiss franc (CHF), euro (EUR), British pound (GBP), South African rand (RAND),
 Brazilian real (REALB), and Japanese yen (YEN) over the period from January 1, 1999
-until May 7, 2010 (T=2856 observations). This dataset contains the standarised rates after
+until May 7, 2010 (T = 2856 observations). This dataset contains the standarised rates after
 "devolatilisation", i.e. standarising the rates using a GARCH(1,1) estimate of the volatility.
 }
 \references{

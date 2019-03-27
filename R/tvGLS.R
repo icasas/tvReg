@@ -8,10 +8,11 @@
 #' @return \code{tvGLS} returns a list containing:
 #' \item{tvcoef}{An array of dimension obs x nvar x neq (obs = number of observations, nvar = number of variables
 #' in each equation, neq = number of equations in the system) with the time-varying coefficients estimates.}
-#' \item{fited}{A matrix of dimension obs x neq with the fited values from the estimation.}
+#' \item{fitted}{A matrix of dimension obs x neq with the fited values from the estimation.}
 #' \item{residuals}{A matrix of dimension obs x neq with the residuals from the estimation.}
 #' @export
 #' @import Matrix
+#' @import methods
 
 tvGLS<- function(x, ...) UseMethod("tvGLS", x)
 
@@ -33,27 +34,29 @@ tvGLS<- function(x, ...) UseMethod("tvGLS", x)
 #'
 #' @rdname tvGLS
 #' @param y A matrix.
-#' @param z A vector with the variable over which coefficients are smooth over.
+#' @param z A vector with the smoothing variable.
 #' @param bw A numeric vector.
 #' @param Sigma An array.
 #' @param R A matrix.
 #' @param r A numeric vector.
 #' @param est Either "lc" or "ll".
 #' @param tkernel Either "Gaussian" or "Epa".
-#' @return A list with the estimates, fitted and residuals values.
 #'
 #' @examples
 #' data(FF5F)
 #' x <- list()
 #' ## SMALL/LoBM porfolios time-varying three factor model
-#' x[[1]] <- FF5F[, c("NA.Mkt.RF", "NA.SMB",  "NA.HML", "NA.RMW", "NA.CMA")]
-#' x[[2]] <- FF5F[, c("JP.Mkt.RF", "JP.SMB",  "JP.HML", "JP.RMW", "JP.CMA")]
-#' x[[3]] <- FF5F[, c("AP.Mkt.RF", "AP.SMB",  "AP.HML", "AP.RMW", "AP.CMA")]
-#' x[[4]] <- FF5F[, c("EU.Mkt.RF", "EU.SMB",  "EU.HML", "EU.RMW", "EU.CMA")]
-#' y <- cbind(FF5F$NA.SMALL.LoBM, FF5F$JP.SMALL.LoBM, FF5F$AP.SMALL.LoBM,
-#' FF5F$EU.SMALL.LoBM)
+#' x[[1]] <- cbind(rep (1, 314), FF5F[, c("NA.Mkt.RF", "NA.SMB",  "NA.HML", "NA.RMW", "NA.CMA")])
+#' x[[2]] <- cbind(rep (1, 314), FF5F[, c("JP.Mkt.RF", "JP.SMB",  "JP.HML", "JP.RMW", "JP.CMA")])
+#' x[[3]] <- cbind(rep (1, 314), FF5F[, c("AP.Mkt.RF", "AP.SMB",  "AP.HML", "AP.RMW", "AP.CMA")])
+#' x[[4]] <- cbind(rep (1, 314), FF5F[, c("EU.Mkt.RF", "EU.SMB",  "EU.HML", "EU.RMW", "EU.CMA")])
+#' ##Returns
+#' y <- cbind(FF5F$NA.SMALL.LoBM, FF5F$JP.SMALL.LoBM, FF5F$AP.SMALL.LoBM, 
+#' FF5F$EU.SMALL.LoBM) 
+#' ##Excess returns
+#' y <- y - cbind(FF5F$NA.RF, FF5F$JP.RF, FF5F$AP.RF, FF5F$EU.RF)
 #' ##I fit the data with one bandwidth for each equation
-#' ff5f.fit <- tvGLS(x = x, y = y, bw = c(0.89, 1.55, 0.78, 0.31))
+#' ff5f.fit <- tvGLS(x = x, y = y, bw = c(1.03, 0.44, 0.69, 0.31))
 #'
 #' @method tvGLS list
 #' @export
@@ -65,32 +68,52 @@ tvGLS.list <- function(x, y, z = NULL, bw, Sigma = NULL, R = NULL, r = NULL,
     stop("\n'x' should be a list of matrices. \n")
   tkernel <- match.arg(tkernel)
   est <- match.arg(est)
-  if(tkernel != "Epa" & tkernel != "Gaussian")
+  if(!(tkernel %in% c("Epa", "Gaussian")))
     tkernel <- "Epa"
-  if(est != "lc" & est != "ll")
+  if(!(est %in% c("lc", "ll")))
     est <- "lc"
   y <- as.matrix(y)
-  neq <- ncol(y)
-  obs <- nrow(y)
-  if (neq != length(x))
-    stop("\nIncompatible dimensions. \n")
+  neq <- length(x)
   for (i in 1:neq)
     x[[i]] <- as.matrix(x[[i]])
+  obs <- NROW(x[[1]])
+  if(!identical(neq, NCOL(y)) | !identical(obs, NROW(y)))
+    stop("The number of equations in 'x' and 'y' are different \n")
   if(is.null(Sigma))
     Sigma <- array(rep(diag(1, neq), obs), dim = c(neq, neq, obs))
   if(length(bw) != 1 & length(bw) != neq)
     stop("\nThere must be a single bandwith or a bandwidth for each equation.\n")
   nvar <- numeric(neq)
   for (i in 1:neq)
-    nvar[i] <- ncol(x[[i]])
+    nvar[i] <- NCOL(x[[i]])
   y.hat <- matrix(0, obs, neq)
   if(!is.null(z))
+  {
+    if(length(z) != obs)
+    {
+      stop("\nDimensions of 'y' and 'z' are not compatible.\n")
+    }
     grid <- z
+  }
   else
     grid <- (1:obs)/obs
   #nu0 <- integrate(nu, -Inf, Inf,pol = 0,tkernel = tkernel)$value
   if (length(bw)==1)
     bw <- rep(bw, neq)
+  if(!is.null(R))
+  {
+    R <- as.matrix(R)
+    if(NCOL(R) != sum(nvar))
+      stop("\nWrong dimension of 'R', it should have as many columns as variables 
+           in the whole system. \n")
+    if (is.null(r))
+      r <- rep(0, NROW(R))
+    else if (length(r) == 1)
+      r <- rep(r, NROW(R))
+    else if (length(r) != NROW(R) & length(r) != 1)
+      stop("\nWrong dimension of 'r', it should be as long as the number of 
+           rows in 'R'. \n")
+  }
   resid <- matrix(0, obs, neq)
   theta <- matrix(0, obs, sum(nvar))
   index.length <- numeric(neq)
@@ -102,19 +125,19 @@ tvGLS.list <- function(x, y, z = NULL, bw, Sigma = NULL, R = NULL, r = NULL,
     eSigma <- eigen(Sigma[,,t], TRUE)
     lambda <- eSigma$values
     if (any(lambda <= 0))
-      stop("\n'Sigma' is not positive definite\n")
-    A <- diag(lambda^-0.5)  %*%  t(eSigma$vector) %x% Diagonal(obs)
+      stop("\n'Sigma' is not positive definite.\n")
+    A <- diag(lambda^-0.5) %*% t(eSigma$vector) %x% Matrix::Diagonal(obs)
     for (i in 1:neq)
     {
       mykernel <- sqrt(.kernel(x = x2, bw = bw[i], tkernel = tkernel, N = 1))
-      y.kernel <- cbind(y.kernel, y[, i]*mykernel)
+      y.kernel <- cbind(y.kernel, y[, i] * mykernel)
       xtemp <- x[[i]] * mykernel
       if(est == "ll")
         xtemp <- cbind (xtemp, xtemp * x2)
       x.kernel[[i]] <- xtemp
     }
     x.star <- A %*% Matrix::bdiag(x.kernel)
-    y.star <- A %*% as.vector(y.kernel)
+    y.star <- A %*% methods::as (y.kernel, "sparseVector")
     s0 <- Matrix::crossprod(x.star)
     T0 <- Matrix::crossprod(x.star, y.star)
     result <- try(drop(Matrix::solve(s0, T0)), silent = TRUE)
@@ -138,8 +161,8 @@ tvGLS.list <- function(x, y, z = NULL, bw, Sigma = NULL, R = NULL, r = NULL,
 
 #' Estimate Time-varying Coefficients
 #'
-#' \code{tvGLS} is used to estimate time-varying coefficients SURE using the kernel smoothing GLS
-#' @return A list with the estimates, the fitted values and the residuals.
+#' \code{tvGLS} is used to estimate time-varying coefficients SURE using the 
+#' kernel smoothing GLS
 #' @rdname tvGLS
 #' @method tvGLS tvsure
 #' @export
@@ -149,23 +172,29 @@ tvGLS.tvsure <- function(x, ...)
     stop ("Function for object of class 'tvsure' \n")
   y <- x$y
   y <- as.matrix(y)
-  neq <- ncol(y)
+  neq <- x$neq
   tkernel <- x$tkernel
   est <- x$est
-  if (neq != length(x$x))
-    stop("\nIncompatible dimensions. \n")
-  if(tkernel != "Epa" & tkernel != "Gaussian")
-    tkernel <- "Epa"
-  if(est != "lc" & est != "ll")
-    est <- "lc"
-  obs <- nrow(y)
+  obs <- x$obs
   bw <- x$bw
   Sigma <- x$Sigma
   nvar <- x$nvar
-  est <- x$est
-  tkernel <- x$tkernel
   R <- x$R
   r <- x$r
+  if(!is.null(R))
+  {
+    R <- as.matrix(R)
+    if(NCOL(R) != sum(nvar))
+      stop("\nWrong dimension of R, it should have as many columns as variables 
+           in the whole system. \n")
+    if (is.null(r))
+      r <- rep(0, NROW(R))
+    else if (length(r) == 1)
+      r <- rep(r, NROW(R))
+    else if (length(r) != NROW(R) & length(r) != 1)
+      stop("\nWrong dimension of r, it should be as long as the number of 
+           rows in R. \n")
+  }
   x <- x$x
   z <- x$z
   for (i in 1:neq)
@@ -178,7 +207,7 @@ tvGLS.tvsure <- function(x, ...)
   if (length(bw) == 1)
     bw <- rep(bw, neq)
   resid <- matrix(0, obs, neq)
-  theta <- matrix(0,nrow = obs, ncol = sum(nvar))
+  theta <- matrix(0, nrow = obs, ncol = sum(nvar))
   index.length <- numeric(neq)
   bw.N <- bw * obs/2
   kernel.length <- 2 * floor(bw.N)+1
@@ -189,7 +218,7 @@ tvGLS.tvsure <- function(x, ...)
   for (i in 1:neq)
   {
     kernel.temp <- .kernel(x2, bw[i], tkernel = tkernel)
-    index <- which(kernel.temp!=0)
+    index <- which(kernel.temp != 0)
     sqkernel[index,i] <- sqrt(kernel.temp[index])
   }
   for (t in 1:obs)
@@ -203,7 +232,8 @@ tvGLS.tvsure <- function(x, ...)
     lambda <- eSigma$values
     if (any(lambda <= 0))
       stop("\n'Sigma' is not positive definite\n")
-    A <- diag(lambda^-0.5) %*% t(eSigma$vector) %x% Diagonal(length(index.kernel))
+    A <- diag(lambda^-0.5) %*% t(eSigma$vector) %x% 
+      Matrix::Diagonal(length(index.kernel))
     for (i in 1:neq)
     {
       mykernel <- sqkernel[index.kernel, i]
@@ -213,8 +243,8 @@ tvGLS.tvsure <- function(x, ...)
         xtemp <- cbind (xtemp, xtemp * x2[myindex])
       x.kernel[[i]] <- xtemp
     }
-    x.star <- A %*% Matrix::bdiag(x.kernel)
-    y.star <- A %*% as.vector(y.kernel)
+    x.star <- try(A %*% Matrix::bdiag(x.kernel), silent = TRUE)
+    y.star <- try(A %*% methods::as(y.kernel, "sparseVector"), silent = TRUE)
     s0 <- Matrix::crossprod(x.star)
     T0 <- Matrix::crossprod(x.star, y.star)
     result <- try(drop(Matrix::solve(s0, T0)), silent = TRUE)
@@ -236,7 +266,6 @@ tvGLS.tvsure <- function(x, ...)
 
 #' @rdname tvGLS
 #' @inheritParams tvGLS
-#' @return A list with the estimates, fitted and residuals values.
 #' @method tvGLS matrix
 #' @export
 
@@ -246,28 +275,32 @@ tvGLS.matrix <- function(x, y, z = NULL, bw, Sigma = NULL, R = NULL, r = NULL,
   if(!is.matrix(x))
     stop("\n'x' should be a matrix. \n")
   y <- as.numeric(y)
-  obs <- nrow(x)
+  obs <- NROW(x)
   neq <- length(y)/obs
-  if(length(z) != obs)
-    stop("\nIncompatible data dimensions.\n")
+  if (neq != NCOL(x))
+    stop("\nNumber of equations in 'x' and 'y' are not compatible.\n")
   if(is.null(Sigma))
     Sigma <- array(rep(diag(1, neq), obs), dim = c(neq, neq, obs))
   if(length(bw) != 1 & length(bw) != neq)
     stop("\nThere must be a single bandwith or a bandwidth for each equation.\n")
-  tkernel <- match.arg(tkernel)
-  est <- match.arg(est)
-  if(tkernel != "Epa" & tkernel != "Gaussian")
-    tkernel <- "Epa"
-  if(est != "lc" & est != "ll")
-    est <- "lc"
-  nvar <- ncol(x)
-  y.hat <- matrix(0, obs, neq)
-  if(!is.null(z))
-    grid <- z
-  else
-    grid <- (1:obs)/obs
   if (length(bw) == 1)
     bw <- rep(bw, neq)
+  tkernel <- match.arg(tkernel)
+  est <- match.arg(est)
+  if(!(tkernel %in% c("Epa", "Gaussian")))
+    tkernel <- "Epa"
+  if(!(est %in% c("lc", "ll")))
+    est <- "lc"
+  nvar <- NCOL(x)
+  y.hat <- matrix(0, obs, neq)
+  if(!is.null(z))
+  {
+    if(length(z) != obs)
+      stop("\nDimensions of 'x' and 'z' are not compatible.\n")
+    grid <- z
+  }
+  else
+    grid <- (1:obs)/obs
   resid <- matrix(0, obs, neq)
   theta <- matrix(0, obs, sum(nvar))
   index.length <- numeric(neq)
@@ -276,7 +309,6 @@ tvGLS.matrix <- function(x, y, z = NULL, bw, Sigma = NULL, R = NULL, r = NULL,
   hmax <- max(kernel.length)
   sqkernel <- matrix(0, nrow = hmax, ncol = neq, byrow = TRUE)
   x2 <- ((hmax:(2 * hmax - 1))-(hmax+(2 * hmax - 1)) * 0.5)/obs
-
   for (i in 1:neq)
   {
     kernel.temp <- .kernel(x2, bw[i], tkernel = tkernel)
@@ -294,7 +326,8 @@ tvGLS.matrix <- function(x, y, z = NULL, bw, Sigma = NULL, R = NULL, r = NULL,
     lambda <- eSigma$values
     if (any(lambda <= 0))
       stop("\n'Sigma' is not positive definite\n")
-    A <- diag(lambda^-0.5)  %*%  t(eSigma$vector) %x% Diagonal(length(index.kernel))
+    A <- diag(lambda^-0.5)  %*%  t(eSigma$vector) %x% 
+      Matrix::Diagonal(length(index.kernel))
     for (i in 1:neq)
     {
       mykernel <- sqkernel[index.kernel, i]
@@ -304,8 +337,8 @@ tvGLS.matrix <- function(x, y, z = NULL, bw, Sigma = NULL, R = NULL, r = NULL,
         xtemp <- cbind (xtemp, xtemp * x2[myindex])
       x.kernel[[i]] <- xtemp
     }
-    x.star <- A %*% Matrix::bdiag(x.kernel)
-    y.star <- A %*% as.vector(y.kernel)
+    x.star <- try(A %*% Matrix::bdiag(x.kernel), silent = TRUE)
+    y.star <- try(A %*% methods::as(y.kernel, "sparseVector"), silent = TRUE)
     s0 <- Matrix::crossprod(x.star)
     T0 <- Matrix::crossprod(x.star, y.star)
     result <- try(drop(Matrix::solve(s0, T0)), silent = TRUE)

@@ -11,14 +11,13 @@
 #' @return A list with the estimates, fitted and residuals values.
 #'
 #' @examples
-#' tau <- seq(1:1000)/1000
+#' tau <- seq(1:500)/500
 #' beta <- data.frame(beta1 = sin(2*pi*tau), beta2= 2*tau)
-#' X <- data.frame(X1= rnorm(1000), X2 = rchisq(1000, df = 4))
-#' error <- rt(1000, df = 10)
+#' X <- data.frame(X1 = rnorm(500), X2 = rchisq(500, df = 4))
+#' error <- rt(500, df = 10)
 #' y <- apply(X*beta, 1, sum) + error
 #' coef.lm <- stats::lm(y~0+X1+X2, data = X)$coef
-#' bandw <- bw (x = X, y = y)
-#' coef.tvlm <-  tvOLS(x = X, y = y, bw = bandw)$tvcoef
+#' coef.tvlm <-  tvOLS(x = X, y = y, bw = 0.1)$tvcoef
 #' plot(tau,beta[, 1], type="l", main="", ylab = expression(beta[1]), xlab = expression(tau),
 #' ylim = range(beta[,1], coef.tvlm[, 1]))
 #' abline(h = coef.lm[1], col = 2)
@@ -33,21 +32,27 @@ tvOLS <- function(x, y, z = NULL, bw, est = c("lc", "ll"),
 {
   x <- as.matrix(x)
   y <- as.numeric(y)
+  obs <- NROW(x)
+  if(!identical(length(y), obs))
+    stop("\nDimensions of 'x' and 'y' are not compatible.\n")
   if(!is.numeric(bw))
-    stop ("Parameter bw should be a scalar. \n")
+    stop ("Parameter 'bw' should be a scalar. \n")
   tkernel <- match.arg(tkernel)
   est <- match.arg(est)
-  if(tkernel != "Epa" & tkernel != "Gaussian")
+  if(!(tkernel %in% c("Epa", "Gaussian")))
     tkernel <- "Epa"
-  if(est != "lc" & est != "ll")
+  if(!(est %in% c("lc", "ll")))
     est <- "lc"
-  obs <- nrow(x)
   fitted <- numeric(obs)
   resid <- numeric(obs)
-  nvar <- ncol(x)
+  nvar <- NCOL(x)
   theta <- matrix(0, obs, nvar)
   if(!is.null(z))
+  {
+    if(length(z) != obs)
+      stop("\nDimensions of 'x' and 'z' are not compatible\n")
     grid <- z
+  }
   else
     grid <- (1:obs)/obs
   for (t in 1:obs)
@@ -78,14 +83,24 @@ tvOLS <- function(x, y, z = NULL, bw, est = c("lc", "ll"),
                       tkernel = c("Epa", "Gaussian"), singular.ok = TRUE)
 {
   x <- as.matrix(x)
-  obs <- nrow(x)
+  obs <- NROW(x)
+  if(!identical(length(y), obs))
+    stop("\nDimensions of 'x' and 'y' are not compatible\n")
   fitted <- resid.2 <- numeric(obs)
-  nvar <- ncol(x)
+  nvar <- NCOL(x)
   bw <- abs(bw)
   tkernel <- match.arg(tkernel)
   est <- match.arg(est)
+  if(!(tkernel %in% c("Epa", "Gaussian")))
+    tkernel <- "Epa"
+  if(!(est %in% c("lc", "ll")))
+    est <- "lc"
   if(!is.null(z))
+  {
+    if(length(z) != obs)
+      stop("\nDimensions of 'x' and 'z' are not compatible\n")
     grid <- z
+  }
   else
     grid <- (1:obs)/obs
   theta <- matrix(0, obs, nvar)

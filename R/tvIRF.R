@@ -1,7 +1,7 @@
 #' Time-Varying Impulse Response Function
 #'
-#' Computes the time-varying impulse response coefficients of an object of class \code{tvvar},  obtained
-#' with function tvVAR for n.ahead steps.
+#' Computes the time-varying impulse response coefficients of an object 
+#' of class \code{tvvar},  obtained with function \code{tvVAR} for \code{n.ahead} steps.
 #'
 #' @aliases tvirf-class tvirf.
 #' @importFrom vars VAR irf
@@ -10,61 +10,59 @@
 #' @param response A character vector of the responses, default is all variables.
 #' @param n.ahead	Integer specifying the steps.
 #' @param ortho	Logical, if TRUE (the default) the orthogonalised IRF is computed.
-#' @param ortho.cov A character indicating if the covariance matrix for the orthogonal tvIRF should
-#' be estimated as a constant or time varying. Either 'const' or 'tv' (default). This parameter is used
-#' only when ortho = TRUE.
+#' @param ortho.cov A character indicating if the covariance matrix for the 
+#' orthogonal tvIRF should be estimated as a constant or time varying. Either 
+#' 'const' or 'tv' (default). This parameter is used only when ortho = TRUE.
 #' @param bw.cov A scalar (optional) with the bandwidth to estimate the errors
 #' variance-covariance matrix. If left NULL, it is estimated.
-#' @param cumulative Logical, if TRUE the cumulated impulse response coefficients are computed.
-#' Default is FALSE.
+#' @param cumulative Logical, if TRUE the cumulated impulse response 
+#' coefficients are computed. Default is FALSE.
 #' @param ... Other parameters passed to specific methods.
 #'
-#' @return \code{tvIRF} returns and object of class \code{tvirf} with the following components:
-#' \item{irf}{An array dim = c(obs x number of response variables x number of impulse variables x
-#' number steps).}
-#' \item{Lower}{An array with the lower confidence line, if calculated.}
-#' \item{Upper}{An array with the upper confidence line, if calculated.}
-#' \item{response}{A character, a number of a vector with the names or positions of the response(s)
-#' variable(s).}
-#' \item{impulse}{A character, a number of a vector with the names or positions of the impulse(s)
-#' variable(s).}
+#' @return \code{tvIRF} returns and object of class \code{tvirf} with the 
+#' following components:
+#' \item{irf}{A list of length the number of impulse variable(s). Each element
+#' of the list is an array of dim = c(obs x number 
+#' of response variables x n.ahead).}
+#' \item{Lower}{A list of length the number of impulse variable(s), containing
+#'  the lower confidence line, if calculated.}
+#' \item{Upper}{A list of length the number of impulse variable(s), containing
+#'  the upper confidence line, if calculated.}
+#' \item{response}{A character, a number of a vector with the names or 
+#' positions of the response(s) variable(s).}
+#' \item{impulse}{A character, a number of a vector with the names or 
+#' positions of the impulse(s) variable(s).}
 #' \item{x}{A object of class \code{tvvar}}.
 #' \item{n.ahead}{Number of ahead impulse response functions.}
 #' \item{ortho}{Logical, orthogonal or not impuluse response function.}
-#' \item{ortho.cov}{Character, either 'const' or 'tv' (default). This parameter is used when the orthogonal
-#' tv-IRF is calculated. The default is using an error time-varying variance-covariance.}
-#' \item{bw.cov}{A scalar with the bandwidth to estimate the errors variance-covariance matrix. If NULL,
-#' it is calculated by cross-validation.}
-#' \item{cumulative}{Logical, if TRUE the cumulated impulse response coefficients are computed. Default is FALSE.}
+#' \item{ortho.cov}{Character, either 'const' or 'tv' (default). This 
+#' parameter is used when the orthogonal tv-IRF is calculated. The default 
+#' is using an error time-varying variance-covariance.}
+#' \item{bw.cov}{A scalar with the bandwidth to estimate the errors 
+#' variance-covariance matrix. If NULL, it is calculated by cross-validation.}
+#' \item{cumulative}{Logical, if TRUE the cumulated impulse response 
+#' coefficients are computed. Default is FALSE.}
 #' \item{level}{Numeric, confidence interval range. The default is zero.}
 #' \item{runs}{Number of bootstrap replications.}
 #' \item{tboot}{Type of bootstrap.}
 #' \item{BOOT}{List with all bootstrap replications of \code{tvirf}, if done.}
-#' @seealso \code{\link{CI}}, \code{\link{plot}}
-#' @examples
-#' ## Inflation rate, unemployment rate and treasury bill interest rate for the US,
-#' ## as used by Primiceri (2005).
-#'
-#' data(usmacro, package = "bvarsv")
-#'
-#' ##Estimate a vector autoregressive with VAR and tvVAR
-#' model.VAR <- vars::VAR(usmacro, p = 6, type = "const")
-#' model.tvVAR <- tvVAR(usmacro, p = 6, type = "const")
-#'
-#' ##Estimate a the impulse response functions with irf and tvIRF
-#' model.irf <- vars::irf(model.VAR)
-#' model.tvIRF <- tvIRF(model.tvVAR)
-#'
-#' ##plot the mean of all tvIRF over time
-#' plot(model.tvIRF)
 #' 
-#' ##Plot the tvIRF of record 100
-#' plot(model.tvIRF, obs.index = 100)
-#'
-#' ##Estimate the cumulative tvIRF
+#' @seealso \code{\link{bw}}, \code{\link{tvVAR}}, \code{\link{confint}}, 
+#' \code{\link{plot}}, \code{\link{print}} and \code{\link{summary}}
+#' 
+#' @examples
+#' \dontrun{
+#' ##Inflation rate, unemployment rate and treasury bill 
+#' ##interest rate for the US as in Primiceri (2005). 
+#' data(usmacro, package = "bvarsv")
+#' model.tvVAR <- tvVAR(usmacro, p = 4, type = "const")
+#' 
+#' ##Estimate a the tvIRF with time-varying covariance function
+#' model.tvIRF <- tvIRF(model.tvVAR)
+#' 
+#' ##Cumulative impulse response function
 #' model.tvIRF2 <- tvIRF(model.tvVAR, cumulative = TRUE)
-#'
-#' plot <- plot(model.tvIRF2, response = "inf")
+#' }
 #' 
 #' @export
 tvIRF<-function (x, ...)
@@ -76,12 +74,12 @@ tvIRF<-function (x, ...)
 #' @method tvIRF tvvar
 #' @export
 tvIRF.tvvar<-function (x, impulse = NULL, response = NULL, n.ahead = 10,
-                       ortho = TRUE,  ortho.cov = c("tv", "const"), bw.cov = NULL, 
-                       cumulative = FALSE, ...)
+                       ortho = TRUE,  ortho.cov = c("tv", "const"), 
+                       bw.cov = NULL, cumulative = FALSE, ...)
 {
-  if (!(class(x) == "tvvar")) {
-    stop("\nPlease provide an object of class 'tvvar', generated by 'tvVAR()'.\n")
-  }
+  if (!(class(x) == "tvvar")) 
+    stop("\nPlease provide an object of class 'tvvar', 
+         generated by 'tvVAR()'.\n")
   y.names <- colnames(x$y)
   if (is.null(impulse))
   {
@@ -92,7 +90,8 @@ tvIRF.tvvar<-function (x, impulse = NULL, response = NULL, n.ahead = 10,
     impulse <- as.vector(as.character(impulse))
     if (any(!(impulse %in% y.names)))
     {
-      stop("\nPlease provide variables names in impulse\nthat are in the set of endogenous variables.\n")
+      stop("\nPlease provide variables names in impulse\n
+           that are in the set of endogenous variables.\n")
     }
     impulse <- subset(y.names, subset = y.names %in% impulse)
   }
@@ -105,7 +104,8 @@ tvIRF.tvvar<-function (x, impulse = NULL, response = NULL, n.ahead = 10,
     response <- as.vector(as.character(response))
     if (any(!(response %in% y.names)))
     {
-      stop("\nPlease provide variables names in response\nthat are in the set of endogenous variables.\n")
+      stop("\nPlease provide variables names in response\n
+           that are in the set of endogenous variables.\n")
     }
     response <- subset(y.names, subset = y.names %in% response)
   }
@@ -115,8 +115,9 @@ tvIRF.tvvar<-function (x, impulse = NULL, response = NULL, n.ahead = 10,
               cumulative = cumulative, ortho.cov = ortho.cov, bw.cov = bw.cov)
   result <- list( irf = irs$irf, Lower = NULL, Upper = NULL, response = response,
                  impulse = impulse, x = x,  n.ahead = n.ahead, ortho = ortho,
-                 ortho.cov = ortho.cov, bw.cov = irs$bw.cov, cumulative = cumulative, 
-                 level = 0, runs = 0, tboot = NULL, BOOT = NULL)
+                 ortho.cov = ortho.cov, bw.cov = irs$bw.cov, 
+                 cumulative = cumulative, level = 0, runs = 0, 
+                 tboot = NULL, BOOT = NULL, call = match.call())
   class(result) <- "tvirf"
   return(result)
 }
@@ -144,7 +145,8 @@ tvIRF.tvvar<-function (x, impulse = NULL, response = NULL, n.ahead = 10,
   irs <- list()
   for (i in 1:idx)
   {
-    irs[[i]] <- array(irf[, response, impulse[i], 1:(n.ahead + 1)], dim = c(x$obs, length(response), n.ahead + 1))
+    irs[[i]] <- array(irf[, response, impulse[i], 1:(n.ahead + 1)], 
+                      dim = c(x$obs, length(response), n.ahead + 1))
     if (cumulative)
       irs[[i]] <- aperm (apply(irs[[i]], 1:2, cumsum), c(2, 3, 1))
     dimnames (irs[[i]]) <- list(NULL, response, NULL)

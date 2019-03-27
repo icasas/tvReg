@@ -24,7 +24,7 @@ tvGLS(x, ...)
 
 \item{y}{A matrix.}
 
-\item{z}{A vector with the variable over which coefficients are smooth over.}
+\item{z}{A vector with the smoothing variable.}
 
 \item{bw}{A numeric vector.}
 
@@ -42,14 +42,8 @@ tvGLS(x, ...)
 \code{tvGLS} returns a list containing:
 \item{tvcoef}{An array of dimension obs x nvar x neq (obs = number of observations, nvar = number of variables
 in each equation, neq = number of equations in the system) with the time-varying coefficients estimates.}
-\item{fited}{A matrix of dimension obs x neq with the fited values from the estimation.}
+\item{fitted}{A matrix of dimension obs x neq with the fited values from the estimation.}
 \item{residuals}{A matrix of dimension obs x neq with the residuals from the estimation.}
-
-A list with the estimates, fitted and residuals values.
-
-A list with the estimates, the fitted values and the residuals.
-
-A list with the estimates, fitted and residuals values.
 }
 \description{
 \code{tvGLS} estimates time-varying coefficients of SURE using the kernel smoothing GLS.
@@ -57,7 +51,8 @@ A list with the estimates, fitted and residuals values.
 \code{tvGLS} is used to estimate time-varying coefficients SURE using the kernel smoothing
 generalised least square.
 
-\code{tvGLS} is used to estimate time-varying coefficients SURE using the kernel smoothing GLS
+\code{tvGLS} is used to estimate time-varying coefficients SURE using the 
+kernel smoothing GLS
 }
 \details{
 The classical GLS estimator must be modified to generate a set of coefficients changing over time.
@@ -75,13 +70,16 @@ equations or with a different bandwidths for each equation.
 data(FF5F)
 x <- list()
 ## SMALL/LoBM porfolios time-varying three factor model
-x[[1]] <- FF5F[, c("NA.Mkt.RF", "NA.SMB",  "NA.HML", "NA.RMW", "NA.CMA")]
-x[[2]] <- FF5F[, c("JP.Mkt.RF", "JP.SMB",  "JP.HML", "JP.RMW", "JP.CMA")]
-x[[3]] <- FF5F[, c("AP.Mkt.RF", "AP.SMB",  "AP.HML", "AP.RMW", "AP.CMA")]
-x[[4]] <- FF5F[, c("EU.Mkt.RF", "EU.SMB",  "EU.HML", "EU.RMW", "EU.CMA")]
-y <- cbind(FF5F$NA.SMALL.LoBM, FF5F$JP.SMALL.LoBM, FF5F$AP.SMALL.LoBM,
-FF5F$EU.SMALL.LoBM)
+x[[1]] <- cbind(rep (1, 314), FF5F[, c("NA.Mkt.RF", "NA.SMB",  "NA.HML", "NA.RMW", "NA.CMA")])
+x[[2]] <- cbind(rep (1, 314), FF5F[, c("JP.Mkt.RF", "JP.SMB",  "JP.HML", "JP.RMW", "JP.CMA")])
+x[[3]] <- cbind(rep (1, 314), FF5F[, c("AP.Mkt.RF", "AP.SMB",  "AP.HML", "AP.RMW", "AP.CMA")])
+x[[4]] <- cbind(rep (1, 314), FF5F[, c("EU.Mkt.RF", "EU.SMB",  "EU.HML", "EU.RMW", "EU.CMA")])
+##Returns
+y <- cbind(FF5F$NA.SMALL.LoBM, FF5F$JP.SMALL.LoBM, FF5F$AP.SMALL.LoBM, 
+FF5F$EU.SMALL.LoBM) 
+##Excess returns
+y <- y - cbind(FF5F$NA.RF, FF5F$JP.RF, FF5F$AP.RF, FF5F$EU.RF)
 ##I fit the data with one bandwidth for each equation
-ff5f.fit <- tvGLS(x = x, y = y, bw = c(0.89, 1.55, 0.78, 0.31))
+ff5f.fit <- tvGLS(x = x, y = y, bw = c(1.03, 0.44, 0.69, 0.31))
 
 }

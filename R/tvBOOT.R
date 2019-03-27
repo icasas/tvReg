@@ -9,7 +9,7 @@
 #'
 .tvboot.default<-function (x, runs = 100, tboot = "wild")
 {
-  if (class(x) %in% c("tvlm", "tvar", "tvsure"))
+  if (any(class(x) %in% c("tvlm", "tvar", "tvsure")))
   {
     MODEL <- eval.parent(x)
   }
@@ -20,11 +20,11 @@
   obs <- MODEL$obs
   nvar<- MODEL$nvar
   neq <- MODEL$neq
-  if(class(x) %in% c("tvlm", "tvar"))
+  if(any(class(x) %in% c("tvlm", "tvar")))
   {
     obs <- length(x$y)
     neq <- 1
-    nvar <- ncol (x$x)
+    nvar <- NCOL (x$x)
   }
   BOOT <- vector("list", runs)
   resorig <- scale(MODEL$residuals, scale = FALSE)
@@ -42,7 +42,7 @@
       ystar <- fitted + resid
     }
     MODEL$y <- ystar
-    if(class (x) == "tvsure")
+    if(any(class(x) == "tvsure"))
       modelboot <- update(MODEL, y = ystar)
     else
       modelboot <- update(MODEL)
@@ -61,7 +61,6 @@
   impulse <- x$impulse
   response <- x$response
   bw.cov <- x$bw.cov
-  tboot <-x$tboot
   ortho.cov <- x$ortho.cov
   n.ahead <- x$n.ahead
   x <- x$x

@@ -3,35 +3,38 @@
 \docType{data}
 \name{FF5F}
 \alias{FF5F}
-\title{Fama and French portfolio excess returns and factors for international markets.}
+\title{Fama and French portfolio daily returns and factors for international markets.}
 \format{A data frame with 314 rows and 41 variables.
 \describe{
-  \item{Date}{Date, months from July 1990 until Agust 2016}
-  \item{NA.SMALL.LoBM}{Excess return of portfolio SMALL/LoBM in North American market}
-  \item{NA.SMALL.HiBM}{Excess return of portfolio SMALL/HiBM in North American market}
-  \item{NA.BIG.LoBM}{Excess return of portfolio BIG/LoBM in North American market}
-  \item{NA.BIG.HiBM}{Excess return of portfolio BIG/HiBM in North American market}
-  \item{NA.Mkt.RF}{North American market excess return}
+  \item{Date}{Date, months from July 1990 until August 2016}
+  \item{NA.SMALL.LoBM}{Monthly returns of portfolio SMALL/LoBM in North American market}
+  \item{NA.SMALL.HiBM}{Monthly returns of portfolio SMALL/HiBM in North American market}
+  \item{NA.BIG.LoBM}{Monthly returns of portfolio BIG/LoBM in North American market}
+  \item{NA.BIG.HiBM}{Monthly returns of portfolio BIG/HiBM in North American market}
+  \item{NA.Mkt.RF}{North American market excess returns, i.e return of the 
+  market - market risk free rate}
   \item{NA.SMB}{SMB (Small Minus Big) for the North American market}
   \item{NA.HML}{HML (High Minus Low) for the North American market}
   \item{NA.RMW}{RMW (Robust Minus Weak) for the North American market}
   \item{NA.CMA}{CMA (Conservative Minus Aggressive) for the North American market}
   \item{NA.RF}{North American risk free rate}
-  \item{JP.SMALL.LoBM}{Excess return of portfolio SMALL/LoBM in Japanese market}
-  \item{JP.SMALL.HiBM}{Excess return of portfolio SMALL/HiBM in Japanese market}
-  \item{JP.BIG.LoBM}{Excess return of portfolio BIG/LoBM in Japanese market}
-  \item{JP.BIG.HiBM}{Excess return of portfolio BIG/HiBM in Japanese market}
-  \item{JP.Mkt.RF}{Japanese market excess return}
+  \item{JP.SMALL.LoBM}{Monthly returns of portfolio SMALL/LoBM in Japanese market}
+  \item{JP.SMALL.HiBM}{Monthly returns of portfolio SMALL/HiBM in Japanese market}
+  \item{JP.BIG.LoBM}{Monthly returns of portfolio BIG/LoBM in Japanese market}
+  \item{JP.BIG.HiBM}{Monthly returns of portfolio BIG/HiBM in Japanese market}
+  \item{JP.Mkt.RF}{Japanese market excess returns, i.e return of the 
+  market - market risk free rate}
   \item{JP.SMB}{SMB (Small Minus Big) for the Japanese market}
   \item{JP.HML}{HML (High Minus Low) for the Japanese market}
   \item{JP.RMW}{RMW (Robust Minus Weak) for the Japanese market}
   \item{JP.CMA}{CMA (Conservative Minus Aggressive) for the Japanese market}
   \item{JP.RF}{Japanese risk free rate}
-  \item{AP.SMALL.LoBM}{Excess return of portfolio SMALL/LoBM in Asia Pacific market}
-  \item{AP.SMALL.HiBM}{Excess return of portfolio SMALL/HiBM in Asia Pacific market}
-  \item{AP.BIG.LoBM}{Excess return of portfolio BIG/LoBM in Asia Pacific market}
-  \item{AP.BIG.HiBM}{Excess return of portfolio BIG/HiBM in Asia Pacific market}
-  \item{AP.Mkt.RF}{Asia Pacific market excess return}
+  \item{AP.SMALL.LoBM}{Monthly returns of portfolio SMALL/LoBM in Asia Pacific market}
+  \item{AP.SMALL.HiBM}{Monthly returns of portfolio SMALL/HiBM in Asia Pacific market}
+  \item{AP.BIG.LoBM}{Monthly returns of portfolio BIG/LoBM in Asia Pacific market}
+  \item{AP.BIG.HiBM}{Monthly returns of portfolio BIG/HiBM in Asia Pacific market}
+  \item{AP.Mkt.RF}{Asia Pacific market excess returns, i.e return of the 
+  market - maket risk free rate}
   \item{AP.SMB}{SMB (Small Minus Big) for the Asia Pacific market}
   \item{AP.HML}{HML (High Minus Low) for the Asia Pacific market}
   \item{AP.RMW}{RMW (Robust Minus Weak) for the Asia Pacific market}
@@ -41,7 +44,8 @@
   \item{EU.SMALL.HiBM}{Excess return of portfolio SMALL/HiBM in European market}
   \item{EU.BIG.LoBM}{Excess return of portfolio BIG/LoBM in European market}
   \item{EU.BIG.HiBM}{Excess return of portfolio BIG/HiBM in European market}
-  \item{EU.Mkt.RF}{European market excess return}
+  \item{EU.Mkt.RF}{European market excess returns, i.e returns of the 
+  market - market risk free rate}
   \item{EU.SMB}{SMB (Small Minus Big) for the European market}
   \item{EU.HML}{HML (High Minus Low) for the European market}
   \item{EU.RMW}{RMW (Robust Minus Weak) for the European market}
@@ -52,12 +56,15 @@
 \url{http://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html}
 }
 \description{
-A dataset containing the excess returns of four portfolios ordered by size and book-to-market. The
+A dataset containing the returns of four portfolios ordered by size and book-to-market. The
 four portfolios are SMALL/LoBM, SMALL/HiBM, BIG/LoBM and BIG/HiBM in four international
-market: North America (NA), Japan (JP), Asia Pacific (AS) and Europe (EU). It also contains the
+markets: North America (NA), Japan (JP), Asia Pacific (AP) and Europe (EU). It also contains the
 Fama/French 5 factors for each of the markets.
 }
 \references{
+Kennet R. French - Data Library (2017) 
+http://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html#International
+
 Fama, E. and French, K. R (1993) Common risk factors in the returns on stocks and bonds,
 \emph{Journal of Financial Economics}, 3-56.
 

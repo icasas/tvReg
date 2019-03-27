@@ -18,10 +18,10 @@ tvAcoef <- function (x) UseMethod("tvAcoef", x)
 #'
 #' @examples
 #' data(Canada, package="vars")
-#' var.2p <-  vars::VAR(Canada, p = 2, type = "const")
-#' tvvar.2p  <-  tvVAR(Canada, p=2, type= "const")
-#' A  <-  vars::Acoef(var.2p)
-#' tvA  <-  tvAcoef(tvvar.2p)
+#' var.2p <- vars::VAR(Canada, p = 2, type = "const")
+#' tvvar.2p <- tvVAR(Canada, p = 2, type = "const")
+#' A <- vars::Acoef(var.2p)
+#' tvA <- tvAcoef(tvvar.2p)
 #'
 #' @method tvAcoef tvvar
 #' @export

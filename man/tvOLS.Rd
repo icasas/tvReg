@@ -29,14 +29,13 @@ A list with the estimates, fitted and residuals values.
 \code{tvOLS} is used to fit univariate linear models with time-varying coefficients.
 }
 \examples{
-tau <- seq(1:1000)/1000
+tau <- seq(1:500)/500
 beta <- data.frame(beta1 = sin(2*pi*tau), beta2= 2*tau)
-X <- data.frame(X1= rnorm(1000), X2 = rchisq(1000, df = 4))
-error <- rt(1000, df = 10)
+X <- data.frame(X1 = rnorm(500), X2 = rchisq(500, df = 4))
+error <- rt(500, df = 10)
 y <- apply(X*beta, 1, sum) + error
 coef.lm <- stats::lm(y~0+X1+X2, data = X)$coef
-bandw <- bw (x = X, y = y)
-coef.tvlm <-  tvOLS(x = X, y = y, bw = bandw)$tvcoef
+coef.tvlm <-  tvOLS(x = X, y = y, bw = 0.1)$tvcoef
 plot(tau,beta[, 1], type="l", main="", ylab = expression(beta[1]), xlab = expression(tau),
 ylim = range(beta[,1], coef.tvlm[, 1]))
 abline(h = coef.lm[1], col = 2)

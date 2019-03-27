@@ -53,16 +53,23 @@ neq = number of equations in the system) with the time-varying coefficients esti
 Fits a time-varying coefficients vector autorregressive model with p lags.
 }
 \examples{
-
-## Inflation rate, unemployment rate and treasury bill interest rate for the US,
-## as used by Primiceri (2005).
+##Inflation rate, unemployment rate and treasury bill interest rate for 
+##the US, as used in Primiceri (2005).
 data(usmacro, package = "bvarsv")
-
 model.VAR <- vars::VAR(usmacro, p = 6, type = "const")
-model.tvVAR <- tvVAR(usmacro, p = 6, type = "const")
+model.tvVAR <- tvVAR(usmacro, p = 6, type = "const", bw = c(1.8, 20, 20))
 plot(model.tvVAR)
 
 }
+\references{
+Casas, I., Ferreira, E., and Orbe, S. (2017) Time-Varying Coefficient Estimation 
+in SURE Models: Application to Portfolio Management. Available at SSRN: 
+https://ssrn.com/abstract=3043137
+
+Primiceri, G.E. (2005) Time varying structural vector autoregressions 
+and monetary policy. \emph{Review of Economic Studies}, 72, 821-852.
+}
 \seealso{
-\code{\link{CI}}, \code{\link{plot}}
+\code{\link{bw}}, \code{\link{tvIRF}}, \code{\link{plot}}, 
+\code{\link{print}} and \code{\link{summary}}
 }

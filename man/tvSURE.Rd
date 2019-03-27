@@ -115,40 +115,22 @@ total number of variables in the system. The error vector \eqn{u_{t} = (u_{1t}, 
 has zero mean and  covariance matrix \eqn{E(u_t u_t') = \Sigma_t}.
 }
 \examples{
+\dontrun{
 data("Kmenta", package = "systemfit")
 eqDemand <- consump ~ price + income
 eqSupply <- consump ~ price + farmPrice + trend
 system <- list(demand = eqDemand, supply = eqSupply)
 
-## OLS estimation
-ols.fit <- systemfit::systemfit(system, method = "SUR", data = Kmenta)
-
-## tvOLS estimation with the local linear estimator
+##OLS estimation of a system
+ols.fit <- systemfit::systemfit(system, method = "OLS", data = Kmenta)
+##tvOLS estimation of a system with the local linear estimator
 tvols.fit <- tvSURE(system, data = Kmenta,  est = "ll")
 
-## FGLS estimation - SURE estimation
+##SUR estimation
 fgls1.fit <- systemfit::systemfit(system, data = Kmenta, method = "SUR")
-
-## tvFGLS estimation - tvSURE estimation
+##tvSURE estimation
 tvfgls1.fit <- tvSURE(system, data = Kmenta, method = "tvFGLS")
-
-## iterative FGLS estimation - SURE estimation
-fgls2.fit <- systemfit::systemfit(system, data = Kmenta, method = "SUR", maxit = 100)
-
-## iterative tvFGLS estimation - SUR estimation using the local linear
-tvfgls2.fit <- tvSURE(system, data = Kmenta, method = "tvFGLS",
-control = list(tol = 0.001, maxiter = 100))
-
-## Estimation with 2 restrictions
-Rrestr <- matrix(0, 2, 7)
-Rrestr[1, 3] <-  1
-Rrestr[1, 7] <- -1
-Rrestr[2, 2] <- -1
-Rrestr[2, 5] <-  1
-qrestr <- c(0, 0.5)
-
-tvfgls.rest <- tvSURE(system, data = Kmenta, method = "tvFGLS",
-R = Rrestr, r = qrestr, bw = tvfgls1.fit$bw, bw.cov = tvfgls1.fit$bw.cov)
+}
 
 }
 \references{
@@ -170,12 +152,8 @@ Orbe, S., Ferreira, E., and Rodriguez-Poo, J (2004) On the estimation and testin
 time varying constraints in econometric models, \emph{Statistica Sinica}.
 }
 \seealso{
-\code{\link{systemfit}}
-
-\code{\link{CI}}, \code{\link{plot}}
-
-\code{\link{bw}} for bandwidth calculation, \code{\link{tvGLS}} for nonparametric
-estimator and \code{\link{CI}} for confidence intervals.
+\code{\link{bw}}, \code{\link{tvCov}},  \code{\link{tvVAR}}, 
+\code{\link{confint}}, \code{\link{plot}}, \code{\link{print}} and \code{\link{summary}}
 }
 \keyword{models,}
 \keyword{nonparametric}

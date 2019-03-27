@@ -12,7 +12,6 @@ bw <- function(x, ...)  UseMethod("bw", x)
 
 
 #' @rdname bw
-
 #' @param y A matrix or vector with the dependent variable(s).
 #' @param z A vector with the variable over which coefficients are smooth over.
 #' @param est The nonparametric estimation method, one of "lc" (default) for linear constant
@@ -24,13 +23,15 @@ bw <- function(x, ...)  UseMethod("bw", x)
 #' @return A scalar or a vector of scalars.
 #'
 #' @examples
-#' tau <- seq(1:1000)/1000
+#' ##Generate data
+#' tau <- seq(1:200)/200
 #' beta <- data.frame(beta1 = sin(2*pi*tau), beta2 =  2*tau)
-#' X <- data.frame(X1 = rnorm(1000), X2 =  rchisq(1000, df = 4))
-#' error <- rt(1000, df = 10)
+#' X <- data.frame(X1 = rnorm(200), X2 =  rchisq(200, df = 4))
+#' error <- rt(200, df = 10)
 #' y <- apply(X*beta, 1, sum) + error
-#' bw <- bw(X, y, est = "ll")
-#' model.tv <-  tvOLS(x = X, y = y, bw = bw)
+#' 
+#' ##Select bandwidth by cross-validation
+#' bw <- bw(X, y, est = "ll", tkernel = "Gaussian")
 #'
 #' @method bw default
 #' @export
@@ -46,14 +47,16 @@ bw.default <- function(x, y, z = NULL, est = c("lc", "ll"), tkernel = c("Epa", "
     stop("There are NA values in your data, please enter only complete cases. \n")
   tkernel <- match.arg(tkernel)
   est <- match.arg(est)
-  if (est  !=  "lc" & est  !=  "ll")
-    stop("The supported estimation methods in parameter 'est' are: 'lc' and 'll' \n")
-  if (tkernel  !=  "Epa" & tkernel  !=  "Gaussian")
+  if(!(tkernel %in% c("Epa", "Gaussian")))
     stop("The supported kernels are 'Epa' and 'Gaussian'\n")
+  if(!(est %in% c("lc", "ll")))
+    stop("The supported estimation methods in parameter 'est' are: 'lc' and 'll' \n")
   y <- as.matrix(y)
   x <- as.matrix(x)
-  neq <- ncol(y)
-  obs <- nrow(y)
+  neq <- NCOL(y)
+  obs <- NROW(y)
+  if( !identical(obs, NROW(x)))
+    stop("The number of equations in 'x' and 'y' are different \n")
   if(is.null(z))
   {
     upper <- 20
@@ -105,52 +108,47 @@ bw.default <- function(x, y, z = NULL, est = c("lc", "ll"), tkernel = c("Epa", "
   return(bw)
 }
 
-
 #' @examples
 #' data( Kmenta, package = "systemfit" )
+#' 
 #' ## x is a list of matrices containing the regressors, one matrix for each equation
 #' x <- list()
 #' x[[1]] <- Kmenta[, c("price", "income")]
 #' x[[2]] <- Kmenta[, c("price", "farmPrice", "trend")]
 #'
-#' ## y is a matrix with one column for each equation
+#' ## 'y' is a matrix with one column for each equation
 #' y <- cbind(Kmenta$consump, Kmenta$consump)
 #'
-#' ## Calculate bandwidth
-#' bw <- bw(x = x, y = y, tkernel = "Gaussian")
+#' ## Select bandwidth by cross-validation
+#' bw <- bw(x = x, y = y)
 #'
 #' ##One bandwidth per equation
 #' print(bw)
-#'
-#' ##Use these bandwidths to estimate the time-varying coefficients
-#' tvgls <- tvGLS(x = x, y = y, bw = bw)
 #'
 #' @rdname bw
 #' @method bw list
 #' @export
 bw.list <- function(x, y, z = NULL, est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"),
-                    singular.ok = singular.ok, ...)
+                    singular.ok = TRUE, ...)
 {
   if(!is.list(x))
     stop("'x' should be a list of matrices. \n")
   neq <- length(x)
-  if(neq< 2)
+  if(neq < 2)
     stop("'x' should have at least two elements.\n")
-  if (sum(is.na(y))>0)
+  if (sum(is.na(y)) >0)
     stop("There are NA values in your data, please enter only complete cases. \n")
   if(is.null(y))
     stop("Parameter 'y' is missing.\n")
-  obs <- nrow(x[[1]])
-  if(!identical(neq, length(x)[1]))
+  obs <- NROW(x[[1]])
+  if(!identical(neq, NCOL(y)) | !identical(obs, NROW(y)))
     stop("The number of equations in 'x' and 'y' are different \n")
-  if (!identical(obs, nrow(x[[1]])))
-    stop("The length of 'x' and 'y' are different \n")
   tkernel <- match.arg(tkernel)
   est <- match.arg(est)
-  if (est  !=  "lc" & est  !=  "ll")
-    stop("The supported estimation methods in parameter 'est' are: 'lc' and 'll' \n")
-  if (tkernel  !=  "Epa" & tkernel  !=  "Gaussian")
+  if(!(tkernel %in% c("Epa", "Gaussian")))
     stop("The supported kernels are 'Epa' and 'Gaussian'\n")
+  if(!(est %in% c("lc", "ll")))
+    stop("The supported estimation methods in parameter 'est' are: 'lc' and 'll' \n")
   bw <- numeric(neq)
   if(is.null(z))
   {
@@ -177,10 +175,11 @@ bw.list <- function(x, y, z = NULL, est = c("lc", "ll"), tkernel = c("Epa", "Gau
         bw[j] <- 100
         break()
       }
-      result <- try(stats::optim(stats::runif(1, lower, top), .tvOLS.cv, method = "Brent",
-                                 lower = lower, upper = upper, x = x[[j]], y = y[, j],
-                                 est = est, tkernel = tkernel, singular.ok = singular.ok),
-                    silent = TRUE)
+      result <- try(stats::optim(stats::runif(1, lower, top), .tvOLS.cv, 
+                                 method = "Brent", lower = lower, 
+                                 upper = upper, x = x[[j]], y = y[, j],
+                                 est = est, tkernel = tkernel, 
+                                 singular.ok = singular.ok), silent = TRUE)
       if (class(result)  !=  "list")
         value <- .Machine$double.xmax
       else
@@ -214,9 +213,9 @@ bw.list <- function(x, y, z = NULL, est = c("lc", "ll"), tkernel = c("Epa", "Gau
 #'
 #' data(CEES)
 #' ## Using a shorter set for a quick example
-#' mydata <- tail (CEES, 100)
+#' mydata <- tail (CEES, 50)
 #' bw.cov <- bwCov(mydata)
-#' Sigma.hat <-  tvCov(mydata, bw = bw.cov)
+#' Sigma.hat <- tvCov(mydata, bw = bw.cov)
 #'
 #' @rdname bwCov
 #' @export
@@ -226,13 +225,13 @@ bwCov <- function(x, est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"))
     stop("'x' should be a matrix or a data.frame.\n")
   tkernel <- match.arg(tkernel)
   est <- match.arg(est)
-  if (est  !=  "lc" & est  !=  "ll")
-    stop("The supported estimation methods in parameter 'est' are: 'lc' and 'll' \n")
-  if (tkernel  !=  "Epa" & tkernel  !=  "Gaussian")
+  if(!(tkernel %in% c("Epa", "Gaussian")))
     stop("The supported kernels are 'Epa' and 'Gaussian'\n")
+  if(!(est %in% c("lc", "ll")))
+    stop("The supported estimation methods in parameter 'est' are: 'lc' and 'll' \n")
   x <- as.matrix(x)
-  obs <- nrow(x)
-  neq <- ncol(x)
+  obs <- NROW(x)
+  neq <- NCOL(x)
   value  <- .Machine$double.xmax
   iter <- 0
   while(value == .Machine$double.xmax)

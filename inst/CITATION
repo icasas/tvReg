@@ -1,0 +1,11 @@
+citHeader("To cite tvReg in publications use:")
+year <- sub("-.*", "", meta$Date)
+note <- sprintf("R package version %s", meta$Version)
+
+bibentry(bibtype = "Manual",
+         title = "tvReg: Time-Varying Coefficients Linear Regression for Single and Multiple Equations",
+         author = c(person("Isabel", "Casas"),
+                    person("Ruben", "Fernandez-Casal")),
+         year = year,
+         note = note,
+         url = "https://CRAN.R-project.org/package=tvReg")

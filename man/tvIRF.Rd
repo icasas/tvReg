@@ -26,69 +26,65 @@ tvIRF(x, ...)
 
 \item{ortho}{Logical, if TRUE (the default) the orthogonalised IRF is computed.}
 
-\item{ortho.cov}{A character indicating if the covariance matrix for the orthogonal tvIRF should
-be estimated as a constant or time varying. Either 'const' or 'tv' (default). This parameter is used
-only when ortho = TRUE.}
+\item{ortho.cov}{A character indicating if the covariance matrix for the 
+orthogonal tvIRF should be estimated as a constant or time varying. Either 
+'const' or 'tv' (default). This parameter is used only when ortho = TRUE.}
 
 \item{bw.cov}{A scalar (optional) with the bandwidth to estimate the errors
 variance-covariance matrix. If left NULL, it is estimated.}
 
-\item{cumulative}{Logical, if TRUE the cumulated impulse response coefficients are computed.
-Default is FALSE.}
+\item{cumulative}{Logical, if TRUE the cumulated impulse response 
+coefficients are computed. Default is FALSE.}
 }
 \value{
-\code{tvIRF} returns and object of class \code{tvirf} with the following components:
-\item{irf}{An array dim = c(obs x number of response variables x number of impulse variables x
-number steps).}
-\item{Lower}{An array with the lower confidence line, if calculated.}
-\item{Upper}{An array with the upper confidence line, if calculated.}
-\item{response}{A character, a number of a vector with the names or positions of the response(s)
-variable(s).}
-\item{impulse}{A character, a number of a vector with the names or positions of the impulse(s)
-variable(s).}
+\code{tvIRF} returns and object of class \code{tvirf} with the 
+following components:
+\item{irf}{A list of length the number of impulse variable(s). Each element
+of the list is an array of dim = c(obs x number 
+of response variables x n.ahead).}
+\item{Lower}{A list of length the number of impulse variable(s), containing
+ the lower confidence line, if calculated.}
+\item{Upper}{A list of length the number of impulse variable(s), containing
+ the upper confidence line, if calculated.}
+\item{response}{A character, a number of a vector with the names or 
+positions of the response(s) variable(s).}
+\item{impulse}{A character, a number of a vector with the names or 
+positions of the impulse(s) variable(s).}
 \item{x}{A object of class \code{tvvar}}.
 \item{n.ahead}{Number of ahead impulse response functions.}
 \item{ortho}{Logical, orthogonal or not impuluse response function.}
-\item{ortho.cov}{Character, either 'const' or 'tv' (default). This parameter is used when the orthogonal
-tv-IRF is calculated. The default is using an error time-varying variance-covariance.}
-\item{bw.cov}{A scalar with the bandwidth to estimate the errors variance-covariance matrix. If NULL,
-it is calculated by cross-validation.}
-\item{cumulative}{Logical, if TRUE the cumulated impulse response coefficients are computed. Default is FALSE.}
+\item{ortho.cov}{Character, either 'const' or 'tv' (default). This 
+parameter is used when the orthogonal tv-IRF is calculated. The default 
+is using an error time-varying variance-covariance.}
+\item{bw.cov}{A scalar with the bandwidth to estimate the errors 
+variance-covariance matrix. If NULL, it is calculated by cross-validation.}
+\item{cumulative}{Logical, if TRUE the cumulated impulse response 
+coefficients are computed. Default is FALSE.}
 \item{level}{Numeric, confidence interval range. The default is zero.}
 \item{runs}{Number of bootstrap replications.}
 \item{tboot}{Type of bootstrap.}
 \item{BOOT}{List with all bootstrap replications of \code{tvirf}, if done.}
 }
 \description{
-Computes the time-varying impulse response coefficients of an object of class \code{tvvar},  obtained
-with function tvVAR for n.ahead steps.
+Computes the time-varying impulse response coefficients of an object 
+of class \code{tvvar},  obtained with function \code{tvVAR} for \code{n.ahead} steps.
 }
 \examples{
-## Inflation rate, unemployment rate and treasury bill interest rate for the US,
-## as used by Primiceri (2005).
-
+\dontrun{
+##Inflation rate, unemployment rate and treasury bill 
+##interest rate for the US as in Primiceri (2005). 
 data(usmacro, package = "bvarsv")
+model.tvVAR <- tvVAR(usmacro, p = 4, type = "const")
 
-##Estimate a vector autoregressive with VAR and tvVAR
-model.VAR <- vars::VAR(usmacro, p = 6, type = "const")
-model.tvVAR <- tvVAR(usmacro, p = 6, type = "const")
-
-##Estimate a the impulse response functions with irf and tvIRF
-model.irf <- vars::irf(model.VAR)
+##Estimate a the tvIRF with time-varying covariance function
 model.tvIRF <- tvIRF(model.tvVAR)
 
-##plot the mean of all tvIRF over time
-plot(model.tvIRF)
-
-##Plot the tvIRF of record 100
-plot(model.tvIRF, obs.index = 100)
-
-##Estimate the cumulative tvIRF
+##Cumulative impulse response function
 model.tvIRF2 <- tvIRF(model.tvVAR, cumulative = TRUE)
-
-plot <- plot(model.tvIRF2, response = "inf")
+}
 
 }
 \seealso{
-\code{\link{CI}}, \code{\link{plot}}
+\code{\link{bw}}, \code{\link{tvVAR}}, \code{\link{confint}}, 
+\code{\link{plot}}, \code{\link{print}} and \code{\link{summary}}
 }

@@ -28,7 +28,6 @@
 #' total number of variables in the system. The error vector \eqn{u_{t} = (u_{1t}, u_{2t}, \ldots, u_{neq t})'}
 #' has zero mean and  covariance matrix \eqn{E(u_t u_t') = \Sigma_t}.
 #'
-#' @seealso \code{\link{systemfit}}
 #' @references
 #' Casas, I., Ferreira, E., and Orbe, S. (2017) Time-Varying Coefficient Estimation 
 #' in SURE Models: Application to Portfolio Management. Available at SSRN: 
@@ -109,45 +108,28 @@
 #' \item{r}{Restrictions vector.}
 #' \item{formula}{Initial formula.}
 #' \item{call}{Matched call.}
-#' @seealso \code{\link{CI}}, \code{\link{plot}}
+#' 
+#' @seealso \code{\link{bw}}, \code{\link{tvCov}},  \code{\link{tvVAR}}, 
+#' \code{\link{confint}}, \code{\link{plot}}, \code{\link{print}} and \code{\link{summary}}
+#' 
 #' @examples
+#' \dontrun{
 #' data("Kmenta", package = "systemfit")
 #' eqDemand <- consump ~ price + income
 #' eqSupply <- consump ~ price + farmPrice + trend
 #' system <- list(demand = eqDemand, supply = eqSupply)
-#'
-#' ## OLS estimation
-#' ols.fit <- systemfit::systemfit(system, method = "SUR", data = Kmenta)
-#'
-#' ## tvOLS estimation with the local linear estimator
+#' 
+#' ##OLS estimation of a system
+#' ols.fit <- systemfit::systemfit(system, method = "OLS", data = Kmenta)
+#' ##tvOLS estimation of a system with the local linear estimator
 #' tvols.fit <- tvSURE(system, data = Kmenta,  est = "ll")
-#'
-#' ## FGLS estimation - SURE estimation
+#' 
+#' ##SUR estimation
 #' fgls1.fit <- systemfit::systemfit(system, data = Kmenta, method = "SUR")
-#'
-#' ## tvFGLS estimation - tvSURE estimation
+#' ##tvSURE estimation
 #' tvfgls1.fit <- tvSURE(system, data = Kmenta, method = "tvFGLS")
+#'}
 #'
-#' ## iterative FGLS estimation - SURE estimation
-#' fgls2.fit <- systemfit::systemfit(system, data = Kmenta, method = "SUR", maxit = 100)
-#'
-#' ## iterative tvFGLS estimation - SUR estimation using the local linear
-#' tvfgls2.fit <- tvSURE(system, data = Kmenta, method = "tvFGLS",
-#' control = list(tol = 0.001, maxiter = 100))
-#'
-#' ## Estimation with 2 restrictions
-#' Rrestr <- matrix(0, 2, 7)
-#' Rrestr[1, 3] <-  1
-#' Rrestr[1, 7] <- -1
-#' Rrestr[2, 2] <- -1
-#' Rrestr[2, 5] <-  1
-#' qrestr <- c(0, 0.5)
-#'
-#' tvfgls.rest <- tvSURE(system, data = Kmenta, method = "tvFGLS",
-#' R = Rrestr, r = qrestr, bw = tvfgls1.fit$bw, bw.cov = tvfgls1.fit$bw.cov)
-#'
-#'@seealso \code{\link{bw}} for bandwidth calculation, \code{\link{tvGLS}} for nonparametric
-#'estimator and \code{\link{CI}} for confidence intervals.
 #'@export
 tvSURE <- function (formula, z = NULL, bw = NULL, data,  method = c("tvOLS", "tvFGLS", "tvGLS"),  
                     Sigma = NULL, est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"),
@@ -173,12 +155,12 @@ tvSURE <- function (formula, z = NULL, bw = NULL, data,  method = c("tvOLS", "tv
     method <- "tvOLS"
     warning("\nSigma is NULL, tvOLS will be performed.\n")
   }
-  est <- match.arg(est)
   tkernel <- match.arg(tkernel)
-  if(est %in% c("lc", "ll"))
-    est <- "lc"
-  if(tkernel %in% c("Epa","Gaussian"))
+  est <- match.arg(est)
+  if(!(tkernel %in% c("Epa", "Gaussian")))
     tkernel <- "Epa"
+  if(!(est %in% c("lc", "ll")))
+    est <- "lc"
   nvar <- numeric(neq)
   if(is.null(names(formula)))
   {
@@ -191,7 +173,6 @@ tvSURE <- function (formula, z = NULL, bw = NULL, data,  method = c("tvOLS", "tv
       stop("\nEquation labels may not contain blanks (' ') or underscores ('_')")
   }
   results <- list()
-  results$call <- match.call()
   callNoDots <- match.call(expand.dots = FALSE)
   mf <- callNoDots[c(1, match("data", names(callNoDots), 0))]
   mf$na.action <- as.name("na.pass")
@@ -201,7 +182,7 @@ tvSURE <- function (formula, z = NULL, bw = NULL, data,  method = c("tvOLS", "tv
   y.names <- NULL
   for(i in 1:neq)
   {
-    mf.eq <-  mf
+    mf.eq <- mf
     mf.eq$formula <- formula[[i]]
     eval.mf <-  eval(mf.eq)
     terms <- attr(eval.mf, "terms")
@@ -212,9 +193,6 @@ tvSURE <- function (formula, z = NULL, bw = NULL, data,  method = c("tvOLS", "tv
     if(is.null(colnames(x[[i]])))
       colnames(x[[i]]) <- paste("X", i, 1:nvar[i], sep = "")
   }
-  eq.names <- names(formula)
-  if(is.null(eq.names))
-    eq.names <- paste("Eq", 1:neq, sep = "")
   names(x) <- eq.names
   colnames(y) <- y.names
   obs <- nrow(y)
@@ -321,12 +299,12 @@ tvSURE <- function (formula, z = NULL, bw = NULL, data,  method = c("tvOLS", "tv
   if(length(bw) == 1)
     names(bw) <- "bw.mean"
   else
-    names(bw) <- paste("bw.", colnames(y), sep = "")
-  colnames(resid) <- paste(colnames(y), "eq", 1:neq, sep = "")
-  colnames(fitted) <- colnames(resid)
+    names(bw) <- paste("bw.", eq.names, sep = "")
+  colnames(resid) <- eq.names
+  colnames(fitted) <- eq.names
   var.names <- NULL
   for(i in 1:neq)
-    var.names <- c(var.names, paste(colnames(x[[i]]), ".eq", i, sep = ""))
+    var.names <- c(var.names, paste(colnames(x[[i]]), ".", eq.names[i], sep = ""))
   colnames(tvcoef) <- var.names
   result <- list(tvcoef =  tvcoef, Lower = NULL, Upper = NULL, Sigma = Sigma,
                  fitted = fitted, residuals = resid, x = x, y = y, z = z,  bw = bw, 

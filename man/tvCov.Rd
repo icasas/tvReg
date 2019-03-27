@@ -24,24 +24,21 @@ smoothing methodologies.
 }
 \examples{
 ##Generate two independent (uncorrelated series)
-y <- cbind(rnorm(200, sd = 4), rnorm(200, sd = 1))
+y <- cbind(rnorm(100, sd = 4), rnorm(100, sd = 1))
 
-##Obtain bandwidth
-bw.cov <- bwCov(y)
+##Estimation variance-variance matrix. If the bandwidth is unknown, it can
+##calculated with function bwCov()
+Sigma.hat <-  tvCov(y, bw = 1.4)
 
-##Estimation variance-variance matrix
-Sigma.hat <-  tvCov(y, bw = bw.cov)
 ##The first time estimate
 print(Sigma.hat[,,1])
 ##The mean over time of all estimates
 print(apply(Sigma.hat, 1:2, mean))
 ##Generate two dependent variables
-y <- MASS::mvrnorm(n = 200, mu = c(0,0), Sigma = cbind(c(1, -0.5), c(-0.5, 4)))
-#obtain bandwidth
-bw.cov <- bwCov(y)
+y <- MASS::mvrnorm(n = 100, mu = c(0,0), Sigma = cbind(c(1, -0.5), c(-0.5, 4)))
 
 ##Estimation variance-variance matrix
-Sigma.hat <-  tvCov(y, bw = bw.cov)
+Sigma.hat <-  tvCov(y, bw = 3.2)
 ##The first time estimate
 print(Sigma.hat[,,1])
 
@@ -49,4 +46,7 @@ print(Sigma.hat[,,1])
 \references{
 Aslanidis, N. and Casas, I (2013) Nonparametric correlation models for portfolio
 allocation. \emph{Journal of Banking \& Finance}, 37, 2268-2283
+}
+\seealso{
+\code{\link{bwCov}}
 }
