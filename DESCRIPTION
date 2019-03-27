@@ -1,8 +1,8 @@
 Package: tvReg
 Type: Package
-Title: Time-Varying Coefficients Linear Regression for Single and Multiple Equations
-Version: 0.3.0
-Date: 2018-05-28
+Title: Time-Varying Coefficient Linear Regression for Single and Multi-Equations
+Version: 0.4.0
+Date: 2019-03-26
 Author: Isabel Casas and Ruben Fernandez-Casal
 Maintainer: Isabel Casas <casasis@gmail.com>
 Description: Fitting time-varying coefficient models both for single and multi-equation regressions, using kernel smoothing techniques.
@@ -15,5 +15,6 @@ Imports:
 Suggests:
     knitr,
     rmarkdown
-RoxygenNote: 6.0.1
+Encoding: UTF-8    
+RoxygenNote: 6.1.1
 VignetteBuilder: knitr

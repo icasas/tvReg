@@ -2,12 +2,15 @@
 % Please edit documentation in R/print_tvReg.R
 \name{print.tvlm}
 \alias{print.tvlm}
+\alias{print.tvar}
 \alias{print.tvsure}
 \alias{print.tvvar}
 \alias{print.tvirf}
 \title{Print results of functions in tvReg}
 \usage{
 \method{print}{tvlm}(x, digits = max(3, getOption("digits") - 3), ...)
+
+\method{print}{tvar}(x, digits = max(3, getOption("digits") - 3), ...)
 
 \method{print}{tvsure}(x, digits = max(3, getOption("digits") - 3), ...)
 

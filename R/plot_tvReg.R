@@ -1,4 +1,4 @@
-#' Plot Methods for objects in tvReg
+#' Plot Methods for Objects in tvReg
 #'
 #' Plot methods for objects with class attribute \code{tvlm}, \code{tvar}, \code{tvvar},
 #' \code{tvirf}, \code{tvsure}.
@@ -20,6 +20,12 @@ plot.tvsure <- function(x, eqs = NULL, vars = NULL,
 {
   if (class(x) != "tvsure")
     stop("\nPlot not implemented for this class.\n")
+  if(!is.null(vars) & any(vars <= 0))
+    stop("\nInvalid number in 'vars'\n")
+  if(!is.null(eqs) & any(eqs <= 0))
+    stop("\nInvalid number in 'eqs'\n")
+  if(!is.null(eqs) & any(eqs > x$neq))
+    stop("\nInvalid number in 'eqs'\n")
   op <- graphics::par(no.readonly = TRUE)
   on.exit(graphics::par(op))
   if (!any(plot.type %in% c("multiple", "single")))
@@ -53,11 +59,13 @@ plot.tvsure <- function(x, eqs = NULL, vars = NULL,
     }
   }
   if (x$level != 0)
-    sub <- paste(sub, "\n", (x$level) * 100, "% Bootstrap CI, ",
-                 x$runs, "runs")
+    sub <- paste0(sub, "\n", (x$level) * 100, "% Bootstrap CI, ",
+                 x$runs, " runs")
   for (i in eqs)
   {
-    var.names<-colnames(x$x[[i]])
+    var.names <- colnames(x$x[[i]])
+    if(any(vars > nvar[i]))
+      warning("\nSome variables you want to plot do not exist in equation ", i, "\n")
     if(!is.null(vars))
       var.names <- var.names[vars]
     plotvars <- which(colnames(x$x[[i]]) %in% var.names)
@@ -71,13 +79,13 @@ plot.tvsure <- function(x, eqs = NULL, vars = NULL,
       plot.type <- "single"
     if(any(plot.type == "multiple"))
     {
-      nplots <- ceiling (length(plotvars)/4)
-      graphics::par(mfrow = c(min(4, length(plotvars)), 1), 
-                    mar = c(0, 4, 0, 4), oma = c(6, 4, 6, 4))
+      nplots <- ceiling (length(plotvars)/3)
+      graphics::par(mfrow = c(min(3, length(plotvars)), 1), 
+                    mar = c(0, 4, 0, 1), oma = c(6, 4, 3, 1))
       count <- 1
       while (count <= nplots)
       {
-        for (j in ((count-1)*4 +1):(min(count*4, length(plotvars))))
+        for (j in ((count-1)*3 + 1):(min(count*3, length(plotvars))))
         {
           ylim <- range(coef[, j], upper[, j], lower[, j])
           graphics::plot(x.axis, coef[, j], axes = FALSE, type = "l", ylab = var.names[j],
@@ -93,7 +101,7 @@ plot.tvsure <- function(x, eqs = NULL, vars = NULL,
           graphics::box()
         }
         graphics::axis(1, at = pretty(x.axis)[-1])
-        graphics::mtext(eq.names[i], 3, line = 2, outer = TRUE, ...)
+        graphics::mtext(eq.names[i], 3, line = 1, outer = TRUE, ...)
         graphics::mtext(sub, 1, line = 4, outer = FALSE, ...)
         count <- count + 1
       }
@@ -135,6 +143,11 @@ plot.tvlm <- function(x, ...)
   .univariatePlot (x)
 }
 
+#' @rdname plot.tvReg
+#' @method plot tvar
+#' @export 
+plot.tvar <- plot.tvlm
+
 #' @name tvReg-internals
 #' @aliases .univariatePlot
 #' @title tvReg internal and secondary functions
@@ -168,8 +181,8 @@ plot.tvlm <- function(x, ...)
     sub <- expression(z[t])
   }
   if (x$level != 0)
-    sub <- paste(sub, "\n", (x$level) * 100, "% Bootstrap CI, ",
-                 x$runs, "runs")
+    sub <- paste0(sub, "\n", (x$level) * 100, "% Bootstrap CI, ",
+                 x$runs, " runs")
   graphics::par(mfrow = c(1, 1), 
                 mar = c(4, 4, 2, 1), oma = c(0, 0, 0, 0))
   for ( j in 1:nvar)
@@ -209,7 +222,7 @@ plot.tvvar <- function(x, ...)
   residuals <- x$resid
   neq <- x$neq
   obs <- x$obs
-  y <- x$datamat[, 1:neq]
+  y <- x$y
   var.names <- colnames(y)
   graphics::par(mar = c(2, 3, 2, 1), mfrow = c(2,1), cex = 1)
   for ( j in 1:neq)
@@ -268,7 +281,7 @@ plot.tvirf <- function (x, obs.index = NULL, impulse = NULL, response = NULL,
     stop ("\nOne or several impulse variables are not part of the model.\n")
   inames <- impulse
   rnames <- response
-  index <- response %in%x$response
+  index <- response %in% x$response
   if(length(rnames) == 1)
     plot.type <- "single"
   if (is.null(obs.index))
@@ -284,8 +297,8 @@ plot.tvirf <- function (x, obs.index = NULL, impulse = NULL, response = NULL,
       main <- paste(main, "(cumulative)", sep = " ")
     sub <- "horizon"
     if (x$level != 0)
-      sub <- paste(sub, "\n",(x$level) * 100, "% Bootstrap CI, ",
-                     x$runs, "runs")
+      sub <- paste0(sub, "\n",(x$level) * 100, "% Bootstrap CI, ",
+                     x$runs, " runs")
     ylabel = rnames
     impulses <- x$irf[[iname]][obs.index2, rnames, ,drop = FALSE]
     impulses <- apply (impulses, 2:3, mean)

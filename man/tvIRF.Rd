@@ -4,19 +4,14 @@
 \alias{tvIRF}
 \alias{tvirf-class}
 \alias{tvirf.}
-\alias{tvIRF.tvvar}
 \title{Time-Varying Impulse Response Function}
 \usage{
-tvIRF(x, ...)
-
-\method{tvIRF}{tvvar}(x, impulse = NULL, response = NULL, n.ahead = 10,
+tvIRF(x, impulse = NULL, response = NULL, n.ahead = 10,
   ortho = TRUE, ortho.cov = c("tv", "const"), bw.cov = NULL,
   cumulative = FALSE, ...)
 }
 \arguments{
 \item{x}{An object of class \code{tvvar}.}
-
-\item{...}{Other parameters passed to specific methods.}
 
 \item{impulse}{A character vector of the impulses, default is all variables.}
 
@@ -35,6 +30,8 @@ variance-covariance matrix. If left NULL, it is estimated.}
 
 \item{cumulative}{Logical, if TRUE the cumulated impulse response 
 coefficients are computed. Default is FALSE.}
+
+\item{...}{Other parameters passed to specific methods.}
 }
 \value{
 \code{tvIRF} returns and object of class \code{tvirf} with the 
@@ -54,16 +51,12 @@ positions of the impulse(s) variable(s).}
 \item{n.ahead}{Number of ahead impulse response functions.}
 \item{ortho}{Logical, orthogonal or not impuluse response function.}
 \item{ortho.cov}{Character, either 'const' or 'tv' (default). This 
-parameter is used when the orthogonal tv-IRF is calculated. The default 
+parameter is used when the orthogonal TV-IRF is calculated. The default 
 is using an error time-varying variance-covariance.}
 \item{bw.cov}{A scalar with the bandwidth to estimate the errors 
 variance-covariance matrix. If NULL, it is calculated by cross-validation.}
 \item{cumulative}{Logical, if TRUE the cumulated impulse response 
 coefficients are computed. Default is FALSE.}
-\item{level}{Numeric, confidence interval range. The default is zero.}
-\item{runs}{Number of bootstrap replications.}
-\item{tboot}{Type of bootstrap.}
-\item{BOOT}{List with all bootstrap replications of \code{tvirf}, if done.}
 }
 \description{
 Computes the time-varying impulse response coefficients of an object 

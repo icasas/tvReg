@@ -4,16 +4,15 @@
 \name{RV}
 \alias{RV}
 \title{Daily realized variance}
-\format{A data frame with 4530 rows and 9 variables.
+\format{A data frame with 4529 rows and 6 variables.
 \describe{
-  \item{Date}{Daily data from Jan 2, 1990 until Dec 19, 2007 - without
+  \item{Date}{Daily data from Jan 3, 1990 until Dec 19, 2007 - without
   weekends and days off}
-  \item{RVt}{Daily realized variance at time t}
-  \item{RVt_1_pos}{Positive daily realized variance at time t-1}
-  \item{RVt_1_neg}{Negative daily realized variance at time t-1}
-  \item{RVt_1_5}{Weekly realized variance at time t-1}
-  \item{RVt_1_22}{Monthly realized variance at time t-1}
-  \item{RQt_1_sqrt}{Daily squared root of the realized quarticity at time t-1}
+  \item{RV}{Daily realized variance at time t}
+  \item{RV_lag}{Daily realized variance at time t-1}
+  \item{RV_week}{Weekly average realized variance at time t-1}
+  \item{RV_month}{Monthly average realized variance at time t-1}
+  \item{RQ_lag_sqrt}{Daily squared root of the realized quarticity at time t-1}
 }}
 \description{
 A dataset containing the daily realized variance, and some of its lags,

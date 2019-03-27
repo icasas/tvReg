@@ -4,9 +4,7 @@
 \name{tvReg-internals}
 \alias{tvReg-internals}
 \alias{.kernel}
-\alias{tvReg-internals}
 \alias{.univariatePlot}
-\alias{tvReg-internals}
 \alias{.tvCov.cv}
 \alias{.tvIRF}
 \alias{.tvOLS.cv}

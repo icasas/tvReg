@@ -3,19 +3,22 @@
 \name{plot.tvsure}
 \alias{plot.tvsure}
 \alias{plot.tvlm}
+\alias{plot.tvar}
 \alias{plot.tvvar}
 \alias{plot.tvirf}
-\title{Plot Methods for objects in tvReg}
+\title{Plot Methods for Objects in tvReg}
 \usage{
 \method{plot}{tvsure}(x, eqs = NULL, vars = NULL,
   plot.type = c("multiple", "single"), ...)
 
 \method{plot}{tvlm}(x, ...)
 
+\method{plot}{tvar}(x, ...)
+
 \method{plot}{tvvar}(x, ...)
 
-\method{plot}{tvirf}(x, obs.index = NULL, impulse = NULL, response = NULL,
-  plot.type = c("multiple", "single"), ...)
+\method{plot}{tvirf}(x, obs.index = NULL, impulse = NULL,
+  response = NULL, plot.type = c("multiple", "single"), ...)
 }
 \arguments{
 \item{x}{An x used to select a method.}

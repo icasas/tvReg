@@ -6,9 +6,9 @@
 \alias{tvvar}
 \title{Time-varying Vector Autoregressive Models}
 \usage{
-tvVAR(y, p = 1, z = NULL, bw = NULL, type = c("const", "none"),
-  exogen = NULL, est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"),
-  singular.ok = TRUE)
+tvVAR(y, p = 1, z = NULL, ez = NULL, bw = NULL, type = c("const",
+  "none"), exogen = NULL, est = c("lc", "ll"), tkernel = c("Epa",
+  "Gaussian"), singular.ok = TRUE)
 }
 \arguments{
 \item{y}{A matrix with dimention obs x neq (obs = number of observations and
@@ -17,6 +17,9 @@ neq = number of equations)}
 \item{p}{A scalar indicating the number of lags in the model}
 
 \item{z}{A vector containing the smoothing variable.}
+
+\item{ez}{(optional) A scalar or vector with the smoothing estimation values. If 
+values are included then the vector \code{z} is used.}
 
 \item{bw}{An opcional scalar or vector of length the number of equations. It represents the bandwidth in
 the estimation of trend coefficients. If NULL, it is selected by cross validation.}
@@ -40,6 +43,8 @@ neq = number of equations in the system) with the time-varying coefficients esti
 \item{residuals}{Estimation residuals.}
 \item{x}{A list with the regressors data and the dependent variable.}
 \item{y}{A matrix with the dependent variable data.}
+\item{z}{A vector with the smoothing variable.}
+\item{ez}{A vector with the smoothing estimation values.}
 \item{bw}{Bandwidth of mean estimation.}
 \item{type}{Whether the model has a constant or not.}
 \item{exogen}{A matrix or data.frame with other exogenous variables.}
@@ -56,9 +61,9 @@ Fits a time-varying coefficients vector autorregressive model with p lags.
 ##Inflation rate, unemployment rate and treasury bill interest rate for 
 ##the US, as used in Primiceri (2005).
 data(usmacro, package = "bvarsv")
-model.VAR <- vars::VAR(usmacro, p = 6, type = "const")
-model.tvVAR <- tvVAR(usmacro, p = 6, type = "const", bw = c(1.8, 20, 20))
-plot(model.tvVAR)
+VAR.fit <- vars::VAR(usmacro, p = 6, type = "const")
+tvVAR.fit <- tvVAR(usmacro, p = 6, type = "const", bw = c(1.8, 20, 20))
+plot(tvVAR.fit)
 
 }
 \references{

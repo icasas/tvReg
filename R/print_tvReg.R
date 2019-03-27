@@ -15,15 +15,13 @@
 
 print.tvlm <- function(x,  digits = max(3, getOption("digits") - 3), ... ) 
 {
-   cat("\nCall: \n")
-   print(x$call)
-   cat("\nClass: tvlm \n")
+   cat("\nClass: ", class(x),"\n")
    result <- x$tvcoef
    bw <- round(x$bw, digits = digits)
    lower <- x$Lower
    upper <- x$Upper
    level <- x$level * 100
-   text1 <- "\nMean of tvLM estimated coefficients:"
+   text1 <- "\nMean of coefficient estimates:"
    cat(text1, "\n")
    row <- paste(rep("=", nchar(text1)), collapse = "")
    cat(row, "\n")
@@ -38,6 +36,10 @@ print.tvlm <- function(x,  digits = max(3, getOption("digits") - 3), ... )
    cat("\nBandwidth: ", bw, "\n\n")
    invisible(x)
 }
+#' @rdname print.tvReg
+#' @method print tvar
+#' @export 
+print.tvar <- print.tvlm
 
 #' @inheritParams print.tvlm
 #' @rdname print.tvReg
@@ -45,25 +47,28 @@ print.tvlm <- function(x,  digits = max(3, getOption("digits") - 3), ... )
 #' @export
 print.tvsure <- function (x,  digits = max(3, getOption("digits") - 3), ...)
 {
-  cat("\nCall: \n")
-  print(x$call)
+  cat("\nClass: ", class(x),"\n")
   result <- x$tvcoef
   neq <- x$neq
   nvar <- x$nvar
   names <- names(x$x)
+  method <- x$method
   bw <- round(x$bw, digits = digits)
   if (length(bw) == 1)
     bw <- rep (bw, x$neq)
   for (i in 1:neq)
   {
-    text1 <- paste("\nMean of tvSURE estimates for equation \"", 
-                     names[i], "\"", sep ="")
+    text1 <- paste("\nMean of TV-SURE coefficient estimates for equation \"", 
+                     names[i], "\":", sep ="")
       cat(text1, "\n")
       row <- paste(rep("=", nchar(text1)), collapse = "")
       cat(row, "\n")
       print(apply(result[, (sum(nvar[-c(i:neq)]) + 1):(sum(nvar[-c(i:neq)]) + nvar[i])], 
                   2, mean), digits = digits)
-      cat("\nBandwidth: ", bw[i], "\n\n")
+      cat("\nBandwidth: ", bw[i])
+      if (method == "tvFGLS")
+        cat("\t\t Covariance bandwidth: ", x$bw.cov)
+      cat("\n\n")
   }
   invisible(x)
 }
@@ -74,8 +79,7 @@ print.tvsure <- function (x,  digits = max(3, getOption("digits") - 3), ...)
 #' @export
 print.tvvar <- function (x,  digits = max(3, getOption("digits") - 3), ...)
 {
-  cat("\nCall: \n")
-  print(x$call)
+  cat("\nClass: ", class(x),"\n")
   result <- x$tvcoef
   neq <- x$neq
   nvar <- ncol(x$datamat) - neq
@@ -90,8 +94,8 @@ print.tvvar <- function (x,  digits = max(3, getOption("digits") - 3), ...)
   cat("\n")
   for (i in 1:neq)
   {
-    text1 <- paste("Mean of estimated coefficients for equation ", 
-                   names[i], ":", sep = "")
+    text1 <- paste("Mean of TV-VAR coefficient estimates for equation \"", 
+                   names[i], "\":", sep = "")
     cat(text1, "\n")
     row <- paste(rep("=", nchar(text1)), collapse = "")
     cat(row, "\n")

@@ -200,8 +200,41 @@ bw.list <- function(x, y, z = NULL, est = c("lc", "ll"), tkernel = c("Epa", "Gau
             is constant, or no convergence of bandwidth. \n")
   return(bw)
 }
+#' @rdname bw
+#' @method bw tvlm
+#'
+#' @export
 
+bw.tvlm <- function(x, ...)
+{
+  y <- x$x
+  z <- x$z
+  est <- x$est
+  tkernel <- x$tkernel
+  singular.ok <- x$singular.ok
+  x <- x$x
+  return(bw (x, y, z, est, tkernel, singular.ok))
+}
 
+#' @rdname bw
+#' @method bw tvar
+#'
+#' @export
+bw.tvar <- bw.tvlm
+
+#' @rdname bw
+#' @method bw tvvar
+#'
+#' @export
+bw.tvvar <- bw.tvlm
+
+#' @rdname bw
+#' @method bw tvsure
+#'
+#' @export
+bw.tvsure <- bw.tvlm
+
+#' 
 #' Covariance Bandwidth Calculation by Cross-Validation
 #' \emph{bwCov} calculates a single bandwidth to estimate the time-varying variance-
 #' covariance matrix.

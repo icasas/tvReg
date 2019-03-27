@@ -3,22 +3,26 @@
 \name{summary.tvlm}
 \alias{summary.tvlm}
 \alias{summary}
+\alias{summary.tvar}
 \alias{summary.tvsure}
-\alias{summary}
 \alias{summary.tvvar}
-\alias{summary}
 \alias{summary.tvirf}
-\alias{summary}
 \title{Print results of functions in tvReg}
 \usage{
-\method{summary}{tvlm}(object, digits = max(3, getOption("digits") - 3), ...)
-
-\method{summary}{tvsure}(object, digits = max(3, getOption("digits") - 3),
+\method{summary}{tvlm}(object, digits = max(3, getOption("digits") - 3),
   ...)
 
-\method{summary}{tvvar}(object, digits = max(3, getOption("digits") - 3), ...)
+\method{summary}{tvar}(object, digits = max(3, getOption("digits") - 3),
+  ...)
 
-\method{summary}{tvirf}(object, digits = max(3, getOption("digits") - 3), ...)
+\method{summary}{tvsure}(object, digits = max(3, getOption("digits") -
+  3), ...)
+
+\method{summary}{tvvar}(object, digits = max(3, getOption("digits") - 3),
+  ...)
+
+\method{summary}{tvirf}(object, digits = max(3, getOption("digits") - 3),
+  ...)
 }
 \arguments{
 \item{object}{An object used to select a method.}

@@ -4,6 +4,10 @@
 \alias{bw}
 \alias{bw.default}
 \alias{bw.list}
+\alias{bw.tvlm}
+\alias{bw.tvar}
+\alias{bw.tvvar}
+\alias{bw.tvsure}
 \title{Bandwidth Selection by Cross-Validation}
 \usage{
 bw(x, ...)
@@ -11,8 +15,16 @@ bw(x, ...)
 \method{bw}{default}(x, y, z = NULL, est = c("lc", "ll"),
   tkernel = c("Epa", "Gaussian"), singular.ok = TRUE, ...)
 
-\method{bw}{list}(x, y, z = NULL, est = c("lc", "ll"), tkernel = c("Epa",
-  "Gaussian"), singular.ok = TRUE, ...)
+\method{bw}{list}(x, y, z = NULL, est = c("lc", "ll"),
+  tkernel = c("Epa", "Gaussian"), singular.ok = TRUE, ...)
+
+\method{bw}{tvlm}(x, ...)
+
+\method{bw}{tvar}(x, ...)
+
+\method{bw}{tvvar}(x, ...)
+
+\method{bw}{tvsure}(x, ...)
 }
 \arguments{
 \item{x}{an object used to select a method.}

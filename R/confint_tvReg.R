@@ -1,4 +1,4 @@
-#' Confidence Intervals for Model Parameters of Objects in tvReg
+#' Confidence Intervals for Objects in tvReg
 #'
 #' confint is used to estimate the bootstrap confidence intervals for objects with class
 #' attribute \code{tvlm}, \code{tvar}, \code{tvirf}, \code{tvsure}.
@@ -25,40 +25,41 @@
 #' \emph{ Annals of Statistics}, 21, 255-285.
 #'
 #' @examples
+#' \dontrun{
+#' ##Calculation of confidence intervals for a TV-LM model
 #' 
-#' ##Calculation of confidence intervals for a tvLM model
-#' tau <- seq(1:500)/500
+#' ##Generation of time-varying coefficients linear model
+#' set.seed(42)
+#' tau <- seq(1:200)/200
 #' beta <- data.frame(beta1 = sin(2*pi*tau), beta2= 2*tau)
-#' X1 <- rnorm(500)
-#' X2 <- rchisq(500, df = 4)
-#' error <- rt(500, df = 10)
+#' X1 <- rnorm(200)
+#' X2 <- rchisq(200, df = 4)
+#' error <- rt(200, df = 10)
 #' y <- apply(cbind(X1, X2)*beta, 1, sum) + error
 #' data <- data.frame(y = y, X1 = X1, X2 = X2)
-#' model.tvlm <-  tvLM(y ~ 0 + X1 + X2, data = data, bw = 0.1)
-#' tvci <- confint(model.tvlm, level = 0.95, runs = 30)
-#' plot(tvci)
 #' 
-#' ##The second time is much faster when the level is changed
-#' ##if the user uses the previous information
+#' ##Fitting the model and confidence interval calculation
+#' model.tvlm <-  tvLM(y ~ 0 + X1 + X2, data = data, bw = 0.29)
+#' tvci <- confint(model.tvlm, level = 0.95, runs = 20)
+#' 
+#' ##If a second confidence interval on the "same" object is calculated, 
+#' ##for example with a different level, the calculation is faster
+#' 
 #' tvci.80 <- confint(tvci, level = 0.8)
-#' 
+#' }
 #' @importFrom stats confint
 #' @rdname confint.tvReg
 #' @method confint tvlm
 #' @export 
 #'
-confint.tvlm <- function(object, parm, level = 0, 
-                                           runs = 0, tboot = NULL, ...)
+confint.tvlm <- function(object, parm, level = 0.95, 
+                         runs = 100, tboot = NULL, ...)
 {
   if (!any(class(object) %in% c("tvlm", "tvar", "tvsure")))
     stop("\nConfidence intervals not implemented for this class.\n")
-  if (runs == 0)
-    runs <- ifelse(object$runs != 0, object$runs, 100)
   if(runs <= 0)
     stop("\nVariable 'runs' accepts integer values greater than 0.\n")
-  if (level == 0)
-    level <- ifelse(object$level != 0, object$level, 0.95)
-  if (level < 0 | level > 1)
+  if (level <= 0 | level > 1)
     stop("\nVariable 'level' accepts values between 0 and 1.\n")
   if(is.null(tboot))
     tboot <- ifelse(!is.null(object$tboot), object$tboot, "wild")
@@ -85,7 +86,7 @@ confint.tvlm <- function(object, parm, level = 0,
   object$tboot <- tboot
   object$runs <- runs
   B <- object$tvcoef
-  obs <- length(object$y)
+  obs <- object$obs
   nvar <- ncol(object$x)
   if(any(class(object) == "tvsure"))
   {  
@@ -144,6 +145,11 @@ confint.tvlm <- function(object, parm, level = 0,
 }
 
 #' @rdname confint.tvReg
+#' @method confint tvar 
+#' @export 
+confint.tvar <- confint.tvlm
+
+#' @rdname confint.tvReg
 #' @method confint tvsure 
 #' @export 
 confint.tvsure <- confint.tvlm
@@ -152,17 +158,14 @@ confint.tvsure <- confint.tvlm
 #' @method confint tvirf
 #' @export 
 #'
-confint.tvirf <- function(object, parm, level = 0, runs = 0, tboot = NULL , ...)
+confint.tvirf <- function(object, parm, level = 0.95, 
+                          runs = 100, tboot = NULL , ...)
 {
   if (class(object) != "tvirf")
     stop("\nConfidence intervals not implemented for this class.\n")
-  if (runs == 0)
-    runs <- ifelse(object$runs != 0, object$runs, 100)
   if(runs <= 0)
     stop("\nVariable 'runs' accepts integer values greater than 0.\n")
-  if (level == 0)
-    level <- ifelse(object$level != 0, object$level, 0.95)
-  if (level < 0 | level > 1)
+  if (level <= 0 | level > 1)
     stop("\nVariable 'level' accepts values between 0 and 1.\n")
   if(is.null(tboot))
     tboot <- ifelse(!is.null(object$tboot), object$tboot, "wild")
@@ -221,8 +224,8 @@ confint.tvirf <- function(object, parm, level = 0, runs = 0, tboot = NULL , ...)
         else
           c.hat <- apply(abs(temp - irf[[j]][, m, l])/sd.star, 1, stats::quantile,
                          prob = upper, na.rm = TRUE)
-        mat.l[,m, l] <- irf[[j]][, m,l ] - c.hat*sd.star
-        mat.u[,m, l] <- irf[[j]][, m,l ] + c.hat*sd.star
+        mat.l[,m, l] <- irf[[j]][, m, l] - c.hat*sd.star
+        mat.u[,m, l] <- irf[[j]][, m, l] + c.hat*sd.star
       }
     }
     dimnames(mat.l) <- list(NULL, response, NULL)

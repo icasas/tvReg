@@ -2,12 +2,9 @@
 % Please edit documentation in R/tvPhi.R
 \name{tvPhi}
 \alias{tvPhi}
-\alias{tvPhi.tvvar}
 \title{Time-Varying Coefficient Arrays of the MA Represention}
 \usage{
 tvPhi(x, nstep = 10, ...)
-
-\method{tvPhi}{tvvar}(x, nstep = 10, ...)
 }
 \arguments{
 \item{x}{An object of class \code{tvvar}.}

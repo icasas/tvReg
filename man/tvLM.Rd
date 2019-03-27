@@ -6,13 +6,16 @@
 \alias{tvlm}
 \title{Time-Varying Coefficients Linear Models}
 \usage{
-tvLM(formula, z = NULL, data, bw = NULL, est = c("lc", "ll"),
-  tkernel = c("Epa", "Gaussian"), singular.ok = TRUE)
+tvLM(formula, z = NULL, ez = NULL, data, bw = NULL, est = c("lc",
+  "ll"), tkernel = c("Epa", "Gaussian"), singular.ok = TRUE)
 }
 \arguments{
 \item{formula}{An object of class formula.}
 
 \item{z}{A vector with the smoothing variable.}
+
+\item{ez}{(optional) A scalar or vector with the smoothing estimation values. If 
+values are included then the vector \code{z} is used.}
 
 \item{data}{An optional data frame or matrix.}
 
@@ -36,6 +39,7 @@ The object of class \code{tvlm} have the following components:
 \item{x}{A matrix with the regressors data.}
 \item{y}{A vector with the dependent variable data.}
 \item{z}{A vector with the smoothing variable.}
+\item{ez}{A vector with the smoothing estimation variable.}
 \item{bw}{Bandwidth of mean estimation.}
 \item{est}{Nonparametric estimation methodology.}
 \item{tkernel}{Kernel used in estimation.}
@@ -43,7 +47,6 @@ The object of class \code{tvlm} have the following components:
 \item{runs}{Number of bootstrap replications.}
 \item{tboot}{Type of bootstrap.}
 \item{BOOT}{List with all bootstrap replications of \code{tvcoef}, if done.}
-\item{call}{Matched call.}
 }
 \description{
 \code{tvLM} is used to fit a time-varying coefficients linear model
@@ -65,44 +68,39 @@ y ~ x - 1 or y ~ 0 + x.
 \examples{
 ## Simulate a linear process with time-varying coefficient
 ## as functions of scaled time.
-
-tau <- seq(0, 1, length.out = 200)
-beta <- data.frame(beta1 = sin(2 * pi * tau), beta2 = 2 * tau)
+set.seed(42)
+tau <- seq(1:200)/200
+beta <- data.frame(beta1 = sin(2*pi*tau), beta2= 2*tau)
 X1 <- rnorm(200)
 X2 <- rchisq(200, df = 4)
 error <- rt(200, df = 10)
-y <- apply(cbind(X1, X2) * beta, 1, sum) + error
-data <-data.frame(y = y, X1 = X1, X2 = X2)
-
+y <- apply(cbind(X1, X2)*beta, 1, sum) + error
+data <- data.frame(y = y, X1 = X1, X2 = X2)
 ## Estimate coefficients with lm and tvLM for comparison
 
 coef.lm <- stats::lm(y ~ 0 + X1 + X2, data = data)$coef
-model.tvlm <- tvLM(y ~ 0 + X1 + X2, data = data, bw = 0.2)
+tvlm.fit <- tvLM(y ~ 0 + X1 + X2, data = data, bw = 0.29)
 
 ## Estimate coefficients of different realized variance models
 data("RV")
-##Bollerslev et al. (2016) SHARQ model
-SHARQ <- lm (RVt ~ RVt_1_pos + RVt_1_neg + I(RVt_1_pos * RQt_1_sqrt) +
-I(RVt_1_neg * RQt_1_sqrt) + RVt_1_5 + RVt_1_22, data = tail(RV, 2000))
+##Bollerslev et al. (2016) HARQ model
+HARQ <- lm (RV ~ RV_lag + I(RV_lag * RQ_lag_sqrt) + RV_week + RV_month, 
+                 data = RV)
 
-#Casas et al. (2018) tvSHARQ model
-tvSHARQ <- tvLM (RVt ~ RVt_1_pos + RVt_1_neg + RVt_1_5 + RVt_1_22, 
-z = tail(RV$RQt_1_sqrt, 2000), data = tail(RV, 2000), bw = 0.002)
-
-boxplot(data.frame(tvSHARQ = tvSHARQ$tvcoef[,2],
-SHARQ = SHARQ$coef[2]+ SHARQ$coef[4] * tail(RV$RQt_1_sqrt, 2000)),
-main = expression (RV[t-1]^{"+"}), outline = FALSE)
-boxplot(data.frame(tvSHARQ = tvSHARQ$tvcoef[,3], 
-SHARQ = SHARQ$coef[3]+ SHARQ$coef[5] * tail(RV$RQt_1_sqrt, 2000)),
-main = expression (RV[t-1]^{"-"}), outline = FALSE)
-
+#Casas et al. (2018) TV-HARQ model
+RQ <- RV$RQ_lag_sqrt
+tvHARQ <- tvLM (RV ~ RV_lag + RV_week + RV_month, z = RQ, data = RV, 
+                     bw = 0.004)
+boxplot(data.frame(tvHARQ = tvHARQ$tvcoef[,2] * RV$RV_lag,
+                   HARQ = (HARQ$coef[2] + HARQ$coef[3] * RV$RQ_lag_sqrt)*RV$RV_lag),
+                   main = expression (RV[t-1]), outline = FALSE)
 }
 \references{
 Bollerslev, T., Patton, A. J. and Quaedvlieg, R. (2016) Exploiting the 
 errors: A simple approach for improved volatility forecasting. 
 \emph{Journal of Econometrics}, 192, 1-18.
 
-Casas, I., Mao, X. and Vega, H. (2018) Reexamining financial and economic 
+Casas, I., Mao, X. and Veiga, H. (2018) Reexamining financial and economic 
 predictability with new estimators of realized variance and variance 
 risk premium. Url= http://pure.au.dk/portal/files/123066669/rp18_10.pdf
 }

@@ -6,6 +6,9 @@
 #' @import bvarsv
 #' @param y A matrix with dimention obs x neq (obs = number of observations and
 #' neq = number of equations)
+#' @param z A vector containing the smoothing variable.
+#' @param ez (optional) A scalar or vector with the smoothing estimation values. If 
+#' values are included then the vector \code{z} is used.
 #' @param p A scalar indicating the number of lags in the model
 #' @param type A character 'const' if the model contains an intercept and 'none' otherwise.
 #' @param exogen A matrix or data.frame with the exogenous variables (optional)
@@ -19,6 +22,8 @@
 #' \item{residuals}{Estimation residuals.}
 #' \item{x}{A list with the regressors data and the dependent variable.}
 #' \item{y}{A matrix with the dependent variable data.}
+#' \item{z}{A vector with the smoothing variable.}
+#' \item{ez}{A vector with the smoothing estimation values.}
 #' \item{bw}{Bandwidth of mean estimation.}
 #' \item{type}{Whether the model has a constant or not.}
 #' \item{exogen}{A matrix or data.frame with other exogenous variables.}
@@ -35,9 +40,9 @@
 #' ##Inflation rate, unemployment rate and treasury bill interest rate for 
 #' ##the US, as used in Primiceri (2005).
 #' data(usmacro, package = "bvarsv")
-#' model.VAR <- vars::VAR(usmacro, p = 6, type = "const")
-#' model.tvVAR <- tvVAR(usmacro, p = 6, type = "const", bw = c(1.8, 20, 20))
-#' plot(model.tvVAR)
+#' VAR.fit <- vars::VAR(usmacro, p = 6, type = "const")
+#' tvVAR.fit <- tvVAR(usmacro, p = 6, type = "const", bw = c(1.8, 20, 20))
+#' plot(tvVAR.fit)
 #' 
 #' @references 
 #' Casas, I., Ferreira, E., and Orbe, S. (2017) Time-Varying Coefficient Estimation 
@@ -49,12 +54,18 @@
 #' 
 #' @export
 
-tvVAR <- function (y, p = 1, z = NULL, bw = NULL, type = c("const", "none"), exogen = NULL,
+tvVAR <- function (y, p = 1, z = NULL, ez = NULL, bw = NULL, type = c("const", "none"), exogen = NULL,
                    est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"), singular.ok = TRUE)
 {
   y <- as.matrix(y)
   if (any(is.na(y)))
     stop("\nNAs in y.\n")
+  if(!is.null(z))
+  {
+   if(!inherits(z, c("numeric", "vector")))
+      stop("\nArgument 'z' should be 'numeric' or a 'vector'.\n")
+    z <- as.numeric(z)[-c(1:p)]
+  }
   if (ncol(y) < 2)
     stop("\nMatrix 'y' should contain at least two variables. For univariate
           analysis consider the 'tvAR' function.\n")
@@ -73,30 +84,27 @@ tvVAR <- function (y, p = 1, z = NULL, bw = NULL, type = c("const", "none"), exo
     warning(paste("No column names supplied in y, using:",
                   paste(colnames(y), collapse = ", "), ", instead.\n"))
   }
-  colnames(y) <- make.names(colnames(y))
+  var.names <- make.names(colnames(y))
+  colnames(y) <- var.names
   y.orig <- y
   type <- match.arg(type)
   obs <- dim(y)[1]
   neq <- dim(y)[2]
   sample <- obs - p
-  ylags <- stats::embed(y, dimension = p + 1)[, -(1:neq)]
+  rhs <- stats::embed(y, dimension = p + 1)[, -(1:neq)]
   temp1 <- NULL
   for (i in 1:p)
   {
     temp <- paste(colnames(y), ".l", i, sep = "")
     temp1 <- c(temp1, temp)
   }
-  colnames(ylags) <- temp1
+  colnames(rhs) <- temp1
   yend <- y[-c(1:p), ]
+  
   if (type == "const")
   {
-    rhs <- cbind( ylags, rep(1, sample))
-    colnames(rhs) <- c(colnames(ylags), "Intercept")
-  }
-  else if (type == "none")
-  {
-    rhs <- ylags
-    colnames(rhs) <- colnames(ylags)
+    rhs <- cbind( rhs, rep(1, sample))
+    colnames(rhs) <- c(temp1, "(Intercept)")
   }
   if (!(is.null(exogen)))
   {
@@ -113,32 +121,36 @@ tvVAR <- function (y, p = 1, z = NULL, bw = NULL, type = c("const", "none"), exo
     rhs <- cbind(rhs, exogen[-c(1:p), ])
     colnames(rhs) <- c(tmp, colnames(exogen))
   }
-  datamat <- as.data.frame(rhs)
-  colnames(datamat) <- colnames(rhs)
   equation <- list()
   if(is.null(bw))
-   bw <- bw(y = yend, x = datamat, tkernel = tkernel, est = est, singular = singular.ok)
+  {
+    cat("Calculating regression bandwidths...\n")
+    bw <- bw(y = yend, x = rhs, z = z, tkernel = tkernel, 
+             est = est, singular = singular.ok)
+  }
   resid = fitted <- matrix(0, nrow = sample, ncol = neq)
   for (i in 1:neq)
   {
       y <- yend[, i]
-      results <- tvOLS(x = datamat, y = y, bw = bw[i], est = est, tkernel = tkernel,
+      results <- tvOLS(x = rhs, y = y, z = z, bw = bw[i], est = est, tkernel = tkernel,
                        singular.ok = singular.ok)
       equation[[colnames(yend)[i]]] <- results$tvcoef
       colnames(equation[[colnames(yend)[i]]]) <- colnames(rhs)
       resid[,i] <- results$residuals
       fitted[, i] <- results$fitted
   }
-  colnames(resid) <- names(equation)
-  colnames(fitted) <- colnames(resid)
+  colnames(resid) <- var.names
+  colnames(fitted) <- var.names
+  colnames(yend) <- var.names
   if(length(bw) == 1)
     names(bw) <- "bw.mean"
   else
     names(bw) <- paste("bw.", names(equation), sep = "")
   result <- list(tvcoef = equation, Lower = NULL, Upper = NULL,  fitted = fitted,
-                 residuals = resid, datamat = data.frame(cbind(yend,rhs)), y = y.orig,
+                 residuals = resid, y = yend, x = rhs, z = z, y.orig = y.orig,
                  exogen = exogen, p = p, type = type, obs = sample, totobs = sample + p,
-                 neq = neq, est = est, tkernel = tkernel, bw = bw, call = match.call())
+                 neq = neq, est = est, tkernel = tkernel, bw = bw, 
+                 singular.ok = singular.ok)
   class(result) <- "tvvar"
   return(result)
 }

@@ -6,15 +6,19 @@
 \alias{tvsure}
 \title{Time-Varying Seemingly Unrelated Regression Equations Model}
 \usage{
-tvSURE(formula, z = NULL, bw = NULL, data, method = c("tvOLS", "tvFGLS",
-  "tvGLS"), Sigma = NULL, est = c("lc", "ll"), tkernel = c("Epa",
-  "Gaussian"), bw.cov = NULL, singular.ok = TRUE, R = NULL, r = NULL,
+tvSURE(formula, z = NULL, ez = NULL, bw = NULL, data,
+  method = c("tvOLS", "tvFGLS", "tvGLS"), Sigma = NULL, est = c("lc",
+  "ll"), tkernel = c("Epa", "Gaussian"), bw.cov = NULL,
+  singular.ok = TRUE, R = NULL, r = NULL,
   control = tvsure.control(...), ...)
 }
 \arguments{
 \item{formula}{A list of formulas, one for each equation.}
 
 \item{z}{A vector containing the smoothing variable.}
+
+\item{ez}{(optional) A scalar or vector with the smoothing estimation values. If 
+values are included then the vector \code{z} is used.}
 
 \item{bw}{An opcional scalar or vector of length the number of equations. It represents the bandwidth in
 the estimation of trend coefficients. If NULL, it is selected by cross validation.}
@@ -68,6 +72,7 @@ interval upper band.}
 \item{x}{A list with the regressors data.}
 \item{y}{A matrix with the dependent variable data.}
 \item{z}{A vector with the smoothing variable.}
+\item{ez}{A vector with the smoothing estimation values.}
 \item{bw}{Bandwidth of mean estimation.}
 \item{obs}{Integer specifying the number of observations in each equation (balanced sample).}
 \item{neq}{Integer specifying the number of equations.}
@@ -83,7 +88,6 @@ interval upper band.}
 \item{R}{Restrictions matrix.}
 \item{r}{Restrictions vector.}
 \item{formula}{Initial formula.}
-\item{call}{Matched call.}
 }
 \description{
 Fits a set of balanced linear structural equations using Time-varying Ordinary Least 
@@ -120,11 +124,14 @@ data("Kmenta", package = "systemfit")
 eqDemand <- consump ~ price + income
 eqSupply <- consump ~ price + farmPrice + trend
 system <- list(demand = eqDemand, supply = eqSupply)
+eqSupply2 <- consump ~  price + farmPrice 
+system2 <- list(demand = eqDemand, supply = eqSupply2)
 
 ##OLS estimation of a system
 ols.fit <- systemfit::systemfit(system, method = "OLS", data = Kmenta)
 ##tvOLS estimation of a system with the local linear estimator
-tvols.fit <- tvSURE(system, data = Kmenta,  est = "ll")
+##removing trend because it is included in the intercept changing over time
+tvols.fit <- tvSURE(system2, data = Kmenta,  est = "ll")
 
 ##SUR estimation
 fgls1.fit <- systemfit::systemfit(system, data = Kmenta, method = "SUR")

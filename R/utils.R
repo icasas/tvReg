@@ -28,4 +28,3 @@ tvsure.control <- function(maxiter = 1, tol = 1e-05)
   result$tol <- tol
   return(result)
 }
-

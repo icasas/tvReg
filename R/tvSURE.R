@@ -53,6 +53,8 @@
 #' @importFrom systemfit systemfit
 #' @param formula A list of formulas, one for each equation.
 #' @param z A vector containing the smoothing variable.
+#' @param ez (optional) A scalar or vector with the smoothing estimation values. If 
+#' values are included then the vector \code{z} is used.
 #' @param bw An opcional scalar or vector of length the number of equations. It represents the bandwidth in
 #' the estimation of trend coefficients. If NULL, it is selected by cross validation.
 #' @param data A matrix or data frame containing variables in the formula.
@@ -92,6 +94,7 @@
 #' \item{x}{A list with the regressors data.}
 #' \item{y}{A matrix with the dependent variable data.}
 #' \item{z}{A vector with the smoothing variable.}
+#' \item{ez}{A vector with the smoothing estimation values.}
 #' \item{bw}{Bandwidth of mean estimation.}
 #' \item{obs}{Integer specifying the number of observations in each equation (balanced sample).}
 #' \item{neq}{Integer specifying the number of equations.}
@@ -107,7 +110,6 @@
 #' \item{R}{Restrictions matrix.}
 #' \item{r}{Restrictions vector.}
 #' \item{formula}{Initial formula.}
-#' \item{call}{Matched call.}
 #' 
 #' @seealso \code{\link{bw}}, \code{\link{tvCov}},  \code{\link{tvVAR}}, 
 #' \code{\link{confint}}, \code{\link{plot}}, \code{\link{print}} and \code{\link{summary}}
@@ -118,11 +120,14 @@
 #' eqDemand <- consump ~ price + income
 #' eqSupply <- consump ~ price + farmPrice + trend
 #' system <- list(demand = eqDemand, supply = eqSupply)
+#' eqSupply2 <- consump ~  price + farmPrice 
+#' system2 <- list(demand = eqDemand, supply = eqSupply2)
 #' 
 #' ##OLS estimation of a system
 #' ols.fit <- systemfit::systemfit(system, method = "OLS", data = Kmenta)
 #' ##tvOLS estimation of a system with the local linear estimator
-#' tvols.fit <- tvSURE(system, data = Kmenta,  est = "ll")
+#' ##removing trend because it is included in the intercept changing over time
+#' tvols.fit <- tvSURE(system2, data = Kmenta,  est = "ll")
 #' 
 #' ##SUR estimation
 #' fgls1.fit <- systemfit::systemfit(system, data = Kmenta, method = "SUR")
@@ -131,14 +136,15 @@
 #'}
 #'
 #'@export
-tvSURE <- function (formula, z = NULL, bw = NULL, data,  method = c("tvOLS", "tvFGLS", "tvGLS"),  
-                    Sigma = NULL, est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"),
+tvSURE <- function (formula, z = NULL, ez = NULL, bw = NULL, data,  
+                    method = c("tvOLS", "tvFGLS", "tvGLS"), Sigma = NULL, 
+                    est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"),
                     bw.cov = NULL, singular.ok = TRUE, R = NULL, r = NULL,
                     control = tvsure.control(...), ...)
 {
   is.data <- inherits(data, c("data.frame", "matrix"))
   if(!is.data)
-    stop("\nParameter 'data' should be enter and it should be a matrix or a data.frame.\n")
+    stop("\nParameter 'data' should be entered and it should be a matrix or a data.frame.\n")
   if(class(formula) != "list")
     stop("\n'formula' must be a list of formulas. \n")
   if(!all(lapply(formula, class) == "formula"))
@@ -146,10 +152,10 @@ tvSURE <- function (formula, z = NULL, bw = NULL, data,  method = c("tvOLS", "tv
   neq <- length(formula)
   if(neq < 2)
     stop("\nThe list 'formula' should contain at least two equations for multivariate analysis.\n")
-  if(!is.null (Sigma))
+  if(!is.null(Sigma))
     if(any(is.na(Sigma)))
       stop("\nNAs in Sigma.\n")
-  method <- match.arg (method)
+  method <- match.arg(method)
   if(is.null(Sigma) & method == "tvGLS")
   {
     method <- "tvOLS"
@@ -173,6 +179,7 @@ tvSURE <- function (formula, z = NULL, bw = NULL, data,  method = c("tvOLS", "tv
       stop("\nEquation labels may not contain blanks (' ') or underscores ('_')")
   }
   results <- list()
+  cl <- match.call()
   callNoDots <- match.call(expand.dots = FALSE)
   mf <- callNoDots[c(1, match("data", names(callNoDots), 0))]
   mf$na.action <- as.name("na.pass")
@@ -213,8 +220,11 @@ tvSURE <- function (formula, z = NULL, bw = NULL, data,  method = c("tvOLS", "tv
   if (method == "identity" | method == "tvOLS")
   {
     if (is.null(bw))
+    {
+      cat("Calculating regression bandwidth...\n")
       bw <- bw(x = x, y = y, z = z, est = est, tkernel = tkernel, 
                singular.ok = singular.ok)
+    }
     else
     {
       if (any(bw < 5/obs))
@@ -223,14 +233,17 @@ tvSURE <- function (formula, z = NULL, bw = NULL, data,  method = c("tvOLS", "tv
       else if (any(is.na(bw)))
         stop("\nThe bandwidth cannot be a no number.\n")
     }
-    result <- tvGLS(x = x, y = y, z = z, bw = bw, R = R, r = r, est = est, 
-                    tkernel = tkernel)
+    result <- tvGLS(x = x, y = y, z = z, ez = ez, bw = bw, R = R, r = r, 
+                    est = est, tkernel = tkernel)
     Sigma <- array(rep(crossprod(result$residuals)/ (obs - neq), obs), dim = c(neq, neq, obs))
   }
   else if(method == "tvFGLS")
   {
     if (is.null(bw))
+    {
+      cat("Calculating regression bandwidth...\n")
       bw <- bw(x = x, y = y, z = z, est = est, tkernel = tkernel, singular.ok = singular.ok)
+    }
     else
     {
       if (any(bw<5/obs))
@@ -238,21 +251,25 @@ tvSURE <- function (formula, z = NULL, bw = NULL, data,  method = c("tvOLS", "tv
       else if (any (is.na(bw)))
         stop("\nThe bandwidth cannot be a no number.\n")
     }
-    result <- tvGLS(x = x, y = y, z = z, bw = bw, R = R, r = r, est = est, tkernel = tkernel)
-    bw.cov <- bwCov(x = result$residuals, tkernel = tkernel)
+    result <- tvGLS(x = x, y = y, z = z, ez = ez, bw = bw, R = R, r = r, est = est, tkernel = tkernel)
+    if(is.null(bw.cov))
+    {
+      cat("Calculating variance-covariance estimation bandwidth...\n")
+      bw.cov <- bwCov(x = result$residuals, tkernel = tkernel)
+    }
     Sigma <- tvCov(x = result$residuals, bw = bw.cov, tkernel = tkernel)
-    result <- tvGLS(x = x, y = y, z = z, bw = bw, Sigma = Sigma, R = R, r = r,
+    result <- tvGLS(x = x, y = y, z = z, ez = ez, bw = bw, Sigma = Sigma, R = R, r = r,
                     est = est, tkernel = tkernel)
-    itertemp <- 0
+    itertemp <- 1
     tol <- control$tol
     maxiter <- control$maxiter
     tolold <- sum(result$tvcoef^2)
     tolnew <- 0
-    while((abs(tolold-tolnew)>tol) && (itertemp <= maxiter))
+    while((abs(tolold-tolnew)>tol) && (itertemp < maxiter))
     {
       tolold <- tolnew
       Sigma <- tvCov(bw = bw.cov, x = result$residuals, tkernel = tkernel)
-      temp <- tvGLS(x = x, y = y, z = z, bw = bw, Sigma = Sigma, R = R, r = r,
+      temp <- tvGLS(x = x, y = y, z = z, ez = ez, bw = bw, Sigma = Sigma, R = R, r = r,
                     est = est, tkernel = tkernel)
       tolnew <- sqrt(sum((result$tvcoef - temp$tvcoef)^2)/sum(result$tvcoef^2))
       result <- temp
@@ -290,7 +307,7 @@ tvSURE <- function (formula, z = NULL, bw = NULL, data,  method = c("tvOLS", "tv
       else if (any (is.na(bw)))
         stop("\nThe bandwidth cannot be a no number.\n")
     }
-    result <- tvGLS(x = x, y = y, z = z, bw = mean(bw), Sigma = Sigma, R = R, r = r,
+    result <- tvGLS(x = x, y = y, z = z, ez = ez, bw = mean(bw), Sigma = Sigma, R = R, r = r,
                     est = est, tkernel = tkernel)
   }
   tvcoef <- result$tvcoef
@@ -307,11 +324,11 @@ tvSURE <- function (formula, z = NULL, bw = NULL, data,  method = c("tvOLS", "tv
     var.names <- c(var.names, paste(colnames(x[[i]]), ".", eq.names[i], sep = ""))
   colnames(tvcoef) <- var.names
   result <- list(tvcoef =  tvcoef, Lower = NULL, Upper = NULL, Sigma = Sigma,
-                 fitted = fitted, residuals = resid, x = x, y = y, z = z,  bw = bw, 
-                 obs = obs, neq = neq, nvar = nvar, method = method, est =  est,
-                 tkernel = tkernel, bw.cov = bw.cov, 
+                 fitted = fitted, residuals = resid, x = x, y = y, z = z, ez = ez,
+                 bw = bw, obs = obs, neq = neq, nvar = nvar, method = method, 
+                 est =  est, tkernel = tkernel, bw.cov = bw.cov, 
                  level = 0, runs = 0, tboot = NULL, BOOT = NULL,
-                 R = R, r = r, formula = formula, call = match.call())
+                 R = R, r = r, control = control, formula = formula, call = cl)
   class(result) <- "tvsure"
   return(result)
 }

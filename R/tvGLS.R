@@ -1,10 +1,10 @@
-#' Time-varying Generalised Least Squares
+#' Time-Varying Generalised Least Squares
 #'
 #' \code{tvGLS} estimates time-varying coefficients of SURE using the kernel smoothing GLS.
 #'
 #'
 #' @param x an object used to select a method.
-#' @param ... Other parameters passed to specific methods.
+#' @param ... Other arguments passed to specific methods.
 #' @return \code{tvGLS} returns a list containing:
 #' \item{tvcoef}{An array of dimension obs x nvar x neq (obs = number of observations, nvar = number of variables
 #' in each equation, neq = number of equations in the system) with the time-varying coefficients estimates.}
@@ -35,6 +35,8 @@ tvGLS<- function(x, ...) UseMethod("tvGLS", x)
 #' @rdname tvGLS
 #' @param y A matrix.
 #' @param z A vector with the smoothing variable.
+#' @param ez (optional) A scalar or vector with the smoothing values. If 
+#' values are included then the vector z is used.
 #' @param bw A numeric vector.
 #' @param Sigma An array.
 #' @param R A matrix.
@@ -61,11 +63,12 @@ tvGLS<- function(x, ...) UseMethod("tvGLS", x)
 #' @method tvGLS list
 #' @export
 
-tvGLS.list <- function(x, y, z = NULL, bw, Sigma = NULL, R = NULL, r = NULL,
+tvGLS.list <- function(x, y, z = NULL, ez = NULL, bw, Sigma = NULL, R = NULL, r = NULL,
                        est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"), ...)
 {
   if(!is.list(x))
     stop("\n'x' should be a list of matrices. \n")
+  is.predict <- ifelse (is.null(ez), FALSE, TRUE)
   tkernel <- match.arg(tkernel)
   est <- match.arg(est)
   if(!(tkernel %in% c("Epa", "Gaussian")))
@@ -86,7 +89,6 @@ tvGLS.list <- function(x, y, z = NULL, bw, Sigma = NULL, R = NULL, r = NULL,
   nvar <- numeric(neq)
   for (i in 1:neq)
     nvar[i] <- NCOL(x[[i]])
-  y.hat <- matrix(0, obs, neq)
   if(!is.null(z))
   {
     if(length(z) != obs)
@@ -97,8 +99,10 @@ tvGLS.list <- function(x, y, z = NULL, bw, Sigma = NULL, R = NULL, r = NULL,
   }
   else
     grid <- (1:obs)/obs
-  #nu0 <- integrate(nu, -Inf, Inf,pol = 0,tkernel = tkernel)$value
-  if (length(bw)==1)
+  if (is.null(ez))
+    ez <- grid
+  eobs <- NROW(ez)
+  if (length(bw) == 1)
     bw <- rep(bw, neq)
   if(!is.null(R))
   {
@@ -114,37 +118,38 @@ tvGLS.list <- function(x, y, z = NULL, bw, Sigma = NULL, R = NULL, r = NULL,
       stop("\nWrong dimension of 'r', it should be as long as the number of 
            rows in 'R'. \n")
   }
-  resid <- matrix(0, obs, neq)
-  theta <- matrix(0, obs, sum(nvar))
-  index.length <- numeric(neq)
-  for (t in 1:obs)
+  y.hat <- matrix(0, eobs, neq)
+  resid <- matrix(0, eobs, neq)
+  theta <- matrix(0, eobs, sum(nvar))
+  for (t in 1:eobs)
   {
-    x2 <- grid - grid[t]
+    x2 <- grid - ez[t]
     y.kernel <- NULL
     x.kernel <- vector ("list", neq)
     eSigma <- eigen(Sigma[,,t], TRUE)
     lambda <- eSigma$values
     if (any(lambda <= 0))
       stop("\n'Sigma' is not positive definite.\n")
-    A <- diag(lambda^-0.5) %*% t(eSigma$vector) %x% Matrix::Diagonal(obs)
+    A <- diag(lambda^-0.5) %*% t(eSigma$vectors) %x% Matrix::Diagonal(obs)
     for (i in 1:neq)
     {
       mykernel <- sqrt(.kernel(x = x2, bw = bw[i], tkernel = tkernel, N = 1))
       y.kernel <- cbind(y.kernel, y[, i] * mykernel)
       xtemp <- x[[i]] * mykernel
       if(est == "ll")
-        xtemp <- cbind (xtemp, xtemp * x2)
+        xtemp <- cbind(xtemp, xtemp * x2)
       x.kernel[[i]] <- xtemp
     }
     x.star <- A %*% Matrix::bdiag(x.kernel)
-    y.star <- A %*% methods::as (y.kernel, "sparseVector")
+    y.star <- A %*% methods::as(y.kernel, "sparseVector")
     s0 <- Matrix::crossprod(x.star)
     T0 <- Matrix::crossprod(x.star, y.star)
     result <- try(drop(Matrix::solve(s0, T0)), silent = TRUE)
     if(class(result) == "try-error")
       result <- try(drop(Matrix::solve(s0, T0, tol = .Machine$double.xmin)), silent = TRUE)
     if(class(result) == "try-error")
-      stop("\nSystem is computationally singular, the inverse cannot be calculated.\n")
+      stop("\nSystem is computationally singular, the inverse cannot be calculated. 
+           Possibly, the 'bw' is too small for values in 'ez'.\n")
     if(!is.null(R))
     {
       Sinv <- Matrix::solve(s0)
@@ -155,113 +160,32 @@ tvGLS.list <- function(x, y, z = NULL, bw, Sigma = NULL, R = NULL, r = NULL,
     xt.diag <- as.matrix(Matrix::bdiag(lapply(x,"[",t, ,drop = FALSE)))
     y.hat[t, ] <- xt.diag %*% theta[t, ]
   }
-  resid <- as.matrix(y - y.hat)
+  if(!is.predict)
+    resid <- as.matrix(y - y.hat)
   return(list( tvcoef = theta, fitted = y.hat, residuals = resid ))
 }
 
-#' Estimate Time-varying Coefficients
-#'
-#' \code{tvGLS} is used to estimate time-varying coefficients SURE using the 
-#' kernel smoothing GLS
 #' @rdname tvGLS
+#' @inheritParams tvGLS
 #' @method tvGLS tvsure
 #' @export
 tvGLS.tvsure <- function(x, ...)
 {
-  if(class(x) != "tvsure")
+  if(!inherits(x, c("tvsure")))
     stop ("Function for object of class 'tvsure' \n")
   y <- x$y
-  y <- as.matrix(y)
-  neq <- x$neq
-  tkernel <- x$tkernel
-  est <- x$est
-  obs <- x$obs
+  z <- x$z
+  ez <- x$ez
   bw <- x$bw
   Sigma <- x$Sigma
-  nvar <- x$nvar
+  neq <- x$neq
   R <- x$R
   r <- x$r
-  if(!is.null(R))
-  {
-    R <- as.matrix(R)
-    if(NCOL(R) != sum(nvar))
-      stop("\nWrong dimension of R, it should have as many columns as variables 
-           in the whole system. \n")
-    if (is.null(r))
-      r <- rep(0, NROW(R))
-    else if (length(r) == 1)
-      r <- rep(r, NROW(R))
-    else if (length(r) != NROW(R) & length(r) != 1)
-      stop("\nWrong dimension of r, it should be as long as the number of 
-           rows in R. \n")
-  }
+  est <- x$est
+  tkernel <- x$tkernel
   x <- x$x
-  z <- x$z
-  for (i in 1:neq)
-    x[[i]] <- as.matrix(x[[i]])
-  y.hat <- matrix(0, obs, neq)
-  if(!is.null(z))
-    grid <- z
-  else
-    grid <- (1:obs)/obs
-  if (length(bw) == 1)
-    bw <- rep(bw, neq)
-  resid <- matrix(0, obs, neq)
-  theta <- matrix(0, nrow = obs, ncol = sum(nvar))
-  index.length <- numeric(neq)
-  bw.N <- bw * obs/2
-  kernel.length <- 2 * floor(bw.N)+1
-  hmax <- max(kernel.length)
-  sqkernel <- matrix(0, nrow = hmax, ncol = neq, byrow = TRUE)
-  x2 <- ((hmax:(2 * hmax-1))-(hmax+(2 * hmax-1))*0.5)/obs
-  kernel <- list()
-  for (i in 1:neq)
-  {
-    kernel.temp <- .kernel(x2, bw[i], tkernel = tkernel)
-    index <- which(kernel.temp != 0)
-    sqkernel[index,i] <- sqrt(kernel.temp[index])
-  }
-  for (t in 1:obs)
-  {
-    x2 <- grid - grid[t]
-    y.kernel <- NULL
-    x.kernel <- vector ("list", neq)
-    index.kernel <- max(1, floor(max(bw.N)) + 2 - t):min(hmax, obs - t + floor(max(bw.N)) + 1)
-    myindex <- max(1,ceiling(t-max(bw.N))):min(obs,floor(t+max(bw.N)))
-    eSigma <- eigen(Sigma[,,t], TRUE)
-    lambda <- eSigma$values
-    if (any(lambda <= 0))
-      stop("\n'Sigma' is not positive definite\n")
-    A <- diag(lambda^-0.5) %*% t(eSigma$vector) %x% 
-      Matrix::Diagonal(length(index.kernel))
-    for (i in 1:neq)
-    {
-      mykernel <- sqkernel[index.kernel, i]
-      y.kernel <- cbind(y.kernel, y[myindex, i]*mykernel)
-      xtemp <- x[[i]][myindex, ]*mykernel
-      if(est == "ll")
-        xtemp <- cbind (xtemp, xtemp * x2[myindex])
-      x.kernel[[i]] <- xtemp
-    }
-    x.star <- try(A %*% Matrix::bdiag(x.kernel), silent = TRUE)
-    y.star <- try(A %*% methods::as(y.kernel, "sparseVector"), silent = TRUE)
-    s0 <- Matrix::crossprod(x.star)
-    T0 <- Matrix::crossprod(x.star, y.star)
-    result <- try(drop(Matrix::solve(s0, T0)), silent = TRUE)
-    if(class(result) == "try-error")
-      result <- try(drop(Matrix::solve(s0, T0, tol = .Machine$double.xmin)), silent = TRUE)
-    if (!is.null(R))
-    {
-      Sinv <- Matrix::solve(s0)
-      result[1:sum(nvar)] <- result[1:sum(nvar)] - Sinv %*% t(R) %*%
-        Matrix::solve(R %*% Sinv %*% t(R)) %*% (R %*% result[1:sum(nvar)]-r)
-    }
-    theta[t, ] <- result[1:sum(nvar)]
-    xt.diag <- as.matrix(Matrix::bdiag(lapply(x,"[",t, ,drop = FALSE)))
-    y.hat[t, ] <-  xt.diag %*% theta[t, ]
-  }
-  resid = y - y.hat
-  return(list( tvcoef = theta, fitted = y.hat, residuals = resid ))
+  result <- tvGLS(x, y, z, ez, bw, Sigma, R, r, est, tkernel)
+  return(result)
 }
 
 #' @rdname tvGLS
@@ -269,11 +193,13 @@ tvGLS.tvsure <- function(x, ...)
 #' @method tvGLS matrix
 #' @export
 
-tvGLS.matrix <- function(x, y, z = NULL, bw, Sigma = NULL, R = NULL, r = NULL, 
-                         est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"), ...)
+tvGLS.matrix <- function(x, y, z = NULL, ez = NULL, bw, Sigma = NULL, 
+                         R = NULL, r = NULL, est = c("lc", "ll"), 
+                         tkernel = c("Epa", "Gaussian"), ...)
 {
   if(!is.matrix(x))
     stop("\n'x' should be a matrix. \n")
+  is.predict <- ifelse (is.null(ez), FALSE, TRUE)
   y <- as.numeric(y)
   obs <- NROW(x)
   neq <- length(y)/obs
@@ -292,7 +218,6 @@ tvGLS.matrix <- function(x, y, z = NULL, bw, Sigma = NULL, R = NULL, r = NULL,
   if(!(est %in% c("lc", "ll")))
     est <- "lc"
   nvar <- NCOL(x)
-  y.hat <- matrix(0, obs, neq)
   if(!is.null(z))
   {
     if(length(z) != obs)
@@ -301,9 +226,12 @@ tvGLS.matrix <- function(x, y, z = NULL, bw, Sigma = NULL, R = NULL, r = NULL,
   }
   else
     grid <- (1:obs)/obs
-  resid <- matrix(0, obs, neq)
-  theta <- matrix(0, obs, sum(nvar))
-  index.length <- numeric(neq)
+  if (is.null(ez))
+    ez <- grid
+  eobs <- NROW(ez)
+  y.hat <- matrix(0, eobs, neq)
+  resid <- matrix(0, eobs, neq)
+  theta <- matrix(0, eobs, sum(nvar))
   bw.N <- bw * obs/2
   kernel.length <- 2 * floor(bw.N)+1
   hmax <- max(kernel.length)
@@ -315,9 +243,9 @@ tvGLS.matrix <- function(x, y, z = NULL, bw, Sigma = NULL, R = NULL, r = NULL,
     index <- which(kernel.temp != 0)
     sqkernel[index,i] <- sqrt(kernel.temp[index])
   }
-  for (t in 1:obs)
+  for (t in 1:eobs)
   {
-    x2 <- grid -grid[t]
+    x2 <- grid - ez[t]
     y.kernel <- NULL
     x.kernel <- vector ("list", neq)
     index.kernel <- max(1, floor(max(bw.N))+2 - t):min(hmax, obs - t + floor(max(bw.N)) + 1)
@@ -326,8 +254,7 @@ tvGLS.matrix <- function(x, y, z = NULL, bw, Sigma = NULL, R = NULL, r = NULL,
     lambda <- eSigma$values
     if (any(lambda <= 0))
       stop("\n'Sigma' is not positive definite\n")
-    A <- diag(lambda^-0.5)  %*%  t(eSigma$vector) %x% 
-      Matrix::Diagonal(length(index.kernel))
+    A <- diag(lambda^-0.5)  %*%  t(eSigma$vector) %x% Matrix::Diagonal(length(index.kernel))
     for (i in 1:neq)
     {
       mykernel <- sqkernel[index.kernel, i]
@@ -344,6 +271,9 @@ tvGLS.matrix <- function(x, y, z = NULL, bw, Sigma = NULL, R = NULL, r = NULL,
     result <- try(drop(Matrix::solve(s0, T0)), silent = TRUE)
     if(class(result) == "try-error")
       result <- try(drop(Matrix::solve(s0, T0, tol = .Machine$double.xmin)), silent = TRUE)
+    if(class(result) == "try-error")
+      stop("\nSystem is computationally singular, the inverse cannot be calculated. 
+           Possibly, the 'bw' is too small for values in 'ez'.\n")
     if (!is.null(R))
     {
       Sinv <- Matrix::solve(s0)
@@ -354,6 +284,7 @@ tvGLS.matrix <- function(x, y, z = NULL, bw, Sigma = NULL, R = NULL, r = NULL,
     xt.diag <- as.matrix(Matrix::bdiag(lapply(x,"[",t, ,drop = FALSE)))
     y.hat[t, ] <-  xt.diag %*% theta[t, ]
   }
-  resid <- as.matrix(y - y.hat)
+  if(!is.predict)
+    resid <- as.matrix(y - y.hat)
   return(list( tvcoef = theta, fitted = y.hat, residuals = resid ))
 }

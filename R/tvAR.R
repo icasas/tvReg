@@ -15,6 +15,8 @@
 #' @param y A vector with the dependent variable.
 #' @param p A scalar indicating the number of lags in the model.
 #' @param z A vector with the smoothing variable.
+#' @param ez (optional) A scalar or vector with the smoothing estimation values. If 
+#' values are included then the vector \code{z} is used.
 #' @param bw An opcional scalar or vector of length the number of equations. It represents
 #' the bandwidth in the estimation of coefficients. If NULL, it is selected
 #' by cross validation.
@@ -22,8 +24,7 @@
 #' @param fixed (optional) numeric vector of the same length as the total number of parameters.
 #' If supplied, only NA entries in fixed will be varied.
 #' 
-#' @return An object of class 'tvar' 
-#' The object of class \code{tvar} have the following components:
+#' @return An object of class \code{tvar} with the following components:
 #' \item{tvcoef}{A vector of dimension obs (obs = number of observations - number lags),
 #'  with the time-varying coefficients estimates.}
 #' \item{fitted}{The fitted values.}
@@ -31,6 +32,8 @@
 #' \item{x}{A matrix of model data, with lagged y and exogenous variables.}
 #' \item{y}{A vector with the dependent data used in the model.}
 #' \item{z}{A vector with the smoothing variable in the model.}
+#' \item{ez}{A vector with the smoothing estimation values.}
+#' \item{y.orig}{A vector with the original variable y.}
 #' \item{bw}{Bandwidth of mean estimation.}
 #' \item{type}{Whether the model has a constant or not.}
 #' \item{exogen}{A matrix or data.frame with other exogenous variables.}
@@ -41,89 +44,40 @@
 #' \item{runs}{Number of bootstrap replications.}
 #' \item{tboot}{Type of bootstrap.}
 #' \item{BOOT}{List with all bootstrap replications of \code{tvcoef}, if done.}
-#' \item{call}{Matched call.}
 #' 
 #' @seealso  \code{\link{bw}}, \code{\link{tvLM}}, \code{\link{confint}}, 
 #' \code{\link{plot}}, \code{\link{print}} and \code{\link{summary}}
 #' 
 #' @examples
-#' ## Simulate an tvAR(2) process
-#' \dontrun{
-#' tt <- (1:1000)/1000
-#' beta <- cbind( 0.5 * cos (2 * pi * tt), (tt - 0.5)^2)
-#' y <- numeric(1000)
-#' y[1] <- 0.5
-#' y[2] <- -0.2
 #'
-#' ## y(t) = beta1(t) y(t-1) + beta2(t) y(t-2) + ut
-#'
-#' for (t in 3:1000)
-#' {
-#'   y[t] <- y[(t-1):(t-2)] %*% beta[t,] + rnorm(1)
-#' }
-#' Y <- tail (y, 600)
-#'
-#' ## Estimate coefficients of Y with ar.ols and tvAR
-#'
-#' tvAR.2p <- tvAR(Y, p = 2, type = "none", est = "ll")
-#' AR.2p <- ar.ols(Y, aic = FALSE, order = 2, 
-#' intercept = FALSE, demean = FALSE )
-#' 
-#' ##Compare methodologies in a plot
-#' ylim <- range(tvAR.2p$tvcoef[, 1], tail(beta[, 1], 600))
-#' plot(tail(beta[, 1], 600), ylim = ylim, xlab = "", ylab = "", cex = 0.5)
-#' abline(h = AR.2p$ar[1], col = 2)
-#' lines(tvAR.2p$tvcoef[, 1], col = 4)
-#' legend("topleft", c(expression(beta[1]),"AR", "tvAR"), col = c(1, 2, 4),
-#' lty = 1, bty = "n")
-#'
-#' ## Estimate only coefficient from odd lags and the intercept
-#' tvAR.6p <- tvAR(Y, p = 6, type = "const",
-#' fixed = c(NA, 0, NA, 0, NA, 0, NA), est = "ll")
-#'
-#' ## Generation of model with coefficients depending 
-#' ## on a random variable
-#' z <- arima.sim(n = 1000, list(ma = c(-0.2279, 0.2488)))
-#' beta <- (z - 0.5)^2
-#' y <- numeric(1000)
-#' y[1] <- -1
-#' 
-#' ##y(t) = beta1(z(t)) y(t-1) + ut
-#'  
-#' for (t in 3:1000)
-#' {
-#'   y[t] <- y[(t-1)] %*% beta[t] + rnorm(1)
-#' }
-#' Y <- tail (y, 600)
-#' Z <- tail(z, 600)
-#' 
-#' ## Estimate coefficients of process Y with ar.ols and tvAR
-#' 
-#' tvAR.2p.z <- tvAR(Y, z = Z, p = 1, type = "none", est = "ll")
-#' AR.2p <- ar.ols(Y, aic = FALSE, order = 1, intercept = FALSE, 
-#'          demean = FALSE)
-#'
-#'#' ## Estimate coefficients of different realized variance models
+#' ## Estimate coefficients of different realized variance models
 #' data("RV")
-#' Date <- tail(as.Date(RV$Date), 2000)
-#' RVt <- tail(RV$RVt, 2000)
-#' RV_week <- tail(RV$RVt_1_5, 2000)
-#' RV_month <- tail(RV$RVt_1_22, 2000)
-#' RQ <- 1/tail(RV$RQt_1_sqrt, 2000)
+#' RV2 <- head(RV, 2000)
+#' RV <- RV2$RV
+#' RV_week <- RV2$RV_week
+#' RV_month <- RV2$RV_month
+#' RQ <- RV2$RQ_lag_sqrt
 #
 #' ##Corsi (2009) HAR model
-#' HAR <- arima(RVt, order = c(1, 0, 0), xreg = cbind (RV_week, RV_month))
-#' summary(HAR)
+#' HAR <- arima(RV, order = c(1, 0, 0), xreg = cbind (RV_week, RV_month))
+#' print(HAR)
 #' 
 #' ##Chen et al (2017) TVC-HAR model 
-#' TVCHAR <- tvAR (RVt, p = 1, exogen = cbind (RV_week, RV_month), bw = 1.83)
-#' plot(TVCHAR)
-#' summary(TVCHAR)
-#' }
+#' TVCHAR <- tvAR (RV, p = 1, exogen = cbind (RV_week, RV_month), bw = 20)
+#' print(TVCHAR)
+#' 
+#' ##Casas et al (2018) TV-HARQ model
+#' tvHARQ <- tvAR (RV, p = 1, exogen = cbind (RV_week, RV_month), 
+#' z=RQ, bw = 0.0062)
+#' print(tvHARQ)
 #' 
 #' @aliases tvar-class tvar
 #' @references
 #' 
+#' Casas, I., Mao, X. and Veiga, H. (2018) Reexamining financial and economic 
+#' predictability with new estimators of realized variance and variance 
+#' risk premium. Url= http://pure.au.dk/portal/files/123066669/rp18_10.pdf
+#'
 #' Chen, X. B., Gao, J., Li, D., and Silvapulle, P (2017) Nonparametric estimation and 
 #' forecasting for time-varying coefficient realized volatility models,
 #' \emph{Journal of Business \& Economic Statistics}, online, 1-13.
@@ -134,7 +88,7 @@
 #' @rdname tvAR
 #' @inheritParams tvVAR
 #' @export
-tvAR <- function (y, p = 1, z = NULL, bw = NULL, type = c("const", "none"), exogen = NULL,
+tvAR <- function (y, p = 1, z = NULL, ez = NULL, bw = NULL, type = c("const", "none"), exogen = NULL,
                   fixed = NULL, est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"), singular.ok = TRUE)
 {
   if (any(is.na(y)))
@@ -158,8 +112,8 @@ tvAR <- function (y, p = 1, z = NULL, bw = NULL, type = c("const", "none"), exog
   rhs <- ylags
   colnames(rhs) <- make.names(colnames(ylags))
   if (type == "const") {
-    rhs <- cbind( ylags, rep(1, sample))
-    colnames(rhs) <- c(colnames(ylags), "Intercept")
+    rhs <- cbind(rep(1, sample), ylags)
+    colnames(rhs) <- c("(Intercept)", colnames(ylags))
   }
   if (!(is.null(exogen))) 
   {
@@ -187,18 +141,22 @@ tvAR <- function (y, p = 1, z = NULL, bw = NULL, type = c("const", "none"), exog
     stop("\nWrong length for 'fixed'\n")
   mask <- is.na(fixed)
   datamat <- as.matrix(rhs[, mask])
+  colnames(datamat) <- colnames(rhs)[mask]
   if(is.null(bw))
+  {
+    cat("Calculating regression bandwidth...\n")
     bw <- bw(x = datamat, y = yend, z = z, tkernel = tkernel, est = est, singular.ok = singular.ok)
-  results <- tvOLS(x = datamat, y = yend, z = z, bw = bw, est = est, tkernel = tkernel,
+  }
+  results <- tvOLS(x = datamat, y = yend, z = z, ez = ez, bw = bw, est = est, tkernel = tkernel,
                    singular.ok = singular.ok)
   tvcoef <- results$tvcoef
   colnames(tvcoef) <- colnames(rhs)[mask]
   result <- list(tvcoef = tvcoef, Lower = NULL, Upper = NULL,  fitted = results$fitted,
-                 residuals = results$resid, x = datamat, y = yend, z = z, y.orig = y.orig, 
-                 mask = mask, exogen = exogen, p = p, type = type, obs = sample, 
+                 residuals = results$resid, x = datamat, y = yend, z = z, ez = ez, 
+                 y.orig = y.orig, mask = mask, exogen = exogen, p = p, type = type, obs = sample, 
                  totobs = sample + p, est = est, tkernel = tkernel, bw = bw, level = 0,
-                 runs = 0, tboot = NULL, BOOT = NULL, call = match.call())
-  class(result) <- c("tvar", "tvlm")
+                 runs = 0, tboot = NULL, BOOT = NULL)
+  class(result) <- c("tvar")
   return(result)
 }
 

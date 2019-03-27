@@ -5,26 +5,31 @@
 \alias{tvGLS.list}
 \alias{tvGLS.tvsure}
 \alias{tvGLS.matrix}
-\title{Time-varying Generalised Least Squares}
+\title{Time-Varying Generalised Least Squares}
 \usage{
 tvGLS(x, ...)
 
-\method{tvGLS}{list}(x, y, z = NULL, bw, Sigma = NULL, R = NULL,
-  r = NULL, est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"), ...)
+\method{tvGLS}{list}(x, y, z = NULL, ez = NULL, bw, Sigma = NULL,
+  R = NULL, r = NULL, est = c("lc", "ll"), tkernel = c("Epa",
+  "Gaussian"), ...)
 
 \method{tvGLS}{tvsure}(x, ...)
 
-\method{tvGLS}{matrix}(x, y, z = NULL, bw, Sigma = NULL, R = NULL,
-  r = NULL, est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"), ...)
+\method{tvGLS}{matrix}(x, y, z = NULL, ez = NULL, bw, Sigma = NULL,
+  R = NULL, r = NULL, est = c("lc", "ll"), tkernel = c("Epa",
+  "Gaussian"), ...)
 }
 \arguments{
 \item{x}{an object used to select a method.}
 
-\item{...}{Other parameters passed to specific methods.}
+\item{...}{Other arguments passed to specific methods.}
 
 \item{y}{A matrix.}
 
 \item{z}{A vector with the smoothing variable.}
+
+\item{ez}{(optional) A scalar or vector with the smoothing values. If 
+values are included then the vector z is used.}
 
 \item{bw}{A numeric vector.}
 
@@ -50,9 +55,6 @@ in each equation, neq = number of equations in the system) with the time-varying
 
 \code{tvGLS} is used to estimate time-varying coefficients SURE using the kernel smoothing
 generalised least square.
-
-\code{tvGLS} is used to estimate time-varying coefficients SURE using the 
-kernel smoothing GLS
 }
 \details{
 The classical GLS estimator must be modified to generate a set of coefficients changing over time.

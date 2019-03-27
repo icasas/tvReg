@@ -2,18 +2,22 @@
 % Please edit documentation in R/confint_tvReg.R
 \name{confint.tvlm}
 \alias{confint.tvlm}
+\alias{confint.tvar}
 \alias{confint.tvsure}
 \alias{confint.tvirf}
-\title{Confidence Intervals for Model Parameters of Objects in tvReg}
+\title{Confidence Intervals for Objects in tvReg}
 \usage{
-\method{confint}{tvlm}(object, parm, level = 0, runs = 0, tboot = NULL,
-  ...)
+\method{confint}{tvlm}(object, parm, level = 0.95, runs = 100,
+  tboot = NULL, ...)
 
-\method{confint}{tvsure}(object, parm, level = 0, runs = 0, tboot = NULL,
-  ...)
+\method{confint}{tvar}(object, parm, level = 0.95, runs = 100,
+  tboot = NULL, ...)
 
-\method{confint}{tvirf}(object, parm, level = 0, runs = 0, tboot = NULL,
-  ...)
+\method{confint}{tvsure}(object, parm, level = 0.95, runs = 100,
+  tboot = NULL, ...)
+
+\method{confint}{tvirf}(object, parm, level = 0.95, runs = 100,
+  tboot = NULL, ...)
 }
 \arguments{
 \item{object}{Object of class \code{tvsure}, class \code{tvvar} or class \code{tvirf}.}
@@ -39,23 +43,28 @@ confint is used to estimate the bootstrap confidence intervals for objects with 
 attribute \code{tvlm}, \code{tvar}, \code{tvirf}, \code{tvsure}.
 }
 \examples{
+\dontrun{
+##Calculation of confidence intervals for a TV-LM model
 
-##Calculation of confidence intervals for a tvLM model
-tau <- seq(1:500)/500
+##Generation of time-varying coefficients linear model
+set.seed(42)
+tau <- seq(1:200)/200
 beta <- data.frame(beta1 = sin(2*pi*tau), beta2= 2*tau)
-X1 <- rnorm(500)
-X2 <- rchisq(500, df = 4)
-error <- rt(500, df = 10)
+X1 <- rnorm(200)
+X2 <- rchisq(200, df = 4)
+error <- rt(200, df = 10)
 y <- apply(cbind(X1, X2)*beta, 1, sum) + error
 data <- data.frame(y = y, X1 = X1, X2 = X2)
-model.tvlm <-  tvLM(y ~ 0 + X1 + X2, data = data, bw = 0.1)
-tvci <- confint(model.tvlm, level = 0.95, runs = 30)
-plot(tvci)
 
-##The second time is much faster when the level is changed
-##if the user uses the previous information
+##Fitting the model and confidence interval calculation
+model.tvlm <-  tvLM(y ~ 0 + X1 + X2, data = data, bw = 0.29)
+tvci <- confint(model.tvlm, level = 0.95, runs = 20)
+
+##If a second confidence interval on the "same" object is calculated, 
+##for example with a different level, the calculation is faster
+
 tvci.80 <- confint(tvci, level = 0.8)
-
+}
 }
 \references{
 Chen, X. B., Gao, J., Li, D., and Silvapulle, P (2017) Nonparametric estimation and 

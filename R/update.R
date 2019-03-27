@@ -2,103 +2,83 @@
 #'
 #' Update and Re-fit the Models of package tvReg
 #' @rdname update.tvReg
-#' @param object An object used to select a method.
+#' @param object An object of any class in package tvReg
 #' @param ... Other parameters passed to specific methods.
-#' @param y The dependent variable to update the model.
-#' @return An object of class \code{tvsure}.
+#' @return An object of the same class than the argument *object*.
+#' @method update tvlm
+#' @export
+update.tvlm <- function(object, ...)
+{
+  result <- tvOLS(object)
+  object$tvcoef <- result$tvcoef
+  object$fitted <- result$fitted
+  object$residuals <- result$residuals
+  return(object)
+}
+
+#' @rdname update.tvReg
+#' @method update tvar 
+#' @export 
+update.tvar <- update.tvlm
+
+
+#' @rdname update.tvReg
+#' @method update tvvar
+#' @export
+update.tvvar <- function(object, ...)
+{
+  results <- tvOLS(object)
+  object$tvcoef <- results$tvcoef
+  object$fitted <- results$fitted
+  object$residuals <- results$residuals
+  class(object) <- "tvvar"
+  return(object)
+}
+#' @rdname update.tvReg
 #' @method update tvsure
 #' @export
-update.tvsure <- function(object, y = NULL, ...)
+update.tvsure <- function(object, ...)
 {
-  neq <- object$neq
-  obs <- object$obs
   method <- object$method
-  if(!is.null(y))
-    object$y <- y
-  if (method == "tvOLS" | method == "identity")
+  tkernel <- object$tkernel
+  obs <- object$obs
+  neq <- object$neq
+  if (method == "identity" | method == "tvOLS" | method == "tvFGLS")
   {
-    Sigma.ols <- array(rep(diag(1, neq), obs), dim=c(neq,neq, obs))
-    object$Sigma <- Sigma.ols
+    object$Sigma <- NULL
+    result <- tvGLS(object)
+    Sigma <- array(rep(crossprod(result$residuals)/(obs - neq), obs), dim = c(neq, neq, obs))
+    object$Sigma <- Sigma
   }
-  result <- tvGLS(object)
+  if(method == "tvFGLS")
+  {
+    bw.cov <- object$bw.cov
+    Sigma <- tvCov(x = result$residuals, bw = bw.cov, tkernel = tkernel)
+    object$Sigma <- Sigma
+    result <- tvGLS(object)
+    itertemp <- 0
+    tol <- object$control$tol
+    maxiter <- object$control$maxiter
+    tolold <- sum(result$tvcoef^2)
+    tolnew <- 0
+    while((abs(tolold-tolnew)>tol) && (itertemp <= maxiter))
+    {
+      tolold <- tolnew
+      Sigma <- tvCov(bw = bw.cov, x = result$residuals, tkernel = tkernel)
+      object$Sigma <- Sigma
+      temp <- tvGLS(object)
+      tolnew <- sqrt(sum((result$tvcoef - temp$tvcoef)^2)/sum(result$tvcoef^2))
+      result <- temp
+      itertemp <- itertemp + 1
+    }
+  }
+  else if(method == "tvGLS")
+  {
+    result <- tvGLS(object)
+  }
   object$tvcoef <- result$tvcoef
   object$fitted <- result$fitted
   object$residuals <- result$residuals
   class(object) <- "tvsure"
-  return(object)
-}
-#' @rdname update.tvReg
-#' @return An object of class \code{tvlm}.
-#' @method update tvlm
-#' @export
-update.tvlm <- function(object, y = NULL, ...)
-{
-  if(!is.null(y))
-    object$y <- y
-  result <- tvOLS(x = object$x, y = object$y, z = object$z,
-                  bw = object$bw, est = object$est, tkernel = object$tkernel)
-  object$tvcoef <- result$tvcoef
-  object$fitted <- result$fitted
-  object$residuals <- result$residuals
-  class(object) <- "tvlm"
-  return(object)
-}
-#' @rdname update.tvReg
-#' @return An object of class \code{tvar}.
-#' @method update tvar
-#' @export
-update.tvar <- function(object, y = NULL, ...)
-{
-  if(!is.null(y))
-    object$y <- y
-  result <- tvOLS(x = object$x, y = object$y, z = object$z,
-                  bw = object$bw, est = object$est, tkernel = object$tkernel)
-  object$tvcoef <- result$tvcoef
-  object$fitted <- result$fitted
-  object$residuals <- result$residuals
-  class(object) <- "tvar"
-  return(object)
-}
-#' @rdname update.tvReg
-#' @return An object of class \code{tvvar}.
-#' @method update tvvar
-#' @export
-update.tvvar <- function(object, y = NULL, ...)
-{
-  neq <- object$neq
-  obs <- object$obs
-  p <- object$p
-  ynames <- colnames(object$datamat)[1:neq]
-  yend <- object$datamat[, 1:neq]
-  rhs <- object$datamat[, -c(1:neq)]
-  if(!is.null(y))
-  {
-    rhs <- stats::embed(y, dimension = p + 1)[, -(1:neq)]
-    if(object$type == "const")
-      rhs <- cbind(rhs, rep(1, obs))
-    yend <- y[-c(1:p), ]
-  }
-  bw <- object$bw
-  est <- object$est
-  tkernel <- object$tkernel
-  singular.ok <- object$singular.ok
-  residuals <- object$resid
-  fitted <- object$fitted
-  equation <- object$tvcoef
-  eqnames <- names(equation)
-  for (i in 1:neq)
-  {
-    y <- yend[, i]
-    results <- tvOLS(x = rhs, y = y, bw = bw[i], est = est, tkernel = tkernel,
-                     singular.ok = singular.ok)
-    equation[[eqnames[i]]] <- results$tvcoef
-    residuals[, i] <- results$resid
-    fitted[, i] <- results$fitted
-  }
-  object$tvcoef <- equation
-  object$datamat[, 1:neq] <- yend
-  object$fitted <- fitted
-  object$resid <- residuals
-  class(object) <- "tvvar"
   return(object)
 }

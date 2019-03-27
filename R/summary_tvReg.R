@@ -24,6 +24,7 @@ summary.tvlm <- function(object,  digits = max(3, getOption("digits") - 3), ... 
    lower <- object$Lower
    upper <- object$Upper
    level <- object$level * 100
+   obs <- object$obs
    text1 <- "\nSummary of time-varying estimated coefficients:"
    cat(text1, "\n")
    row <- paste(rep("=", nchar(text1)), collapse = "")
@@ -38,10 +39,18 @@ summary.tvlm <- function(object,  digits = max(3, getOption("digits") - 3), ... 
      print(apply(upper, 2, summary), digits = digits)
    }
    cat("\nBandwidth: ", bw)
-   R2 <- round(stats::cor(object$y, object$residuals), digits = digits)
-   cat("\nPseudo R-squared, assuming independence: ", R2, "\n\n")
+   SSR <- sum(object$residuals^2)
+   SST <- sum((object$y- mean(object$y))^2)
+   R2 <- round(1 - SSR/SST, digits = digits)
+   cat("\nPseudo R-squared: ", R2, "\n\n")
    invisible(object)
 }
+
+#' @rdname summary.tvReg
+#' @method summary tvar
+#' @export 
+summary.tvar <- summary.tvlm
+
 
 #' @inheritParams summary.tvlm
 #' @aliases summary summary.tvsure
@@ -50,8 +59,6 @@ summary.tvlm <- function(object,  digits = max(3, getOption("digits") - 3), ... 
 #' @export
 summary.tvsure <- function (object,  digits = max(3, getOption("digits") - 3), ...)
 {
-  cat("\nCall: \n")
-  print(object$call)
   result <- object$tvcoef
   bw <- round(object$bw, digits = digits)
   if (length(bw) == 1)
@@ -81,8 +88,10 @@ summary.tvsure <- function (object,  digits = max(3, getOption("digits") - 3), .
       print(apply(upper[, index], 2, summary), digits = digits)
     }
     cat("\nBandwidth: ", bw[i])
-    R2 <- round(stats::cor(object$y[, i], object$residuals[, i]), digits = digits)
-    cat("\nPseudo R-squared, assuming independence: ", R2, "\n\n")
+    SSR <- sum(object$residuals[, i]^2)
+    SST <- sum((object$y[, i]- mean(object$y[, i]))^2)
+    R2 <- round(1 - SSR/SST, digits = digits)
+    cat("\nPseudo R-squared: ", R2, "\n\n")
   }
   invisible(object)
 }
@@ -101,8 +110,8 @@ summary.tvvar <- function (object,  digits = max(3, getOption("digits") - 3), ..
   if (length(bw) == 1)
     bw <- rep(bw, object$neq)
   neq <- object$neq
-  nvar <- ncol(object$datamat) - neq
-  names <- colnames(object$y)
+  nvar <- NCOL(object$x) - neq
+  names <- colnames(object$y.orig)
   for (i in 1:neq)
   {
     text1 <- paste("\nSummary of tvVAR for equation ", 
@@ -112,8 +121,10 @@ summary.tvvar <- function (object,  digits = max(3, getOption("digits") - 3), ..
     cat(row, "\n")
     print(apply(result[[i]], 2, summary), digits = digits)
     cat("\nBandwidth: ", bw[i])
-    R2 <- round(stats::cor(object$datamat[, i], object$residuals[, i]), digits = digits)
-    cat("\nPseudo R-squared, assuming independence: ", R2, "\n\n")
+    SSR <- sum(object$residuals[, i]^2)
+    SST <- sum((object$y[, i]- mean(object$y[, i]))^2)
+    R2 <- round(1 - SSR/SST, digits = digits)
+    cat("\nPseudo R-squared: ", R2, "\n\n")
   }
   invisible(object)
 }

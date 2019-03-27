@@ -2,47 +2,32 @@
 % Please edit documentation in R/tvOLS.R
 \name{tvOLS}
 \alias{tvOLS}
+\alias{tvOLS.tvlm}
+\alias{tvOLS.tvar}
+\alias{tvOLS.tvvar}
 \title{Time-Varying Ordinary Least Squares}
 \usage{
-tvOLS(x, y, z = NULL, bw, est = c("lc", "ll"), tkernel = c("Epa",
-  "Gaussian"), singular.ok = singular.ok)
+tvOLS(x, ...)
+
+\method{tvOLS}{tvlm}(x, ...)
+
+\method{tvOLS}{tvar}(x, ...)
+
+\method{tvOLS}{tvvar}(x, ...)
 }
 \arguments{
-\item{x}{A matrix with all regressors.}
+\item{x}{an object used to select a method.}
 
-\item{y}{A vector with dependent variable.}
-
-\item{z}{A vector with the variable over which coefficients are smooth over.}
-
-\item{bw}{A numeric vector.}
-
-\item{est}{The nonparametric estimation method, one of "lc" (default) for linear constant or "ll" for local linear.}
-
-\item{tkernel}{The type of kernel used in the coefficients estimation method, one of Epanesnikov ("Epa") or "Gaussian".}
-
-\item{singular.ok}{Logical. If FALSE, a singular model is an error.}
+\item{...}{Other arguments passed to specific methods.}
 }
 \value{
-A list with the estimates, fitted and residuals values.
+\code{tvGLS} returns a list containing:
+\item{tvcoef}{A vector of length obs, number of observations with
+the time-varying estimates.}
+\item{fitted}{A vector of length obs with the fited values from the estimation.}
+\item{residuals}{A vector of length obs with the residuals from the estimation.}
 }
 \description{
-\code{tvOLS} is used to fit univariate linear models with time-varying coefficients.
-}
-\examples{
-tau <- seq(1:500)/500
-beta <- data.frame(beta1 = sin(2*pi*tau), beta2= 2*tau)
-X <- data.frame(X1 = rnorm(500), X2 = rchisq(500, df = 4))
-error <- rt(500, df = 10)
-y <- apply(X*beta, 1, sum) + error
-coef.lm <- stats::lm(y~0+X1+X2, data = X)$coef
-coef.tvlm <-  tvOLS(x = X, y = y, bw = 0.1)$tvcoef
-plot(tau,beta[, 1], type="l", main="", ylab = expression(beta[1]), xlab = expression(tau),
-ylim = range(beta[,1], coef.tvlm[, 1]))
-abline(h = coef.lm[1], col = 2)
-lines(tau, coef.tvlm[, 1], col = 4)
-legend("topright", c(expression(beta[1]), "lm", "tvlm"), col = c(1, 2, 4), bty="n", lty = 1)
-
-}
-\seealso{
-\code{\link{bw}} for bandwidth selection and \code{\link{tvLM}}
+\code{tvOLS} estimate time-varying coefficient of univariate 
+linear models using the kernel smoothing OLS.
 }

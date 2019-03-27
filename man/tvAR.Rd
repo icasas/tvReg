@@ -6,9 +6,9 @@
 \alias{tvar}
 \title{Time-Varying Autoregressive Model}
 \usage{
-tvAR(y, p = 1, z = NULL, bw = NULL, type = c("const", "none"),
-  exogen = NULL, fixed = NULL, est = c("lc", "ll"), tkernel = c("Epa",
-  "Gaussian"), singular.ok = TRUE)
+tvAR(y, p = 1, z = NULL, ez = NULL, bw = NULL, type = c("const",
+  "none"), exogen = NULL, fixed = NULL, est = c("lc", "ll"),
+  tkernel = c("Epa", "Gaussian"), singular.ok = TRUE)
 }
 \arguments{
 \item{y}{A vector with the dependent variable.}
@@ -16,6 +16,9 @@ tvAR(y, p = 1, z = NULL, bw = NULL, type = c("const", "none"),
 \item{p}{A scalar indicating the number of lags in the model.}
 
 \item{z}{A vector with the smoothing variable.}
+
+\item{ez}{(optional) A scalar or vector with the smoothing estimation values. If 
+values are included then the vector \code{z} is used.}
 
 \item{bw}{An opcional scalar or vector of length the number of equations. It represents
 the bandwidth in the estimation of coefficients. If NULL, it is selected
@@ -37,8 +40,7 @@ one of Epanesnikov ("Epa") or "Gaussian".}
 \item{singular.ok}{Logical. If FALSE, a singular model is an error.}
 }
 \value{
-An object of class 'tvar' 
-The object of class \code{tvar} have the following components:
+An object of class \code{tvar} with the following components:
 \item{tvcoef}{A vector of dimension obs (obs = number of observations - number lags),
  with the time-varying coefficients estimates.}
 \item{fitted}{The fitted values.}
@@ -46,6 +48,8 @@ The object of class \code{tvar} have the following components:
 \item{x}{A matrix of model data, with lagged y and exogenous variables.}
 \item{y}{A vector with the dependent data used in the model.}
 \item{z}{A vector with the smoothing variable in the model.}
+\item{ez}{A vector with the smoothing estimation values.}
+\item{y.orig}{A vector with the original variable y.}
 \item{bw}{Bandwidth of mean estimation.}
 \item{type}{Whether the model has a constant or not.}
 \item{exogen}{A matrix or data.frame with other exogenous variables.}
@@ -56,7 +60,6 @@ The object of class \code{tvar} have the following components:
 \item{runs}{Number of bootstrap replications.}
 \item{tboot}{Type of bootstrap.}
 \item{BOOT}{List with all bootstrap replications of \code{tvcoef}, if done.}
-\item{call}{Matched call.}
 }
 \description{
 \code{tvAR} is used to fit an autorregressive model with time varying coefficients.
@@ -68,83 +71,35 @@ to the regressors matrix. A time-varying coefficients linear regression (with an
 intercept if type = "const") is fitted.
 }
 \examples{
-## Simulate an tvAR(2) process
-\dontrun{
-tt <- (1:1000)/1000
-beta <- cbind( 0.5 * cos (2 * pi * tt), (tt - 0.5)^2)
-y <- numeric(1000)
-y[1] <- 0.5
-y[2] <- -0.2
 
-## y(t) = beta1(t) y(t-1) + beta2(t) y(t-2) + ut
-
-for (t in 3:1000)
-{
-  y[t] <- y[(t-1):(t-2)] \%*\% beta[t,] + rnorm(1)
-}
-Y <- tail (y, 600)
-
-## Estimate coefficients of Y with ar.ols and tvAR
-
-tvAR.2p <- tvAR(Y, p = 2, type = "none", est = "ll")
-AR.2p <- ar.ols(Y, aic = FALSE, order = 2, 
-intercept = FALSE, demean = FALSE )
-
-##Compare methodologies in a plot
-ylim <- range(tvAR.2p$tvcoef[, 1], tail(beta[, 1], 600))
-plot(tail(beta[, 1], 600), ylim = ylim, xlab = "", ylab = "", cex = 0.5)
-abline(h = AR.2p$ar[1], col = 2)
-lines(tvAR.2p$tvcoef[, 1], col = 4)
-legend("topleft", c(expression(beta[1]),"AR", "tvAR"), col = c(1, 2, 4),
-lty = 1, bty = "n")
-
-## Estimate only coefficient from odd lags and the intercept
-tvAR.6p <- tvAR(Y, p = 6, type = "const",
-fixed = c(NA, 0, NA, 0, NA, 0, NA), est = "ll")
-
-## Generation of model with coefficients depending 
-## on a random variable
-z <- arima.sim(n = 1000, list(ma = c(-0.2279, 0.2488)))
-beta <- (z - 0.5)^2
-y <- numeric(1000)
-y[1] <- -1
-
-##y(t) = beta1(z(t)) y(t-1) + ut
- 
-for (t in 3:1000)
-{
-  y[t] <- y[(t-1)] \%*\% beta[t] + rnorm(1)
-}
-Y <- tail (y, 600)
-Z <- tail(z, 600)
-
-## Estimate coefficients of process Y with ar.ols and tvAR
-
-tvAR.2p.z <- tvAR(Y, z = Z, p = 1, type = "none", est = "ll")
-AR.2p <- ar.ols(Y, aic = FALSE, order = 1, intercept = FALSE, 
-         demean = FALSE)
-
-#' ## Estimate coefficients of different realized variance models
+## Estimate coefficients of different realized variance models
 data("RV")
-Date <- tail(as.Date(RV$Date), 2000)
-RVt <- tail(RV$RVt, 2000)
-RV_week <- tail(RV$RVt_1_5, 2000)
-RV_month <- tail(RV$RVt_1_22, 2000)
-RQ <- 1/tail(RV$RQt_1_sqrt, 2000)
+RV2 <- head(RV, 2000)
+RV <- RV2$RV
+RV_week <- RV2$RV_week
+RV_month <- RV2$RV_month
+RQ <- RV2$RQ_lag_sqrt
 ##Corsi (2009) HAR model
-HAR <- arima(RVt, order = c(1, 0, 0), xreg = cbind (RV_week, RV_month))
-summary(HAR)
+HAR <- arima(RV, order = c(1, 0, 0), xreg = cbind (RV_week, RV_month))
+print(HAR)
 
 ##Chen et al (2017) TVC-HAR model 
-TVCHAR <- tvAR (RVt, p = 1, exogen = cbind (RV_week, RV_month), bw = 1.83)
-plot(TVCHAR)
-summary(TVCHAR)
-}
+TVCHAR <- tvAR (RV, p = 1, exogen = cbind (RV_week, RV_month), bw = 20)
+print(TVCHAR)
+
+##Casas et al (2018) TV-HARQ model
+tvHARQ <- tvAR (RV, p = 1, exogen = cbind (RV_week, RV_month), 
+z=RQ, bw = 0.0062)
+print(tvHARQ)
 
 }
 \references{
 Cai, Z. (2007) Trending time-varying coefficient time series with serially
 correlated errors, \emph{Journal of Econometrics}, 136, pp. 163-188.
+
+Casas, I., Mao, X. and Veiga, H. (2018) Reexamining financial and economic 
+predictability with new estimators of realized variance and variance 
+risk premium. Url= http://pure.au.dk/portal/files/123066669/rp18_10.pdf
 
 Chen, X. B., Gao, J., Li, D., and Silvapulle, P (2017) Nonparametric estimation and 
 forecasting for time-varying coefficient realized volatility models,
