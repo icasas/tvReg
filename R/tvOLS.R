@@ -14,7 +14,9 @@
 #' @import methods
 tvOLS <- function(x, ...) UseMethod("tvOLS", x)
 
-#' @param x A matrix with all regressors.
+#' @rdname tvOLS
+#' @method tvOLS matrix
+# @param x A matrix with all regressors.
 #' @param y A vector with dependent variable.
 #' @param z A vector with the variable over which coefficients are smooth over.
 #' @param ez (optional) A scalar or vector with the smoothing values. If 
@@ -29,7 +31,7 @@ tvOLS <- function(x, ...) UseMethod("tvOLS", x)
 #' error <- rt(500, df = 10)
 #' y <- apply(X*beta, 1, sum) + error
 #' coef.lm <- stats::lm(y~0+X1+X2, data = X)$coef
-#' coef.tvlm <-  tvOLS(x = X, y = y, bw = 0.1)$tvcoef
+#' coef.tvlm <-  tvOLS(x = as.matrix(X), y = y, bw = 0.1)$tvcoef
 #' plot(tau,beta[, 1], type="l", main="", ylab = expression(beta[1]), xlab = expression(tau),
 #' ylim = range(beta[,1], coef.tvlm[, 1]))
 #' abline(h = coef.lm[1], col = 2)
@@ -38,9 +40,7 @@ tvOLS <- function(x, ...) UseMethod("tvOLS", x)
 #'
 #' @seealso \code{\link{bw}} for bandwidth selection, \code{\link{tvLM}} and
 #' \code{\link{tvAR}}.
-#' @method tvOLS matrix
 #' @export
-
 tvOLS.matrix <- function(x, y, z = NULL, ez = NULL, bw, est = c("lc", "ll"), 
                   tkernel = c("Epa", "Gaussian"), 
                   singular.ok = singular.ok, ...)

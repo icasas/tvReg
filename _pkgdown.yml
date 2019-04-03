@@ -1,0 +1,64 @@
+url: http://github.com/icasas/tvReg
+
+reference:
+  - title: "Regression methods with time-varying coefficients"
+    desc: "Main functions for semiparametric regression with time-varying coefficients."
+    contents: 
+      - tvAR
+      - tvCov
+      - tvGLS
+      - tvIRF
+      - tvLM
+      - tvOLS
+  - title: "Bandwidth selection"
+    desc: "Cross-validation methods for bandwidth selection."
+    contents:
+      - bw
+      - bwCov
+  - title: "Results output"
+    desc: "Plot, summary and print methods."
+    contents:
+    - plot.tvsure
+    - plot.tvlm
+    - plot.tvar
+    - plot.tvvar
+    - plot.tvirf
+    - print.tvlm
+    - print.tvar
+    - print.tvsure
+    - print.tvvar
+    - print.tvirf
+    - summary.tvlm
+    - summary.tvar
+    - summary.tvsure
+    - summary.tvvar
+    - summary.tvirf	
+  - title: "Data sets"
+    desc: "Data sets included in the package."
+    contents:
+      - CEES
+      - FF5F
+      - RV
+  - title: "Utilities"
+    desc: "Utilities for tvReg objects."
+    contents:
+    - confint.tvlm 
+    - confint.tvar 
+    - confint.tvsure 
+    - confint.tvirf
+    - predict.tvlm
+    - predict.tvar
+    - predict.tvvar
+    - predict.tvsure
+    - forecast
+    - coef.tvlm
+    - tvAcoef
+    - tvBcoef
+    - tvPhi
+    - tvPsi
+    - update.tvlm
+    - update.tvar
+    - update.tvvar
+    - update.tvsure
+
+

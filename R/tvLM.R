@@ -68,7 +68,7 @@
 #'
 #' ## Estimate coefficients of different realized variance models
 #' data("RV")
-#  RV2 <- head(RV, 2000)
+#' RV2 <- head(RV, 2000)
 #' ##Bollerslev t al. (2016) HARQ model
 #' HARQ <- with(RV2, lm(RV ~ RV_lag + I(RV_lag * RQ_lag_sqrt) + RV_week + RV_month))
 #' 

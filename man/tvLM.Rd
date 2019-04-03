@@ -83,16 +83,15 @@ tvlm.fit <- tvLM(y ~ 0 + X1 + X2, data = data, bw = 0.29)
 
 ## Estimate coefficients of different realized variance models
 data("RV")
-##Bollerslev et al. (2016) HARQ model
-HARQ <- lm (RV ~ RV_lag + I(RV_lag * RQ_lag_sqrt) + RV_week + RV_month, 
-                 data = RV)
+RV2 <- head(RV, 2000)
+##Bollerslev t al. (2016) HARQ model
+HARQ <- with(RV2, lm(RV ~ RV_lag + I(RV_lag * RQ_lag_sqrt) + RV_week + RV_month))
 
 #Casas et al. (2018) TV-HARQ model
-RQ <- RV$RQ_lag_sqrt
-tvHARQ <- tvLM (RV ~ RV_lag + RV_week + RV_month, z = RQ, data = RV, 
-                     bw = 0.004)
-boxplot(data.frame(tvHARQ = tvHARQ$tvcoef[,2] * RV$RV_lag,
-                   HARQ = (HARQ$coef[2] + HARQ$coef[3] * RV$RQ_lag_sqrt)*RV$RV_lag),
+tvHARQ <- with(RV2, tvLM (RV ~ RV_lag + RV_week + RV_month, z = RQ_lag_sqrt, 
+                         bw = 0.0061))
+boxplot(data.frame(tvHARQ = tvHARQ$tvcoef[,2] * RV2$RV_lag,
+                   HARQ = (HARQ$coef[2] + HARQ$coef[3] * RV2$RQ_lag_sqrt)*RV2$RV_lag),
                    main = expression (RV[t-1]), outline = FALSE)
 }
 \references{

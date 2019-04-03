@@ -11,10 +11,10 @@
 #' input the intercept.
 #' @param newz A vector with new values of the smoothing variable.
 #' @param newexogen A matrix or vector with the new value of the exogenous variables.
-#' Only for predictions of *tvar* and *tvvar* objects.
+#' Only for predictions of 'tvar' and 'tvvar' objects.
 #' @param ... Other arguments passed to specific methods.
 #' @return An object of class matrix or vector with the prediction.
-#' @rdname predict.tvReg
+#' @rdname predict-tvReg
 #' @method predict tvlm
 #' @seealso \code{\link{forecast}}.
 #' @examples
@@ -62,7 +62,7 @@ predict.tvlm<-function (object, newx, newz, ...)
   return(prediction)
 }
 
-#' @rdname predict.tvReg
+#' @rdname predict-tvReg
 #' @method predict tvar
 #' @examples 
 #' ## Example of TV-AR prediction with coefficients as 
@@ -118,7 +118,7 @@ predict.tvar<-function (object, newy, newz, newexogen = NULL, ...)
     prediction[t] <- beta[t, ]%*%newx[t, ]
   return(prediction)
 }
-#' @rdname predict.tvReg
+#' @rdname predict-tvReg
 #' @method predict tvvar
 #' @examples 
 #' ## Example of TV-VAR prediction with coefficients as 
@@ -191,10 +191,10 @@ predict.tvvar<-function (object, newy, newz, newexogen = NULL, ...)
   return(prediction)
 }
 
-#' @rdname predict.tvReg
+#' @rdname predict-tvReg
 #' @method predict tvsure
 #' @param newdata A dataframe with new values of all regressors, with the
-#' same name and order as they appear in argument *data* from the *tvsure* 
+#' same name and order as they appear in argument 'data' from the 'tvsure'
 #' object
 #' @examples 
 #' ## Example of TV-SURE prediction with coefficients as 

@@ -2,14 +2,44 @@
 % Please edit documentation in R/forecast_tvreg.R
 \name{forecast}
 \alias{forecast}
+\alias{forecast.tvlm}
+\alias{forecast.tvar}
+\alias{forecast.tvvar}
+\alias{forecast.tvsure}
 \title{Forecast Methods for Objects in tvReg.}
 \usage{
 forecast(object, ...)
+
+\method{forecast}{tvlm}(object, newx, n.ahead = 1, winsize = 0, ...)
+
+\method{forecast}{tvar}(object, n.ahead = 1, newexogen = NULL,
+  winsize = 0, ...)
+
+\method{forecast}{tvvar}(object, n.ahead = 1, newexogen = NULL,
+  winsize = 0, ...)
+
+\method{forecast}{tvsure}(object, newdata, n.ahead = 1, winsize = 0,
+  ...)
 }
 \arguments{
 \item{object}{Object of class \code{tvlm}, \code{tvar}, \code{tvvar} or \code{tvsure}.}
 
 \item{...}{Other parameters passed to specific methods.}
+
+\item{newx}{A vector, dataframe or matrix with new values of all variables in x. No need to 
+input the intercept.}
+
+\item{n.ahead}{A scalar with the forecast horizon, value 1 by default.}
+
+\item{winsize}{A scalar. If 0 then an 'increase window' forecasting is performed.
+Otherwise a 'rolling window' forecasting is performed with window size given by 
+'winsize'.}
+
+\item{newexogen}{A matrix or vector with the new value of the exogenous variables.
+Only for predictions of *tvar* and *tvvar* objects.}
+
+\item{newdata}{A matrix or data.frame with the values of the regressors to use
+for forecasting.}
 }
 \value{
 An object of class matrix or vector with the same dimensions than  the dependent 
@@ -20,6 +50,33 @@ Forecast methods for objects with class attribute \code{tvlm}, \code{tvar},
 \code{tvvar}, \code{tvirf} and \code{tvsure}. If the 
 smoothing variable (z) in the model is non-NULL and it is a random 
 variable then use function \code{predict} with parameter \code{newz}.
+}
+\examples{
+data("RV")
+RV2 <- head(RV, 2001)
+tvHAR <- tvLM (RV ~ RV_lag + RV_week + RV_month, data = RV2, bw = 20)
+newx <- cbind(RV$RV_lag[2002:2004], RV$RV_week[2002:2004],
+              RV$RV_month[2002:2004])
+forecast(tvHAR, newx, n.ahead = 3)
+
+exogen = RV2[, c("RV_week", "RV_month")]
+tvHAR2 <- tvAR(RV2$RV_lag, p = 1, exogen = exogen, bw = 20)
+newexogen <- newx[, -1]
+forecast(tvHAR2, n.ahead = 3, newexogen = newexogen)
+
+data(usmacro, package = "bvarsv")
+tvVAR <- tvVAR(usmacro, p = 6, type = "const", bw = c(1.8, 20, 20))
+forecast(tvVAR, n.ahead = 10)
+
+data("Kmenta", package = "systemfit")
+eqDemand <- consump ~ price + income
+eqSupply <- consump ~ price + farmPrice 
+system <- list(demand = eqDemand, supply = eqSupply)
+tvOLS.fit <- tvSURE(system, data = Kmenta, est = "ll", bw = c(1.5, 1.5))
+newdata <- data.frame(consump = c(95, 100, 102), price = c(90, 100, 103), 
+farmPrice = c(70, 95, 103), income = c(82, 94, 115))
+forecast(tvOLS.fit, newdata = newdata, n.ahead = 3)
+
 }
 \seealso{
 \code{\link{predict}}.

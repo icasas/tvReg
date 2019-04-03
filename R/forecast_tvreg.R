@@ -13,7 +13,7 @@
 #' @export
 forecast <- function(object, ...) UseMethod("forecast", object)
 
-#' @rdname forecast.tvReg
+#' @rdname forecast
 #' @method forecast tvlm
 #' @param newx A vector, dataframe or matrix with new values of all variables in x. No need to 
 #' input the intercept.
@@ -79,9 +79,9 @@ forecast.tvlm<-function (object, newx, n.ahead = 1, winsize = 0, ...)
   return(prediction)
 }
 
-#' @rdname forecast.tvReg
+#' @rdname forecast
 #' @method forecast tvar
-#' @inheritParams forecast.tvlm
+# @inheritParams forecast.tvlm
 #' @param newexogen A matrix or vector with the new value of the exogenous variables.
 #' Only for predictions of *tvar* and *tvvar* objects.
 #' @examples 
@@ -147,7 +147,7 @@ forecast.tvar <- function(object, n.ahead = 1, newexogen = NULL, winsize = 0, ..
 }
 
 
-#' @rdname forecast.tvReg
+#' @rdname forecast
 #' @method forecast tvvar
 #' @inheritParams forecast.tvar
 #' 
@@ -222,15 +222,16 @@ forecast.tvvar<-function (object, n.ahead = 1, newexogen = NULL, winsize = 0, ..
 }
 
 
-#' @rdname forecast.tvReg
+#' @rdname forecast
 #' @method forecast tvsure
-#' @inheritParams forecast.tvlm
+# @inheritParams forecast.tvlm
 #' @param newdata A matrix or data.frame with the values of the regressors to use
 #' for forecasting.
 #' @examples 
 #' data("Kmenta", package = "systemfit")
 #' eqDemand <- consump ~ price + income
 #' eqSupply <- consump ~ price + farmPrice 
+#' system <- list(demand = eqDemand, supply = eqSupply)
 #' tvOLS.fit <- tvSURE(system, data = Kmenta, est = "ll", bw = c(1.5, 1.5))
 #' newdata <- data.frame(consump = c(95, 100, 102), price = c(90, 100, 103), 
 #' farmPrice = c(70, 95, 103), income = c(82, 94, 115))
