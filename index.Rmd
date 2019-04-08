@@ -1,3 +1,19 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+[![CRAN status](https://www.r-pkg.org/badges/version/tvReg)](https://cran.r-project.org/package=tvReg)
 
 # tvReg
 
@@ -8,12 +24,12 @@ This R package covers a large range of semiparametric regression methods with ti
 
 You can install the released version of tvReg from [CRAN](https://CRAN.R-project.org) with:
 
-```
+``` {r, eval = FALSE}
 install.packages("tvReg")
 ```
 
 or the development version from GitHub with:
-```
+```{r, eval = FALSE}
 devtools::install_github("icasas/tvReg")
 ```
 
@@ -31,5 +47,7 @@ and in the package vignette <https://icasas.github.io/tvReg/articles/tvReg.html>
 
 Casas, Isabel and Fernandez-Casal, Ruben, *tvReg: Time-varying Coefficient Linear Regression for Single and Multi-Equations in R* (April 1, 2019). Available at SSRN:<https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3363526>.
 
-
+<!-- 
+pkgdown::build_home()
+-->
 
