@@ -1,8 +1,10 @@
 # tvReg 0.4.1
 
+* Fix bug in `tvGLS.R` for option `est = "ll"`.
+
 * Added a website for the package (with pkgdown).
 
-* Added 'README.Rmd' and 'index.Rmd'.
+* Added `README.Rmd` and `index.Rmd`.
 
 * Updated documentation `tvOLS matrix`, `forecast.tvar`, `forecast.tvlm` and
   `forecast.tvsure`.

@@ -150,13 +150,21 @@ tvGLS.list <- function(x, y, z = NULL, ez = NULL, bw, Sigma = NULL, R = NULL, r 
     if(class(result) == "try-error")
       stop("\nSystem is computationally singular, the inverse cannot be calculated. 
            Possibly, the 'bw' is too small for values in 'ez'.\n")
+    if(est =="ll")
+    {
+      temp <- result[1:nvar[1]]
+      for(i in 2:neq)
+        temp <- c(temp, result[(1:nvar[i]) + 2 * sum(nvar[1:(i-1)])])
+      theta[t, ] <- temp
+    }
+    else
+      theta[t, ] <- result
     if(!is.null(R))
     {
       Sinv <- Matrix::solve(s0)
-      result[1:sum(nvar)] <- result[1:sum(nvar)] - Sinv %*% t(R) %*%
-        Matrix::solve(R %*% Sinv %*% t(R)) %*% (R %*% result[1:sum(nvar)]-r)
+      theta[t, ] <- theta[t, ] - Sinv %*% t(R) %*%
+        Matrix::solve(R %*% Sinv %*% t(R)) %*% (R %*% theta[t, ] - r)
     }
-    theta[t, ] <- result[1:sum(nvar)]
     xt.diag <- as.matrix(Matrix::bdiag(lapply(x,"[",t, ,drop = FALSE)))
     y.hat[t, ] <- xt.diag %*% theta[t, ]
   }
@@ -274,13 +282,21 @@ tvGLS.matrix <- function(x, y, z = NULL, ez = NULL, bw, Sigma = NULL,
     if(class(result) == "try-error")
       stop("\nSystem is computationally singular, the inverse cannot be calculated. 
            Possibly, the 'bw' is too small for values in 'ez'.\n")
-    if (!is.null(R))
+    if(est =="ll")
+    {
+      temp <- result[1:nvar[1]]
+      for(i in 2:neq)
+        temp <- c(temp, result[(1:nvar[i]) + 2 * sum(nvar[1:(i-1)])])
+      theta[t, ] <- temp
+    }
+    else
+      theta[t, ] <- result
+    if(!is.null(R))
     {
       Sinv <- Matrix::solve(s0)
-      result <- result[1:sum(nvar)] - Sinv %*% t(R) %*%
-        Matrix::solve(R %*% Sinv %*% t(R)) %*% (R %*% result[1:sum(nvar)] - r)
+      theta[t, ] <- theta[t, ] - Sinv %*% t(R) %*%
+        Matrix::solve(R %*% Sinv %*% t(R)) %*% (R %*% theta[t, ] - r)
     }
-    theta[t, ] <- result[1:sum(nvar)]
     xt.diag <- as.matrix(Matrix::bdiag(lapply(x,"[",t, ,drop = FALSE)))
     y.hat[t, ] <-  xt.diag %*% theta[t, ]
   }
