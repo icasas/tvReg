@@ -12,11 +12,11 @@ forecast(object, ...)
 
 \method{forecast}{tvlm}(object, newx, n.ahead = 1, winsize = 0, ...)
 
-\method{forecast}{tvar}(object, n.ahead = 1, newexogen = NULL,
-  winsize = 0, ...)
+\method{forecast}{tvar}(object, n.ahead = 1, newz = NULL,
+  newexogen = NULL, winsize = 0, ...)
 
-\method{forecast}{tvvar}(object, n.ahead = 1, newexogen = NULL,
-  winsize = 0, ...)
+\method{forecast}{tvvar}(object, n.ahead = 1, newz = NULL,
+  newexogen = NULL, winsize = 0, ...)
 
 \method{forecast}{tvsure}(object, newdata, n.ahead = 1, winsize = 0,
   ...)
@@ -35,7 +35,9 @@ input the intercept.}
 Otherwise a 'rolling window' forecasting is performed with window size given by 
 'winsize'.}
 
-\item{newexogen}{A matrix or vector with the new value of the exogenous variables.
+\item{newz}{A vector with the new values of the smoothing variable.}
+
+\item{newexogen}{A matrix or vector with the new values of the exogenous variables.
 Only for predictions of *tvar* and *tvvar* objects.}
 
 \item{newdata}{A matrix or data.frame with the values of the regressors to use

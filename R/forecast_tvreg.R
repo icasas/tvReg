@@ -49,19 +49,17 @@ forecast.tvlm<-function (object, newx, n.ahead = 1, winsize = 0, ...)
   if(is.intercept & n.col ==(NCOL(object$x) - 1))
     newx <- cbind(rep(1, n.ahead), newx)
   obs <- object$obs
-  RW = TRUE
-  if(winsize == 0)
-    RW = FALSE
+  is.rw <- !(winsize == 0)
   if(winsize > obs | winsize < 0)
-    winsize = obs - 1
+    winsize <- obs - 1
   prediction <- numeric(n.ahead)
   tobs <- obs + n.ahead
-  grid <- 1:(tobs)/tobs
+  grid <- (1:tobs)/tobs
   X <- object$x
   Y <- object$y
   for (t in 1:n.ahead)
   {
-    i <- ifelse (RW, obs - winsize, 1)
+    i <- ifelse (is.rw, obs - winsize, 1)
     object$x <- X[i:(obs + t -1),]
     object$y <- Y[i:(obs + t -1)]
     object$z <- grid[i:(obs + t -1)]
@@ -82,7 +80,8 @@ forecast.tvlm<-function (object, newx, n.ahead = 1, winsize = 0, ...)
 #' @rdname forecast
 #' @method forecast tvar
 # @inheritParams forecast.tvlm
-#' @param newexogen A matrix or vector with the new value of the exogenous variables.
+#' @param newz A vector with the new values of the smoothing variable.
+#' @param newexogen A matrix or vector with the new values of the exogenous variables.
 #' Only for predictions of *tvar* and *tvvar* objects.
 #' @examples 
 #' exogen = RV2[, c("RV_week", "RV_month")]
@@ -91,18 +90,17 @@ forecast.tvlm<-function (object, newx, n.ahead = 1, winsize = 0, ...)
 #' forecast(tvHAR2, n.ahead = 3, newexogen = newexogen)
 #' 
 #' @export
-forecast.tvar <- function(object, n.ahead = 1, newexogen = NULL, winsize = 0, ...) 
+forecast.tvar <- function(object, n.ahead = 1, newz = NULL, newexogen = NULL, winsize = 0, ...) 
 {
   if(!inherits(object, c("tvar")))
     stop("\nParameter 'object' should be entered and it should have class 'tvar'.\n")
-  if(!is.null(object$z))
-    stop("\nYour model coefficients are functions of a random variable 'z', use function 
-         'predict' with parameter 'newz'.\n")
+  if(!inherits(newz, c( "numeric", "vector")) & !is.null(object$z))
+    stop("\nArgument 'newz' should be entered and it should be a numeric vector.\n")
   if (!identical(NCOL(newexogen), NCOL(object$exogen))) 
     stop("\nWrong dimension in 'newexogen'.\n")
-  if(!is.null(newexogen))
+  is.exogen <- !is.null(newexogen)
+  if(is.exogen)
   {
-    is.exogen = TRUE
     if(NCOL(newexogen) == 1)
       newexogen <- matrix (newexogen, ncol = length(newexogen))
     if(NROW(newexogen) != n.ahead)
@@ -112,20 +110,22 @@ forecast.tvar <- function(object, n.ahead = 1, newexogen = NULL, winsize = 0, ..
   is.intercept <- (object$type == "const")
   prediction <- numeric(n.ahead)
   obs <- object$obs
-  RW = TRUE
-  if(winsize == 0)
-    RW = FALSE
+  is.rw <- !( winsize == 0)
   if(winsize > obs | winsize < 0)
-    winsize = obs - 1
+    winsize <- obs - 1
   prediction <- numeric(n.ahead)
   tobs <- obs + n.ahead
-  grid <- 1:(tobs)/tobs
+  if(is.null(newz))
+    grid <- (1:tobs)/tobs
+  else
+    grid <- c(object$z, newz)
   X <- object$x
   Y <- object$y
   p <- object$p
+  mask <- object$mask
   for (t in 1:n.ahead)
   {
-    i <- ifelse (RW, obs - winsize, 1)
+    i <- ifelse (is.rw, obs - winsize, 1)
     object$x <- X[i:(obs + t -1),]
     object$y <- Y[i:(obs + t -1)]
     object$z <- grid[i:(obs + t -1)]
@@ -136,9 +136,10 @@ forecast.tvar <- function(object, n.ahead = 1, newexogen = NULL, winsize = 0, ..
       object$bw <- bw (object)
       beta<- tvOLS(object)$tvcoef
     }
-    newx <- c(tail(object$y, p))
-    if(is.exogen) newx <- c(newx, newexogen[t, ])
+    newx <- tail(object$y, p)
     if(is.intercept) newx <- c(1L, newx)
+    if(is.exogen) newx <- c(newx, newexogen[t, ])
+    newx <- newx[mask]
     prediction[t] <- beta%*%newx
     X <- rbind(X, newx)
     Y <- c (Y, prediction[t])
@@ -157,22 +158,21 @@ forecast.tvar <- function(object, n.ahead = 1, newexogen = NULL, winsize = 0, ..
 #' forecast(tvVAR, n.ahead = 10)
 #' 
 #' @export
-forecast.tvvar<-function (object, n.ahead = 1, newexogen = NULL, winsize = 0, ...) 
+forecast.tvvar<-function (object, n.ahead = 1, newz = NULL, newexogen = NULL, winsize = 0, ...) 
 {
   if(!inherits(object, c("tvvar")))
     stop("\nParameter 'object' should be entered and it should have class 'tvvar'.\n")
-  if(!is.null(object$z))
-    stop("\nYour model coefficients are functions of a random variable 'z', use function 
-         'predict' with parameter 'newz'.\n")
+  if(!inherits(newz, c( "numeric", "vector")) & !is.null(object$z))
+    stop("\nArgument 'newz' should be entered and it should be a numeric vector.\n")
   if (!identical(NCOL(newexogen), NCOL(object$exogen))) 
     stop("\nWrong dimension in 'newexogen'.\n")
   is.intercept <- (object$type == "const")
   if (!identical(NCOL(newexogen), NCOL(object$exogen))) 
     stop("\nWrong dimension in 'newexogen'.\n")
-  is.exogen = FALSE
+  is.exogen <- FALSE
   if(!is.null(newexogen))
   {
-    is.exogen = TRUE
+    is.exogen <- TRUE
     if(NCOL(newexogen) == 1)
       newexogen <- matrix (newexogen, ncol = length(newexogen))
     if(NROW(newexogen) != n.ahead)
@@ -183,20 +183,21 @@ forecast.tvvar<-function (object, n.ahead = 1, newexogen = NULL, winsize = 0, ..
   obs <- object$obs
   prediction <- matrix(NA, nrow = n.ahead, ncol = neq)
   colnames(prediction) <- colnames(object$y)
-  RW = TRUE
-  if(winsize == 0)
-    RW = FALSE
+  is.rw <- !(winsize == 0)
   if(winsize > obs | winsize < 0)
-    winsize = obs - 1
+    winsize <- obs - 1
   tobs <- obs + n.ahead
-  grid <- 1:(tobs)/tobs
+  if(is.null(newz))
+    grid <- (1:tobs)/tobs
+  else
+    grid <- c(object$z, newz)
   X <- object$x
   Y <- object$y
   p <- object$p
   nlags <- p*neq
   for (t in 1:n.ahead)
   {
-    i <- ifelse (RW, obs - winsize, 1)
+    i <- ifelse (is.rw, obs - winsize, 1)
     object$x <- X[i:(obs + t -1), ]
     object$y <- Y[i:(obs + t -1), ]
     object$z <- grid[i:(obs + t -1)]
@@ -254,13 +255,11 @@ forecast.tvsure<-function (object, newdata, n.ahead = 1, winsize = 0, ...)
   neq <- object$neq
   nvar <- object$nvar
   newnames <- colnames(newdata)
-  RW = TRUE
-  if(winsize == 0)
-    RW = FALSE
+  is.rw <- !(winsize == 0)
   if(winsize > obs | winsize < 0)
-    winsize = obs - 1
+    winsize <- obs - 1
   tobs <- obs + n.ahead
-  grid <- 1:(tobs)/tobs
+  grid <- (1:tobs)/tobs
   X <- object$x
   Y <- object$y
   object$z <- head(grid, obs)
@@ -272,7 +271,7 @@ forecast.tvsure<-function (object, newdata, n.ahead = 1, winsize = 0, ...)
   Y <- object$y
   for (t in 1:n.ahead)
   {
-    i <- ifelse (RW, obs - winsize, 1)
+    i <- ifelse (is.rw, obs - winsize, 1)
     object$y <- Y[i:(obs + t -1), ]
     object$z <- grid[i:(obs + t -1)]
     object$ez <- grid[obs + t]

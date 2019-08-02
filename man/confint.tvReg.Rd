@@ -8,16 +8,16 @@
 \title{Confidence Intervals for Objects in tvReg}
 \usage{
 \method{confint}{tvlm}(object, parm, level = 0.95, runs = 100,
-  tboot = NULL, ...)
+  tboot = c("wild", "wild2"), ...)
 
 \method{confint}{tvar}(object, parm, level = 0.95, runs = 100,
-  tboot = NULL, ...)
+  tboot = c("wild", "wild2"), ...)
 
 \method{confint}{tvsure}(object, parm, level = 0.95, runs = 100,
-  tboot = NULL, ...)
+  tboot = c("wild", "wild2"), ...)
 
 \method{confint}{tvirf}(object, parm, level = 0.95, runs = 100,
-  tboot = NULL, ...)
+  tboot = c("wild", "wild2"), ...)
 }
 \arguments{
 \item{object}{Object of class \code{tvsure}, class \code{tvvar} or class \code{tvirf}.}

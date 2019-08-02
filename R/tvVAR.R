@@ -6,9 +6,6 @@
 #' @import bvarsv
 #' @param y A matrix with dimention obs x neq (obs = number of observations and
 #' neq = number of equations)
-#' @param z A vector containing the smoothing variable.
-#' @param ez (optional) A scalar or vector with the smoothing estimation values. If 
-#' values are included then the vector \code{z} is used.
 #' @param p A scalar indicating the number of lags in the model
 #' @param type A character 'const' if the model contains an intercept and 'none' otherwise.
 #' @param exogen A matrix or data.frame with the exogenous variables (optional)
@@ -54,8 +51,8 @@
 #' 
 #' @export
 
-tvVAR <- function (y, p = 1, z = NULL, ez = NULL, bw = NULL, type = c("const", "none"), exogen = NULL,
-                   est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"), singular.ok = TRUE)
+tvVAR <- function (y, p = 1, z = NULL, ez = NULL, bw = NULL, cv.block = 0, type = c("const", "none"), 
+                   exogen = NULL, est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"), singular.ok = TRUE)
 {
   y <- as.matrix(y)
   if (any(is.na(y)))
@@ -72,12 +69,6 @@ tvVAR <- function (y, p = 1, z = NULL, ez = NULL, bw = NULL, type = c("const", "
   tkernel <- match.arg(tkernel)
   est <- match.arg(est)
   type <- match.arg(type)
-  if(!(tkernel %in% c("Epa","Gaussian")))
-    tkernel <- "Epa"
-  if(!(est %in% c("lc", "ll")))
-    est <- "lc"
-  if(!(type %in% c("const", "none")))
-    type <- "const"
   if (is.null(colnames(y)))
   {
     colnames(y) <- paste("y", 1:ncol(y), sep = "")
@@ -124,9 +115,10 @@ tvVAR <- function (y, p = 1, z = NULL, ez = NULL, bw = NULL, type = c("const", "
   equation <- list()
   if(is.null(bw))
   {
-    cat("Calculating regression bandwidths...\n")
-    bw <- bw(y = yend, x = rhs, z = z, tkernel = tkernel, 
+    cat("Calculating regression bandwidths... ")
+    bw <- bw(y = yend, x = rhs, z = z, cv.block = cv.block, tkernel = tkernel, 
              est = est, singular = singular.ok)
+    cat("bandwidth(s) ", bw, "\n")
   }
   resid = fitted <- matrix(0, nrow = sample, ncol = neq)
   for (i in 1:neq)
@@ -148,8 +140,8 @@ tvVAR <- function (y, p = 1, z = NULL, ez = NULL, bw = NULL, type = c("const", "
     names(bw) <- paste("bw.", names(equation), sep = "")
   result <- list(tvcoef = equation, Lower = NULL, Upper = NULL,  fitted = fitted,
                  residuals = resid, y = yend, x = rhs, z = z, y.orig = y.orig,
-                 exogen = exogen, p = p, type = type, obs = sample, totobs = sample + p,
-                 neq = neq, est = est, tkernel = tkernel, bw = bw, 
+                 bw = bw, cv.block = cv.block, exogen = exogen, p = p, type = type, obs = sample, 
+                 totobs = sample + p, neq = neq, est = est, tkernel = tkernel, 
                  singular.ok = singular.ok)
   class(result) <- "tvvar"
   return(result)

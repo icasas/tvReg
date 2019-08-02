@@ -3,9 +3,18 @@ year <- sub("-.*", "", meta$Date)
 note <- sprintf("R package version %s", meta$Version)
 
 bibentry(bibtype = "Manual",
-         title = "tvReg: Time-Varying Coefficients Linear Regression for Single and Multiple Equations",
+         title = "tvReg: Time-Varying Coefficients Linear Regression for Single and Multi-Equations",
          author = c(person("Isabel", "Casas"),
                     person("Ruben", "Fernandez-Casal")),
          year = year,
          note = note,
          url = "https://CRAN.R-project.org/package=tvReg")
+
+bibentry(bibtype = "TechReport",
+         title = "tvReg: Time-Varying Coefficients Linear Regression for Single and Multi-Equations in R",
+         author = c(person("Isabel", "Casas"),
+                    person("Ruben", "Fernandez-Casal")),
+         year = 2019,
+         note = note,
+         institution = "SSRN",
+         url = "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3363526")

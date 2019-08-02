@@ -56,9 +56,9 @@ predict.tvlm<-function (object, newx, newz, ...)
     newx <- cbind(rep(1, n.ahead), newx)
   prediction <- numeric(n.ahead)
   object$ez <- newz
-  beta <- tvOLS(object)$tvcoef
+  theta <- tvOLS(object)$tvcoef
   for (t in 1:n.ahead)
-    prediction[t] <- beta[t, ]%*%newx[t, ]
+    prediction[t] <- theta[t, ]%*%newx[t, ]
   return(prediction)
 }
 
@@ -94,7 +94,7 @@ predict.tvar<-function (object, newy, newz, newexogen = NULL, ...)
   p <- object$p
   if(p == 1)
     newx <- matrix(newx, ncol = 1)
-  newx <- as.matrix(newx)
+  mask <- object$mask
   if(!is.null(newexogen))
   {
     if(NCOL(newexogen) == 1)
@@ -113,9 +113,9 @@ predict.tvar<-function (object, newy, newz, newexogen = NULL, ...)
     newx <- cbind(rep(1, n.ahead), newx)
   prediction <- numeric(n.ahead)
   object$ez <- newz
-  beta <- tvOLS(object)$tvcoef
+  theta <- tvOLS(object)$tvcoef
   for (t in 1:n.ahead)
-    prediction[t] <- beta[t, ]%*%newx[t, ]
+    prediction[t] <- theta[t, ]%*%newx[t, mask]
   return(prediction)
 }
 #' @rdname predict-tvReg
@@ -153,8 +153,6 @@ predict.tvvar<-function (object, newy, newz, newexogen = NULL, ...)
   p <- object$p
   newx <- newy
   nlags <- neq*p
-  is.exogen = FALSE
-  is.intercept = ifelse(object$type == "const", TRUE, FALSE)
   if(neq == 1)
     newx <- matrix(newy, ncol = 1)
   newx <- as.matrix(newx)
@@ -162,9 +160,11 @@ predict.tvvar<-function (object, newy, newz, newexogen = NULL, ...)
     stop("\nDimensions of 'newx' and 'newz' are not compatible\n")
   if (!identical(NCOL(newexogen), NCOL(object$exogen))) 
     stop("\nWrong dimension in 'newexogen'.\n")
+  is.exogen <- FALSE
+  is.intercept <- ifelse(object$type == "const", TRUE, FALSE)
   if(!is.null(newexogen))
   {
-    is.exogen = TRUE
+    is.exogen <- TRUE
     if(NCOL(newexogen) == 1)
       newexogen <- matrix (newexogen, ncol = length(newexogen))
     if(NROW(newexogen) != n.ahead)
@@ -175,7 +175,7 @@ predict.tvvar<-function (object, newy, newz, newexogen = NULL, ...)
   prediction <- matrix(NA, nrow = n.ahead, ncol = neq)
   colnames(prediction) <- colnames(object$y)
   object$ez <- newz
-  beta <- tvOLS(object)$tvcoef
+  theta <- tvOLS(object)$tvcoef
   rhs <- tail(object$x, 1)
   rhs <- as.numeric(rhs)
   for (t in 1:n.ahead)
@@ -186,7 +186,7 @@ predict.tvvar<-function (object, newy, newz, newexogen = NULL, ...)
     if(is.exogen)
       rhs <- c(rhs, newexogen[t, ])
     for (i in 1:neq)
-      prediction[t, ] <- beta[[i]][t,]%*%rhs
+      prediction[t, ] <- theta[[i]][t,]%*%rhs
   }
   return(prediction)
 }
@@ -237,7 +237,7 @@ predict.tvsure<-function (object, newdata, newz, ...)
   newx <- list()
   newnames <- colnames(newdata)
   object$ez <- newz
-  beta <- update(object)$tvcoef
+  theta <- update(object)$tvcoef
   prediction <- matrix(NA, nrow = n.ahead, ncol = neq)
   for (t in 1:n.ahead)
     for (eq in 1:neq)
@@ -253,7 +253,7 @@ predict.tvsure<-function (object, newdata, newz, ...)
       if(is.intercept)
          newx <- c(1L, newx) 
       columns <- (1 + ifelse(eq == 1, 0, sum(nvar[1:(eq-1)]))):sum(nvar[1:eq])
-      prediction[t, eq] <- beta[t, columns]%*%newx
+      prediction[t, eq] <- theta[t, columns]%*%newx
     }
   colnames(prediction) <- names(object$formula)
   return(prediction)

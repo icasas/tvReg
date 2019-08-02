@@ -117,14 +117,14 @@ The user can provide additional optional arguments to modify the default estimat
  
  ##Coefficients estimation
  coef.lm <- stats::lm(y ~ 0 + X1 + X2, data = data)$coef
- model.tvLM2 <- tvLM(y ~ 0 + X1 + X2, z = z, data = data, bw = 0.4, est = "ll")
+ model.tvLM2 <- tvLM(y ~ 0 + X1 + X2, z = z, data = data, cv.block = 50, est = "ll")
  
  ##Plotting the estimates of beta1
  sort.index <- sort.int(z, index.return = TRUE)$ix
  par (mar = c(4,4,1,1), oma = c(1,1,1,1))
  plot(z[sort.index], beta[sort.index, 1], type = "l", main = "",
  ylab = expression(beta[1]), xlab = expression(z[t]),
- ylim = range(beta[,1], model.tvLM2$tvcoef[, 1]))
+ ylim = range(beta[,1], coefficients(model.tvLM2)[, 1]))
  abline(h = coef.lm[1], col = 2)
  lines(z[sort.index], model.tvLM2$tvcoef[sort.index, 1], col = 4)
  legend("top", c(expression(beta[1]), "lm", "tvLM"), col = c(1, 2, 4), bty = "n", 
@@ -139,7 +139,7 @@ Argument *data* can be used to specify the data frame or matrix with the model v
 
 
 ### Bandwidth
-When argument *bw* is  set to *NULL* in *tvLM*, it is automatically selected by leave-one-out cross-validation. This minimisation can be a bit slow for large datasets, and it should be avoided if the user knows the value of the bandwidth for the required problem. The user can enter values in *bw* to obtain undersmoothed or oversmoothed estimates as needed. As we can see in the previous example, the bandwidth was chosen to 0.4 by the user.
+When argument *bw* is  set to *NULL* in *tvLM*, it is automatically selected by leave-(2l+1)-out cross-validation. The default is leave-one-out cross-validation, i.e $l=0$ but his values can be changed by entering a value different than zero in argument  *cv.block*. This data-driven bandwdith selection can be a bit slow for large datasets, and it should be avoided if the user knows the value of the bandwidth for the required problem. The user can enter values in *bw* to obtain undersmoothed or oversmoothed estimates as needed. As we can see in the previous example, the bandwidth was chosen to 0.4 by the user.
 
 ### Kernel type
 The two choices for this argument are *tkernel = "Epa"* (default) and   *tkernel ="Gaussian"*. The former refers to the Epanechnikov kernel, which is compact in [-1, 1]. The  authors do not recommend the use of the Gaussian kernel because in general, it requires more calculations and it is slower.
@@ -154,7 +154,7 @@ As the *tvOLS* method wraps the *lm.wfit* method, which at default allows the fi
 
 ## Standard usage of *tvAR*
 
-A TV-AR model is a special case of TV-LM in which regressors contain lagged variables of the dependent variable, *y*. The number of lags included depend on the model order *p*. Other exogenous variables may be included in the model using argument *exogen*. An intercept is included by default unless the user enters *type= "none"* into the function call. Econometrically, this function also wraps estimator *tvOLS* which needs a bandwidth *bw* that is automatically selected by the leave-one-out cross-validation when the user does not enter any number. An object of the class attribute *tvar* is returned.
+A TV-AR model is a special case of TV-LM in which regressors contain lagged variables of the dependent variable, *y*. The number of lags included depend on the model order *p*. Other exogenous variables may be included in the model using argument *exogen*. An intercept is included by default unless the user enters *type= "none"* into the function call. Econometrically, this function also wraps estimator *tvOLS* which needs a bandwidth *bw* that is automatically selected by cross-validation when the user does not enter any number. An object of the class attribute *tvar* is returned.
 
 The following examples demonstrates the functionality of *tvAR* on generated data, and compares it with the output of the *ar.ols* method from the *stats* package. Specifically, the following TV-AR(2) process is considered,
 
@@ -351,7 +351,7 @@ R = Rrestr, r = qrestr, bw = tvfgls1.fit$bw, bw.cov = tvfgls1.fit$bw.cov)
 
 ## Standard usage of *tvVAR* and *tvIRF*
 
-A time-varying coefficients vector autoregressive (TV-VAR) model is a system of TV-AR models. The dependent variable, *y*, is a matrix with as many columns as equations. Regressors are often the same for each equation and they consist of the lagged values of *y*, where the number of lags is given in argument *p*; an intercept if argument *type="const"* and other exogenous variables entered in argument *exogen*. Econometrically, the *tvOLS* is called to calculate the estimates for each equation independently using one bandwidth per equation. The user can enter a single scalar in *bw* or a vector of scalars, one bandwidth for each equation. If *bw = NULL*, one bandwidth for each equation is selected by the leave-one-out cross-validation. 
+A time-varying coefficients vector autoregressive (TV-VAR) model is a system of TV-AR models. The dependent variable, *y*, is a matrix with as many columns as equations. Regressors are often the same for each equation and they consist of the lagged values of *y*, where the number of lags is given in argument *p*; an intercept if argument *type="const"* and other exogenous variables entered in argument *exogen*. Econometrically, the *tvOLS* is called to calculate the estimates for each equation independently using one bandwidth per equation. The user can enter a single scalar in *bw* or a vector of scalars, one bandwidth for each equation. If *bw = NULL*, one bandwidth for each equation is selected by cross-validation. 
 
 As in the other models, the kernel and the estimation methodology can be chosen in arguments *tkernel* and *est*. The return is an object of the class attribute *tvvar* which can be used to estimate the time-varying impulse response function with function *tvIRF*. The smoothing variable is time by default, but another random variable can be used by entering it in argument *z*.
 
@@ -490,7 +490,7 @@ tvHAR <- with(RV2, tvAR (RV, p = 1, bw = 20, exogen = cbind(RV_week, RV_month)))
 ##Define the forecast horizon (n.ahead) and the future values of the exogenous variables
 newexogen <- cbind(RV$RV_week[2002:2004], RV$RV_month[2002:2004])
 ##3-step-ahead forecast
-forecast(tvHAR, n.ahead = 3, newexogen)
+forecast(tvHAR, n.ahead = 3, newexogen = newexogen)
 ```
 
 

@@ -6,10 +6,14 @@
 \emph{bwCov} calculates a single bandwidth to estimate the time-varying variance-
 covariance matrix.}
 \usage{
-bwCov(x, est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"))
+bwCov(x, cv.block = 0, est = c("lc", "ll"), tkernel = c("Epa",
+  "Gaussian"))
 }
 \arguments{
 \item{x}{A matrix or a data frame.}
+
+\item{cv.block}{A positive scalar with the size of the block in leave-one block-out cross-validation.
+By default 'cv.block=0' meaning leave-one-out cross-validation.}
 
 \item{est}{The nonparametric estimation method, one of "lc" (default) for linear constant
 or "ll" for local linear.}

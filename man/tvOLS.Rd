@@ -11,8 +11,7 @@
 tvOLS(x, ...)
 
 \method{tvOLS}{matrix}(x, y, z = NULL, ez = NULL, bw, est = c("lc",
-  "ll"), tkernel = c("Epa", "Gaussian"), singular.ok = singular.ok,
-  ...)
+  "ll"), tkernel = c("Epa", "Gaussian"), singular.ok = TRUE, ...)
 
 \method{tvOLS}{tvlm}(x, ...)
 
@@ -53,13 +52,13 @@ linear models using the kernel smoothing OLS.
 }
 \examples{
 tau <- seq(1:500)/500
-beta <- data.frame(beta1 = sin(2*pi*tau), beta2= 2*tau)
+beta <- data.frame(beta1 = sin(2*pi*tau), beta2 = 2*tau)
 X <- data.frame(X1 = rnorm(500), X2 = rchisq(500, df = 4))
 error <- rt(500, df = 10)
 y <- apply(X*beta, 1, sum) + error
 coef.lm <- stats::lm(y~0+X1+X2, data = X)$coef
 coef.tvlm <-  tvOLS(x = as.matrix(X), y = y, bw = 0.1)$tvcoef
-plot(tau,beta[, 1], type="l", main="", ylab = expression(beta[1]), xlab = expression(tau),
+plot(tau, beta[, 1], type="l", main="", ylab = expression(beta[1]), xlab = expression(tau),
 ylim = range(beta[,1], coef.tvlm[, 1]))
 abline(h = coef.lm[1], col = 2)
 lines(tau, coef.tvlm[, 1], col = 4)

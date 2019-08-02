@@ -14,9 +14,6 @@
 #' 
 #' @param y A vector with the dependent variable.
 #' @param p A scalar indicating the number of lags in the model.
-#' @param z A vector with the smoothing variable.
-#' @param ez (optional) A scalar or vector with the smoothing estimation values. If 
-#' values are included then the vector \code{z} is used.
 #' @param bw An opcional scalar or vector of length the number of equations. It represents
 #' the bandwidth in the estimation of coefficients. If NULL, it is selected
 #' by cross validation.
@@ -88,7 +85,7 @@
 #' @rdname tvAR
 #' @inheritParams tvVAR
 #' @export
-tvAR <- function (y, p = 1, z = NULL, ez = NULL, bw = NULL, type = c("const", "none"), exogen = NULL,
+tvAR <- function (y, p = 1, z = NULL, ez = NULL, bw = NULL, cv.block = 0, type = c("const", "none"), exogen = NULL,
                   fixed = NULL, est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"), singular.ok = TRUE)
 {
   if (any(is.na(y)))
@@ -97,12 +94,8 @@ tvAR <- function (y, p = 1, z = NULL, ez = NULL, bw = NULL, type = c("const", "n
     stop("p should be a positive number. \n")
   tkernel <- match.arg(tkernel)
   est <- match.arg(est)
-  if(!(tkernel %in% c("Epa","Gaussian")))
-    tkernel <- "Epa"
-  if(!(est %in% c("lc", "ll")))
-    est <- "lc"
-  y.orig <- y
   type <- match.arg(type)
+  y.orig <- y
   obs <- length(y)
   sample <- obs - p
   ylags <- as.matrix(stats::embed(y, dimension = p + 1))
@@ -152,10 +145,9 @@ tvAR <- function (y, p = 1, z = NULL, ez = NULL, bw = NULL, type = c("const", "n
   tvcoef <- results$tvcoef
   colnames(tvcoef) <- colnames(rhs)[mask]
   result <- list(tvcoef = tvcoef, Lower = NULL, Upper = NULL,  fitted = results$fitted,
-                 residuals = results$resid, x = datamat, y = yend, z = z, ez = ez, 
-                 y.orig = y.orig, mask = mask, exogen = exogen, p = p, type = type, obs = sample, 
-                 totobs = sample + p, est = est, tkernel = tkernel, bw = bw, level = 0,
-                 runs = 0, tboot = NULL, BOOT = NULL)
+                 residuals = results$resid, x = datamat, y = yend, z = z, ez = ez, y.orig = y.orig, 
+                 bw = bw, cv.block = cv.block, mask = mask, exogen = exogen, p = p, type = type, obs = sample, 
+                 totobs = sample + p, est = est, tkernel = tkernel, level = 0, runs = 0, tboot = NULL, BOOT = NULL)
   class(result) <- c("tvar")
   return(result)
 }

@@ -43,7 +43,7 @@ update.tvsure <- function(object, ...)
   tkernel <- object$tkernel
   obs <- object$obs
   neq <- object$neq
-  if (method == "identity" | method == "tvOLS" | method == "tvFGLS")
+  if (method %in% c("identity", "tvOLS", "tvFGLS"))
   {
     object$Sigma <- NULL
     result <- tvGLS(object)
@@ -64,7 +64,7 @@ update.tvsure <- function(object, ...)
     while((abs(tolold-tolnew)>tol) && (itertemp <= maxiter))
     {
       tolold <- tolnew
-      Sigma <- tvCov(bw = bw.cov, x = result$residuals, tkernel = tkernel)
+      Sigma <- tvCov(x = result$residuals, bw = bw.cov, tkernel = tkernel)
       object$Sigma <- Sigma
       temp <- tvGLS(object)
       tolnew <- sqrt(sum((result$tvcoef - temp$tvcoef)^2)/sum(result$tvcoef^2))

@@ -9,31 +9,50 @@
 #'
 .tvboot.default<-function (x, runs = 100, tboot = "wild")
 {
-  if (any(class(x) %in% c("tvlm", "tvar", "tvsure")))
-  {
-    MODEL <- eval.parent(x)
-  }
-  else
+  if (!(any(class(x) %in% c("tvlm", "tvar"))))
   {
     stop("Bootstrap confidence intervals not implemented for this class.\n")
   }
-  obs <- MODEL$obs
-  nvar<- MODEL$nvar
-  neq <- MODEL$neq
-  if(any(class(x) %in% c("tvlm", "tvar")))
-  {
-    obs <- length(x$y)
-    neq <- 1
-    nvar <- NCOL (x$x)
-  }
-  BOOT <- vector("list", runs)
-  resorig <- scale(MODEL$residuals, scale = FALSE)
-  residup <-resorig * -0.6180339887498949025257 # (1+sqrt(5))*0.5
+  obs <- length(x$y)
+  nvar <- NCOL (x$x)
+  resorig <- scale(x$residuals, scale = FALSE)
+  fitted <- x$fitted
+  residup <- resorig * -0.6180339887498949025257 # (1-sqrt(5))*0.5
   residdown <- resorig * 1.618033988749894902526 # (1+sqrt(5))*0.5
-  fitted <- MODEL$fitted
+  yboot <- matrix(NA, nrow = obs, ncol = runs)
+  for (i in 1:runs) 
+  {
+    if (tboot == "wild"){
+      index <- ifelse(apply(resorig, 2, stats::rbinom, size = 1, prob = 0.7236067977499789360962) == 1, TRUE, FALSE)
+      resid <- residup
+      resid [!index] <- residdown[!index]
+      ystar <- fitted + resid
+    }else if (tboot == "wild2"){
+      resid <- resorig*stats::rnorm(obs)
+      ystar <- fitted + resid
+    }
+    yboot[, i] <- ystar
+  }
+  return(.tvLM.ci(x, yboot))
+}
+
+# @rdname tvReg-internals
+#' @method .tvboot tvsure
+#' @keywords internal
+#'
+.tvboot.tvsure<-function (x, runs = 100, tboot = "wild")
+{
+  obs <- x$obs
+  nvar<- x$nvar
+  neq <- x$neq
+  resorig <- scale(x$residuals, scale = FALSE)
+  fitted <- x$fitted
+  residup <- resorig * -0.6180339887498949025257 # (1-sqrt(5))*0.5
+  residdown <- resorig * 1.618033988749894902526 # (1+sqrt(5))*0.5
+  yboot <- vector("list", runs)
   for (i in 1:runs) {
     if (tboot == "wild"){
-      index <- ifelse(apply(resorig, 2, stats::rbinom, size=1, prob=0.7236067977499789360962) == 1, TRUE, FALSE)
+      index <- ifelse(apply(resorig, 2, stats::rbinom, size = 1, prob = 0.7236067977499789360962) == 1, TRUE, FALSE)
       resid <- residup
       resid [!index] <- residdown[!index]
       ystar <- fitted + resid
@@ -41,11 +60,9 @@
       resid <- resorig*stats::rnorm(obs*neq)
       ystar <- fitted + resid
     }
-    MODEL$y <- ystar
-    modelboot <- update(MODEL)
-    BOOT[[i]] <- modelboot$tvcoef
+    yboot[[i]] <- ystar
   }
-  return(BOOT)
+  return(.tvSURE.ci(x, yboot))
 }
 
 # @rdname tvReg-internals
@@ -93,13 +110,15 @@
   resid <-resorig
   fitted <- VAR$fitted
   yorig <- VAR$y.orig
+  residup <- resorig * -0.6180339887498949025257 # (1-sqrt(5))*0.5
+  residdown <- resorig * 1.618033988749894902526 # (1+sqrt(5))*0.5
   for (i in 1:runs)
   {
     if (tboot == "wild")
     {
       index <- ifelse(apply(resorig, 2, stats::rbinom, size=1, prob=0.7236067977499789360962) == 1, TRUE, FALSE)
-      resid <- resorig*-0.6180339887498949025257 # (1-sqrt(5))*0.5
-      resid [!index] <- resorig[!index]*1.618033988749894902526 # (1+sqrt(5))*0.5
+      resid <- residup
+      resid [!index] <- residdown[!index]
       lasty <- c(t(yorig[p:1, ]))
       ystar[c(1:p), ] <- yorig[c(1:p), ]
     }
@@ -120,7 +139,7 @@
     }
     VAR$y.orig <- ystar
     VAR$y <- ystar[-c(1:p),]
-    VAR$resid <- resid
+    VAR$residuals <- resid
     temp <- stats::embed(ystar, dimension = p + 1)[, -c(1:neq)]
     if(VAR$type == "const")
       temp <- cbind(temp, rep(1, obs))

@@ -32,7 +32,7 @@ tvPsi<- function (x, nstep = 10, ortho.cov = "const", bw.cov = NULL, ...)
     tkernel <- x$tkernel
     est <- x$est
     if(is.null(bw.cov))
-      bw.cov <- bwCov(x$residuals, tkernel = tkernel, est = est)
+      bw.cov <- bwCov(x$residuals, cv.block = x$cv.block, tkernel = tkernel, est = est)
     Sigma.hat <- tvCov(x$residuals, bw = bw.cov, tkernel = tkernel, est = est)
   }
   for (t in 1:obs)

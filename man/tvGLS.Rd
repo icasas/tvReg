@@ -4,7 +4,6 @@
 \alias{tvGLS}
 \alias{tvGLS.list}
 \alias{tvGLS.tvsure}
-\alias{tvGLS.matrix}
 \title{Time-Varying Generalised Least Squares}
 \usage{
 tvGLS(x, ...)
@@ -14,10 +13,6 @@ tvGLS(x, ...)
   "Gaussian"), ...)
 
 \method{tvGLS}{tvsure}(x, ...)
-
-\method{tvGLS}{matrix}(x, y, z = NULL, ez = NULL, bw, Sigma = NULL,
-  R = NULL, r = NULL, est = c("lc", "ll"), tkernel = c("Epa",
-  "Gaussian"), ...)
 }
 \arguments{
 \item{x}{an object used to select a method.}

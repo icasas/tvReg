@@ -17,14 +17,15 @@
 #'
 #' @rdname tvLM
 #' @aliases tvlm-class tvlm
-#' @keywords time varying linear regression models, nonparametric statistics
 #' @param formula An object of class formula.
 #' @param z A vector with the smoothing variable.
 #' @param ez (optional) A scalar or vector with the smoothing estimation values. If 
 #' values are included then the vector \code{z} is used.
 #' @param data An optional data frame or matrix.
 #' @param bw An opcional scalar. It represents the bandwidth in
-#' the estimation of trend coefficients. If NULL, it is selected by cross validation.
+#' the estimation of trend coefficients. If NULL, it is selected by cross validation. 
+#' @param cv.block A positive scalar with the size of the block in leave one block out cross-validation.
+#' By default 'cv.block=0' meaning leave one out cross-validation.
 #' @param est The nonparametric estimation method, one of "lc" (default) for linear constant
 #'  or "ll" for local linear.
 #' @param tkernel The type of kernel used in the coefficients estimation method,
@@ -78,6 +79,7 @@
 #' boxplot(data.frame(tvHARQ = tvHARQ$tvcoef[,2] * RV2$RV_lag,
 #'                    HARQ = (HARQ$coef[2] + HARQ$coef[3] * RV2$RQ_lag_sqrt)*RV2$RV_lag),
 #'                    main = expression (RV[t-1]), outline = FALSE)
+#'                  
 #' @references 
 #'  
 #' Bollerslev, T., Patton, A. J. and Quaedvlieg, R. (2016) Exploiting the 
@@ -88,18 +90,13 @@
 #' predictability with new estimators of realized variance and variance 
 #' risk premium. Url= http://pure.au.dk/portal/files/123066669/rp18_10.pdf
 #' 
-#' @keywords time-varying coefficients regression, nonparametric
 #' @export
 
-tvLM<-function (formula, z = NULL, ez = NULL, data, bw = NULL, est = c("lc", "ll"), 
+tvLM<-function (formula, z = NULL, ez = NULL, data, bw = NULL, cv.block = 0, est = c("lc", "ll"), 
                 tkernel = c("Epa", "Gaussian"), singular.ok = TRUE)
 {
   tkernel <- match.arg(tkernel)
   est <- match.arg(est)
-  if(!(tkernel %in% c("Epa","Gaussian")))
-    tkernel <- "Epa"
-  if(!(est %in% c("lc", "ll")))
-    est <- "lc"
   mf <- match.call(expand.dots = FALSE)
   m <- match(c("formula", "data"), names(mf), 0L)
   mf <- mf[c(1L, m)]
@@ -115,8 +112,10 @@ tvLM<-function (formula, z = NULL, ez = NULL, data, bw = NULL, est = c("lc", "ll
     x <- stats::model.matrix(mt, mf)
     if(is.null(bw))
     {
-      cat("Calculating regression bandwidth...\n")
-      bw <- bw(x = x, y = y, z = z, tkernel = tkernel, est = est, singular.ok = singular.ok)
+      cat("Calculating regression bandwidth... ")
+      bw <- bw(x = x, y = y, z = z, cv.block = cv.block, est = est, tkernel = tkernel, 
+               singular.ok = singular.ok)
+      cat("bw = ", bw, "\n")
     }
     results <- tvOLS (x = x, y = y, z = z, ez = ez, bw = bw, tkernel = tkernel, est = est,
                       singular.ok = singular.ok)
@@ -126,14 +125,13 @@ tvLM<-function (formula, z = NULL, ez = NULL, data, bw = NULL, est = c("lc", "ll
   if(is.null(xnames))
     xnames <- paste("X", 1:nvar, collate="&", sep="")
   tvcoef <-results$tvcoef
-  fitted <- results$fitted
-  resid <- results$resid
   colnames(tvcoef) <- xnames
-  result <- list(tvcoef = tvcoef, Lower = NULL, Upper = NULL, fitted = fitted,
-                 residuals=resid, x = x, y = y, z = z, ez = ez, bw = bw, 
-                 obs = length(y), est = est, tkernel = tkernel,
-                 singular.ok = singular.ok, level = 0, runs = 0, tboot = NULL, 
-                 BOOT = NULL)
+  result <- list(tvcoef = tvcoef, Lower = NULL, Upper = NULL, fitted = results$fitted,
+                 residuals = results$resid, x = x, y = y, z = z, ez = ez, bw = bw, 
+                 cv.block = cv.block, obs = length(y), est = est, tkernel = tkernel,
+                 singular.ok = singular.ok, level = 0, runs = 0, 
+                 tboot = NULL, BOOT = NULL)
   class(result) <- "tvlm"
   return(result)
 }
+

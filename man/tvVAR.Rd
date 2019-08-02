@@ -6,9 +6,9 @@
 \alias{tvvar}
 \title{Time-varying Vector Autoregressive Models}
 \usage{
-tvVAR(y, p = 1, z = NULL, ez = NULL, bw = NULL, type = c("const",
-  "none"), exogen = NULL, est = c("lc", "ll"), tkernel = c("Epa",
-  "Gaussian"), singular.ok = TRUE)
+tvVAR(y, p = 1, z = NULL, ez = NULL, bw = NULL, cv.block = 0,
+  type = c("const", "none"), exogen = NULL, est = c("lc", "ll"),
+  tkernel = c("Epa", "Gaussian"), singular.ok = TRUE)
 }
 \arguments{
 \item{y}{A matrix with dimention obs x neq (obs = number of observations and
@@ -21,8 +21,11 @@ neq = number of equations)}
 \item{ez}{(optional) A scalar or vector with the smoothing estimation values. If 
 values are included then the vector \code{z} is used.}
 
-\item{bw}{An opcional scalar or vector of length the number of equations. It represents the bandwidth in
+\item{bw}{An optional scalar or vector of length the number of equations. It represents the bandwidth in
 the estimation of trend coefficients. If NULL, it is selected by cross validation.}
+
+\item{cv.block}{A positive scalar with the size of the block in leave one block out cross-validation.
+By default 'cv.block = 0' meaning leave one out cross-validation.}
 
 \item{type}{A character 'const' if the model contains an intercept and 'none' otherwise.}
 

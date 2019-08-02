@@ -6,8 +6,9 @@
 \alias{tvlm}
 \title{Time-Varying Coefficients Linear Models}
 \usage{
-tvLM(formula, z = NULL, ez = NULL, data, bw = NULL, est = c("lc",
-  "ll"), tkernel = c("Epa", "Gaussian"), singular.ok = TRUE)
+tvLM(formula, z = NULL, ez = NULL, data, bw = NULL, cv.block = 0,
+  est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"),
+  singular.ok = TRUE)
 }
 \arguments{
 \item{formula}{An object of class formula.}
@@ -21,6 +22,9 @@ values are included then the vector \code{z} is used.}
 
 \item{bw}{An opcional scalar. It represents the bandwidth in
 the estimation of trend coefficients. If NULL, it is selected by cross validation.}
+
+\item{cv.block}{A positive scalar with the size of the block in leave one block out cross-validation.
+By default 'cv.block=0' meaning leave one out cross-validation.}
 
 \item{est}{The nonparametric estimation method, one of "lc" (default) for linear constant
 or "ll" for local linear.}
@@ -93,6 +97,7 @@ tvHARQ <- with(RV2, tvLM (RV ~ RV_lag + RV_week + RV_month, z = RQ_lag_sqrt,
 boxplot(data.frame(tvHARQ = tvHARQ$tvcoef[,2] * RV2$RV_lag,
                    HARQ = (HARQ$coef[2] + HARQ$coef[3] * RV2$RQ_lag_sqrt)*RV2$RV_lag),
                    main = expression (RV[t-1]), outline = FALSE)
+                 
 }
 \references{
 Bollerslev, T., Patton, A. J. and Quaedvlieg, R. (2016) Exploiting the 
@@ -107,13 +112,3 @@ risk premium. Url= http://pure.au.dk/portal/files/123066669/rp18_10.pdf
 \code{\link{bw}}, \code{\link{tvAR}}, \code{\link{confint}}, 
 \code{\link{plot}}, \code{\link{print}} and \code{\link{summary}}
 }
-\keyword{coefficients}
-\keyword{linear}
-\keyword{models,}
-\keyword{nonparametric}
-\keyword{regression}
-\keyword{regression,}
-\keyword{statistics}
-\keyword{time}
-\keyword{time-varying}
-\keyword{varying}

@@ -6,9 +6,10 @@
 \alias{tvar}
 \title{Time-Varying Autoregressive Model}
 \usage{
-tvAR(y, p = 1, z = NULL, ez = NULL, bw = NULL, type = c("const",
-  "none"), exogen = NULL, fixed = NULL, est = c("lc", "ll"),
-  tkernel = c("Epa", "Gaussian"), singular.ok = TRUE)
+tvAR(y, p = 1, z = NULL, ez = NULL, bw = NULL, cv.block = 0,
+  type = c("const", "none"), exogen = NULL, fixed = NULL,
+  est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"),
+  singular.ok = TRUE)
 }
 \arguments{
 \item{y}{A vector with the dependent variable.}
@@ -23,6 +24,9 @@ values are included then the vector \code{z} is used.}
 \item{bw}{An opcional scalar or vector of length the number of equations. It represents
 the bandwidth in the estimation of coefficients. If NULL, it is selected
 by cross validation.}
+
+\item{cv.block}{A positive scalar with the size of the block in leave one block out cross-validation.
+By default 'cv.block=0' meaning leave one out cross-validation.}
 
 \item{type}{A character 'const' if the model contains an intercept and 'none' otherwise.}
 

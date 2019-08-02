@@ -6,7 +6,7 @@
 \alias{tvsure}
 \title{Time-Varying Seemingly Unrelated Regression Equations Model}
 \usage{
-tvSURE(formula, z = NULL, ez = NULL, bw = NULL, data,
+tvSURE(formula, z = NULL, ez = NULL, bw = NULL, cv.block = 0, data,
   method = c("tvOLS", "tvFGLS", "tvGLS"), Sigma = NULL, est = c("lc",
   "ll"), tkernel = c("Epa", "Gaussian"), bw.cov = NULL,
   singular.ok = TRUE, R = NULL, r = NULL,
@@ -20,8 +20,11 @@ tvSURE(formula, z = NULL, ez = NULL, bw = NULL, data,
 \item{ez}{(optional) A scalar or vector with the smoothing estimation values. If 
 values are included then the vector \code{z} is used.}
 
-\item{bw}{An opcional scalar or vector of length the number of equations. It represents the bandwidth in
+\item{bw}{An optional scalar or vector of length the number of equations. It represents the bandwidth in
 the estimation of trend coefficients. If NULL, it is selected by cross validation.}
+
+\item{cv.block}{A positive scalar with the size of the block in leave one block out cross-validation.
+By default 'cv.block = 0' meaning leave one out cross-validation.}
 
 \item{data}{A matrix or data frame containing variables in the formula.}
 
@@ -162,7 +165,7 @@ time varying constraints in econometric models, \emph{Statistica Sinica}.
 \code{\link{bw}}, \code{\link{tvCov}},  \code{\link{tvVAR}}, 
 \code{\link{confint}}, \code{\link{plot}}, \code{\link{print}} and \code{\link{summary}}
 }
-\keyword{models,}
+\keyword{models}
 \keyword{nonparametric}
 \keyword{regression}
 \keyword{statistics}

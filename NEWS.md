@@ -1,3 +1,11 @@
+#tvReg 0.4.2
+
+* Added  modified or leave-(2l+1)-out cross-validation for bandwidth selection
+
+* Faster algorithm for the calculation of confidence intervals
+
+* Fix bug in `.tvCov.cv
+
 # tvReg 0.4.1
 
 * Fix bug in `tvGLS.R` for option `est = "ll"`.

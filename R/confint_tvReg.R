@@ -53,7 +53,7 @@
 #' @export 
 #'
 confint.tvlm <- function(object, parm, level = 0.95, 
-                         runs = 100, tboot = NULL, ...)
+                         runs = 100, tboot = c("wild", "wild2"), ...)
 {
   if (!any(class(object) %in% c("tvlm", "tvar", "tvsure")))
     stop("\nConfidence intervals not implemented for this class.\n")
@@ -61,10 +61,7 @@ confint.tvlm <- function(object, parm, level = 0.95,
     stop("\nVariable 'runs' accepts integer values greater than 0.\n")
   if (level <= 0 | level > 1)
     stop("\nVariable 'level' accepts values between 0 and 1.\n")
-  if(is.null(tboot))
-    tboot <- ifelse(!is.null(object$tboot), object$tboot, "wild")
-  if(!(tboot %in% c("wild", "wild2")))
-    tboot <- "wild"
+  tboot <- match.arg(tboot)
   BOOT <- object$BOOT
   if(is.null(BOOT))
   {
@@ -100,7 +97,6 @@ confint.tvlm <- function(object, parm, level = 0.95,
   mat.l <- matrix(0, nrow = obs, ncol = sum(nvar))
   mat.u <- matrix(0, nrow = obs, ncol = sum(nvar))
   temp <- matrix(NA, nrow = obs, ncol = runs)
-
   if(any(class(object) == "tvsure"))
   {
     for (m in 1:neq)
@@ -159,7 +155,7 @@ confint.tvsure <- confint.tvlm
 #' @export 
 #'
 confint.tvirf <- function(object, parm, level = 0.95, 
-                          runs = 100, tboot = NULL , ...)
+                          runs = 100, tboot = c("wild", "wild2") , ...)
 {
   if (class(object) != "tvirf")
     stop("\nConfidence intervals not implemented for this class.\n")
@@ -167,10 +163,7 @@ confint.tvirf <- function(object, parm, level = 0.95,
     stop("\nVariable 'runs' accepts integer values greater than 0.\n")
   if (level <= 0 | level > 1)
     stop("\nVariable 'level' accepts values between 0 and 1.\n")
-  if(is.null(tboot))
-    tboot <- ifelse(!is.null(object$tboot), object$tboot, "wild")
-  if(!(tboot %in% c("wild", "wild2")))
-    tboot <- "wild"
+  tboot <- match.arg(tboot)
   BOOT <- object$BOOT
   if(is.null(BOOT))
   {
@@ -240,4 +233,214 @@ confint.tvirf <- function(object, parm, level = 0.95,
   object$Upper <- Upper
   return(object)
 }
+
+#' @rdname tvReg-internals
+#' @keywords internal
+.tvLM.ci <- function(x, yboot)
+{
+  obs <- NROW(yboot)
+  nboot <- NCOL(yboot)
+  bw <- x$bw
+  z <- x$z
+  ez <- x$ez
+  if(!is.null(z))
+    grid <- z
+  else
+    grid <- (1:obs)/obs
+  ez <- grid
+  tkernel <- x$tkernel
+  est <- x$est
+  nvar <- NCOL(x$x)
+  eobs <- NROW(ez)
+  theta <- matrix(0, eobs, nvar)
+  x <- x$x
+  BOOT <- vector("list", nboot)
+  for (t in 1:eobs)
+  { 
+    tau0 <- grid - ez[t]
+    kernel.bw <- .kernel(x = tau0, bw = bw, tkernel = tkernel)
+    k.index <- which(kernel.bw != 0)
+    xtemp <- x[k.index, ]
+    if (est == "ll")
+      xtemp <- cbind(xtemp, xtemp * tau0[k.index])
+    for (k in 1:nboot)
+    {
+      result <- stats::lm.wfit(x = as.matrix(xtemp), y = yboot[k.index, k], w = kernel.bw[k.index])
+      BOOT[[k]] <-rbind(BOOT[[k]], result$coef[1:nvar])
+    }
+  }
+  return(BOOT)
+}
+
+
+#' @rdname tvReg-internals
+#' @keywords internal
+.tvSURE.ci <- function(x, yboot)
+{
+  obs <- NROW(yboot)
+  nboot <- length(yboot)
+  method <- x$method
+  tkernel <- x$tkernel
+  obs <- x$obs
+  neq <- x$neq
+  Sigma <- x$Sigma
+  bw <- x$bw
+  bw.cov <- x$bw.cov
+  z <- x$z
+  ez <- x$ez
+  R <- x$R
+  r <- x$R
+  if(!is.null(z))
+    grid <- z
+  else
+    grid <- (1:obs)/obs
+  ez <- grid
+  tkernel <- x$tkernel
+  est <- x$est
+  nvar <- x$nvar
+  eobs <- NROW(ez)
+  theta <- matrix(0, eobs, sum(nvar))
+  x <- x$x
+  BOOT = resid <- vector("list", nboot)
+  if (length(bw) == 1)
+    bw <- rep(bw, neq)
+  if(!is.null(R))
+  {
+    R <- as.matrix(R)
+    if (is.null(r))
+      r <- rep(0, NROW(R))
+    else if (length(r) == 1)
+      r <- rep(r, NROW(R))
+  }
+  if(method %in% c("identity", "tvOLS", "tvFGLS"))
+  {
+    Sigma <- array(rep(diag(1, neq), obs), dim = c(neq, neq, obs))
+  }
+  for (t in 1:eobs)
+  {
+    tau0 <- grid - ez[t]
+    y.kernel <- NULL
+    x.kernel <- vector ("list", neq)
+    eSigma <- eigen(Sigma[,,t], TRUE)
+    if (any(eSigma$value <= 0))
+      stop("\n'Sigma' is not positive definite.\n")
+    A <- diag(eSigma$values^-0.5) %*% t(eSigma$vectors) %x% Matrix::Diagonal(obs)
+    for (i in 1:neq)
+    {
+      mykernel <- sqrt(.kernel(x = tau0, bw = bw[i], tkernel = tkernel))          
+      xtemp <- x[[i]] * mykernel
+      if(est == "ll")
+        xtemp <- cbind(xtemp, xtemp * tau0)
+      x.kernel[[i]] <- xtemp
+    }
+    x.star <- A %*% Matrix::bdiag(x.kernel)
+    s0 <- Matrix::crossprod(x.star)
+    if(!is.null(R))
+    {
+      Sinv <- qr.solve(s0)
+      mat <- Sinv %*% t(R) %*% qr.solve(R %*% Sinv %*% t(R))
+    }
+    for(k in 1:nboot)
+    {
+      y.kernel <- NULL
+      for(i in 1:neq)
+      {
+        mykernel <- sqrt(.kernel(x = tau0, bw = bw[i], tkernel = tkernel))
+        y.kernel <- cbind(y.kernel, yboot[[k]][, i] * mykernel)
+      }
+      y.star <- A %*% methods::as(y.kernel, "sparseVector")
+      T0 <- Matrix::crossprod(x.star, y.star)
+      result <- try(qr.solve(s0, T0), silent = TRUE)
+      if(class(result) == "try-error")
+        result <- try(qr.solve(s0, T0, tol = .Machine$double.xmin ), silent = TRUE)
+      if(class(result) == "try-error")
+        stop("\nSystem is computationally singular, the inverse cannot be calculated. 
+             Possibly, the 'bw' is too small for values in 'ez'.\n")
+      if(est =="ll")
+      {
+        temp <- result[1:nvar[1]]
+        for(i in 2:neq)
+          temp <- c(temp, result[(1:nvar[i]) + 2 * sum(nvar[1:(i-1)])])            
+        theta[t, ] <- temp
+      }
+      else
+        theta[t, ] <- result
+      if(!is.null(R))
+      {
+        theta[t, ] <- drop(theta[t, ] - mat %*% (R %*% theta[t, ] - r))
+      }
+      BOOT[[k]] <- rbind (BOOT[[k]], theta[t,])
+      resid[[k]] <- rbind(resid[[k]], yboot[[k]][t,] - as.numeric(Matrix::bdiag(lapply(x,"[",t, ,drop = FALSE))%*%theta[t,]))
+    }
+  }
+  if(method == "tvFGLS")
+  {
+    BOOT = Cov <- vector("list", nboot)
+    for (k in 1:nboot)
+    {
+      Cov[[k]] <- tvCov(x = resid[[k]], bw = bw.cov, tkernel = tkernel)
+    }
+    for (t in 1:eobs)
+    {
+      tau0 <- grid - ez[t]
+      y.kernel <- NULL
+      x.kernel <- vector ("list", neq)
+      for (i in 1:neq)
+      {
+        mykernel <- sqrt(.kernel(x = tau0, bw = bw[i], tkernel = tkernel))          
+        xtemp <- x[[i]] * mykernel
+        if(est == "ll")
+          xtemp <- cbind(xtemp, xtemp * tau0)
+        x.kernel[[i]] <- xtemp
+      }
+      for(k in 1:nboot)
+      {
+        eSigma <- eigen(Cov[[k]][,,t], TRUE)
+        if (any(eSigma$value <= 0))
+        {
+          warning("\n'Sigma' is not positive definite, re-run fitting.\n")
+          bw.cov2 <- bwCov(x = resid[[k]], cv.block = floor(obs/10), tkernel = tkernel)
+          Cov[[k]] <- tvCov(x = resid[[k]], bw = bw.cov2 , tkernel = tkernel)
+          eSigma <- eigen(Cov[[k]][,,t], TRUE)
+        }
+        A <- diag(eSigma$values^-0.5) %*% t(eSigma$vectors) %x% Matrix::Diagonal(obs)
+        x.star <- A %*% Matrix::bdiag(x.kernel)
+        s0 <- Matrix::crossprod(x.star)
+        y.kernel <- NULL
+        for(i in 1:neq)
+        {
+          mykernel <- sqrt(.kernel(x = tau0, bw = bw[i], tkernel = tkernel))
+          y.kernel <- cbind(y.kernel, yboot[[k]][, i] * mykernel)
+        }
+        y.star <- A %*% methods::as(y.kernel, "sparseVector")
+        T0 <- Matrix::crossprod(x.star, y.star)
+        result <- try(qr.solve(s0, T0), silent = TRUE)
+        if(class(result) == "try-error")
+          result <- try(qr.solve(s0, T0, tol = .Machine$double.xmin ), silent = TRUE)
+        if(class(result) == "try-error")
+          stop("\nSystem is computationally singular, the inverse cannot be calculated. 
+               Possibly, the 'bw' is too small for values in 'ez'.\n")
+        if(est =="ll")
+        {
+          temp <- result[1:nvar[1]]
+          for(i in 2:neq)
+            temp <- c(temp, result[(1:nvar[i]) + 2 * sum(nvar[1:(i-1)])])            
+          theta[t, ] <- temp
+        }
+        else
+          theta[t, ] <- result
+        if(!is.null(R))
+        {
+          Sinv <- qr.solve(s0)
+          theta[t, ] <- drop(theta[t, ] - Sinv %*% t(R) %*% qr.solve(R %*% Sinv %*% t(R)) %*% (R %*% theta[t, ] - r))
+        }
+        BOOT[[k]] <- rbind (BOOT[[k]], theta[t,])
+      }
+    }
+    }
+  return(BOOT)
+}
+
+
+
 

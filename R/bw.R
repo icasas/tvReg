@@ -14,6 +14,8 @@ bw <- function(x, ...)  UseMethod("bw", x)
 #' @rdname bw
 #' @param y A matrix or vector with the dependent variable(s).
 #' @param z A vector with the variable over which coefficients are smooth over.
+#' @param cv.block A positive scalar with the size of the block in leave-one block-out cross-validation.
+#' By default 'cv.block=0' meaning leave-one-out cross-validation.
 #' @param est The nonparametric estimation method, one of "lc" (default) for linear constant
 #' or "ll" for local linear.
 #' @param tkernel The type of kernel used in the coefficients estimation method,
@@ -36,7 +38,7 @@ bw <- function(x, ...)  UseMethod("bw", x)
 #' @method bw default
 #' @export
 #'
-bw.default <- function(x, y, z = NULL, est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"),
+bw.default <- function(x, y, z = NULL, cv.block = 0, est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"),
                        singular.ok = TRUE, ...)
 {
   if(!is.matrix(x) & !is.data.frame(x) & !is.numeric(x) & !is.vector(x))
@@ -47,10 +49,7 @@ bw.default <- function(x, y, z = NULL, est = c("lc", "ll"), tkernel = c("Epa", "
     stop("There are NA values in your data, please enter only complete cases. \n")
   tkernel <- match.arg(tkernel)
   est <- match.arg(est)
-  if(!(tkernel %in% c("Epa", "Gaussian")))
-    stop("The supported kernels are 'Epa' and 'Gaussian'\n")
-  if(!(est %in% c("lc", "ll")))
-    stop("The supported estimation methods in parameter 'est' are: 'lc' and 'll' \n")
+  cv.block <- abs(cv.block)
   y <- as.matrix(y)
   x <- as.matrix(x)
   neq <- NCOL(y)
@@ -85,7 +84,8 @@ bw.default <- function(x, y, z = NULL, est = c("lc", "ll"), tkernel = c("Epa", "
       }
       result <- try(stats::optim(stats::runif(1, lower, top), .tvOLS.cv, method = "Brent",
                                  lower = lower, upper = upper, x = x, y = y[, j], z = z,
-                                 est = est, tkernel = tkernel, singular.ok = singular.ok),
+                                 cv.block = cv.block, est = est, tkernel = tkernel, 
+                                 singular.ok = singular.ok),
                     silent = TRUE)
       if (class(result)  !=  "list")
         value <- .Machine$double.xmax
@@ -108,6 +108,7 @@ bw.default <- function(x, y, z = NULL, est = c("lc", "ll"), tkernel = c("Epa", "
   return(bw)
 }
 
+
 #' @examples
 #' data( Kmenta, package = "systemfit" )
 #' 
@@ -128,7 +129,7 @@ bw.default <- function(x, y, z = NULL, est = c("lc", "ll"), tkernel = c("Epa", "
 #' @rdname bw
 #' @method bw list
 #' @export
-bw.list <- function(x, y, z = NULL, est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"),
+bw.list <- function(x, y, z = NULL, cv.block = 0, est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"),
                     singular.ok = TRUE, ...)
 {
   if(!is.list(x))
@@ -145,11 +146,8 @@ bw.list <- function(x, y, z = NULL, est = c("lc", "ll"), tkernel = c("Epa", "Gau
     stop("The number of equations in 'x' and 'y' are different \n")
   tkernel <- match.arg(tkernel)
   est <- match.arg(est)
-  if(!(tkernel %in% c("Epa", "Gaussian")))
-    stop("The supported kernels are 'Epa' and 'Gaussian'\n")
-  if(!(est %in% c("lc", "ll")))
-    stop("The supported estimation methods in parameter 'est' are: 'lc' and 'll' \n")
   bw <- numeric(neq)
+  cv.block <- abs(cv.block)
   if(is.null(z))
   {
     upper <- 2
@@ -177,8 +175,8 @@ bw.list <- function(x, y, z = NULL, est = c("lc", "ll"), tkernel = c("Epa", "Gau
       }
       result <- try(stats::optim(stats::runif(1, lower, top), .tvOLS.cv, 
                                  method = "Brent", lower = lower, 
-                                 upper = upper, x = x[[j]], y = y[, j],
-                                 est = est, tkernel = tkernel, 
+                                 upper = upper, x = x[[j]], y = y[, j], z = z,
+                                 cv.block = cv.block, est = est, tkernel = tkernel, 
                                  singular.ok = singular.ok), silent = TRUE)
       if (class(result)  !=  "list")
         value <- .Machine$double.xmax
@@ -212,8 +210,9 @@ bw.tvlm <- function(x, ...)
   est <- x$est
   tkernel <- x$tkernel
   singular.ok <- x$singular.ok
+  cv.block <- x$cv.block
   x <- x$x
-  return(bw (x, y, z, est, tkernel, singular.ok))
+  return(bw (x, y, z, cv.block, est, tkernel, singular.ok))
 }
 
 #' @rdname bw
@@ -238,7 +237,6 @@ bw.tvsure <- bw.tvlm
 #' Covariance Bandwidth Calculation by Cross-Validation
 #' \emph{bwCov} calculates a single bandwidth to estimate the time-varying variance-
 #' covariance matrix.
-#'
 #' @param x A matrix or a data frame.
 #' @inheritParams bw
 #' @return A scalar.
@@ -252,17 +250,14 @@ bw.tvsure <- bw.tvlm
 #'
 #' @rdname bwCov
 #' @export
-bwCov <- function(x, est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"))
+bwCov <- function(x, cv.block = 0, est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"))
 {
   if(!is.matrix(x) & !is.data.frame(x))
     stop("'x' should be a matrix or a data.frame.\n")
   tkernel <- match.arg(tkernel)
   est <- match.arg(est)
-  if(!(tkernel %in% c("Epa", "Gaussian")))
-    stop("The supported kernels are 'Epa' and 'Gaussian'\n")
-  if(!(est %in% c("lc", "ll")))
-    stop("The supported estimation methods in parameter 'est' are: 'lc' and 'll' \n")
   x <- as.matrix(x)
+  cv.block <- abs(cv.block)
   obs <- NROW(x)
   neq <- NCOL(x)
   value  <- .Machine$double.xmax
@@ -276,8 +271,8 @@ bwCov <- function(x, est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"))
       break()
     }
     result <- try(stats::optim(stats::runif(1, 5/obs, 1), .tvCov.cv, method = "Brent",
-                               lower = 5/obs, upper = 20, x = x, est = est,
-                               tkernel = tkernel),
+                               lower = 5/obs, upper = 20, x = x, cv.block = cv.block,
+                               est = est, tkernel = tkernel),
                   silent = TRUE)
     if (class(result)  !=  "list")
       value <- .Machine$double.xmax

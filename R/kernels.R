@@ -6,12 +6,11 @@
 #' @param x A numeric vector.
 #' @param bw A scalar.
 #' @param tkernel A character, either "Epa" (default) or "Gaussian".
-#' @param N A scalar, in case we want to make the bandwidth smaller.
 #' @return A numeric vector.
 #' @keywords internal
-.kernel <- function(x, bw, tkernel = "Epa", N = 1)
+.kernel <- function(x, bw, tkernel = "Epa")
 {
-  x <- x/(N * bw)
+  x <- x/bw
   value <- numeric(length(x))
   if (tkernel == "Gaussian")
   {

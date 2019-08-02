@@ -43,7 +43,6 @@ tvGLS<- function(x, ...) UseMethod("tvGLS", x)
 #' @param r A numeric vector.
 #' @param est Either "lc" or "ll".
 #' @param tkernel Either "Gaussian" or "Epa".
-#'
 #' @examples
 #' data(FF5F)
 #' x <- list()
@@ -71,10 +70,6 @@ tvGLS.list <- function(x, y, z = NULL, ez = NULL, bw, Sigma = NULL, R = NULL, r 
   is.predict <- ifelse (is.null(ez), FALSE, TRUE)
   tkernel <- match.arg(tkernel)
   est <- match.arg(est)
-  if(!(tkernel %in% c("Epa", "Gaussian")))
-    tkernel <- "Epa"
-  if(!(est %in% c("lc", "ll")))
-    est <- "lc"
   y <- as.matrix(y)
   neq <- length(x)
   for (i in 1:neq)
@@ -118,35 +113,34 @@ tvGLS.list <- function(x, y, z = NULL, ez = NULL, bw, Sigma = NULL, R = NULL, r 
       stop("\nWrong dimension of 'r', it should be as long as the number of 
            rows in 'R'. \n")
   }
-  y.hat <- matrix(0, eobs, neq)
+  fitted <- matrix(0, eobs, neq)
   resid <- matrix(0, eobs, neq)
   theta <- matrix(0, eobs, sum(nvar))
   for (t in 1:eobs)
   {
-    x2 <- grid - ez[t]
+    tau0 <- grid - ez[t]
     y.kernel <- NULL
     x.kernel <- vector ("list", neq)
     eSigma <- eigen(Sigma[,,t], TRUE)
-    lambda <- eSigma$values
-    if (any(lambda <= 0))
+    if (any(eSigma$value <= 0))
       stop("\n'Sigma' is not positive definite.\n")
-    A <- diag(lambda^-0.5) %*% t(eSigma$vectors) %x% Matrix::Diagonal(obs)
+    A <- diag(eSigma$values^-0.5) %*% t(eSigma$vectors) %x% Matrix::Diagonal(obs)
     for (i in 1:neq)
     {
-      mykernel <- sqrt(.kernel(x = x2, bw = bw[i], tkernel = tkernel, N = 1))
+      mykernel <- sqrt(.kernel(x = tau0, bw = bw[i], tkernel = tkernel))
       y.kernel <- cbind(y.kernel, y[, i] * mykernel)
       xtemp <- x[[i]] * mykernel
       if(est == "ll")
-        xtemp <- cbind(xtemp, xtemp * x2)
+        xtemp <- cbind(xtemp, xtemp * tau0)
       x.kernel[[i]] <- xtemp
     }
     x.star <- A %*% Matrix::bdiag(x.kernel)
     y.star <- A %*% methods::as(y.kernel, "sparseVector")
     s0 <- Matrix::crossprod(x.star)
     T0 <- Matrix::crossprod(x.star, y.star)
-    result <- try(drop(Matrix::solve(s0, T0)), silent = TRUE)
+    result <- try(qr.solve(s0, T0), silent = TRUE)
     if(class(result) == "try-error")
-      result <- try(drop(Matrix::solve(s0, T0, tol = .Machine$double.xmin)), silent = TRUE)
+      result <- try(qr.solve(s0, T0, tol = .Machine$double.xmin ), silent = TRUE)
     if(class(result) == "try-error")
       stop("\nSystem is computationally singular, the inverse cannot be calculated. 
            Possibly, the 'bw' is too small for values in 'ez'.\n")
@@ -161,16 +155,16 @@ tvGLS.list <- function(x, y, z = NULL, ez = NULL, bw, Sigma = NULL, R = NULL, r 
       theta[t, ] <- result
     if(!is.null(R))
     {
-      Sinv <- Matrix::solve(s0)
-      theta[t, ] <- theta[t, ] - Sinv %*% t(R) %*%
-        Matrix::solve(R %*% Sinv %*% t(R)) %*% (R %*% theta[t, ] - r)
+      Sinv <- qr.solve(s0)
+      theta[t, ] <- drop(theta[t, ] - Sinv %*% t(R) %*%
+        qr.solve(R %*% Sinv %*% t(R)) %*% (R %*% theta[t, ] - r))
     }
     xt.diag <- as.matrix(Matrix::bdiag(lapply(x,"[",t, ,drop = FALSE)))
-    y.hat[t, ] <- xt.diag %*% theta[t, ]
+    fitted[t, ] <- xt.diag %*% theta[t, ]
   }
   if(!is.predict)
-    resid <- as.matrix(y - y.hat)
-  return(list( tvcoef = theta, fitted = y.hat, residuals = resid ))
+    resid <- as.matrix(y - fitted)
+  return(list( tvcoef = theta, fitted = fitted, residuals = resid))
 }
 
 #' @rdname tvGLS
@@ -181,126 +175,6 @@ tvGLS.tvsure <- function(x, ...)
 {
   if(!inherits(x, c("tvsure")))
     stop ("Function for object of class 'tvsure' \n")
-  y <- x$y
-  z <- x$z
-  ez <- x$ez
-  bw <- x$bw
-  Sigma <- x$Sigma
-  neq <- x$neq
-  R <- x$R
-  r <- x$r
-  est <- x$est
-  tkernel <- x$tkernel
-  x <- x$x
-  result <- tvGLS(x, y, z, ez, bw, Sigma, R, r, est, tkernel)
+  result <- tvGLS(x$x, x$y, x$z, x$ez, x$bw, x$Sigma, x$R, x$r, x$est, x$tkernel)
   return(result)
-}
-
-#' @rdname tvGLS
-#' @inheritParams tvGLS
-#' @method tvGLS matrix
-#' @export
-
-tvGLS.matrix <- function(x, y, z = NULL, ez = NULL, bw, Sigma = NULL, 
-                         R = NULL, r = NULL, est = c("lc", "ll"), 
-                         tkernel = c("Epa", "Gaussian"), ...)
-{
-  if(!is.matrix(x))
-    stop("\n'x' should be a matrix. \n")
-  is.predict <- ifelse (is.null(ez), FALSE, TRUE)
-  y <- as.numeric(y)
-  obs <- NROW(x)
-  neq <- length(y)/obs
-  if (neq != NCOL(x))
-    stop("\nNumber of equations in 'x' and 'y' are not compatible.\n")
-  if(is.null(Sigma))
-    Sigma <- array(rep(diag(1, neq), obs), dim = c(neq, neq, obs))
-  if(length(bw) != 1 & length(bw) != neq)
-    stop("\nThere must be a single bandwith or a bandwidth for each equation.\n")
-  if (length(bw) == 1)
-    bw <- rep(bw, neq)
-  tkernel <- match.arg(tkernel)
-  est <- match.arg(est)
-  if(!(tkernel %in% c("Epa", "Gaussian")))
-    tkernel <- "Epa"
-  if(!(est %in% c("lc", "ll")))
-    est <- "lc"
-  nvar <- NCOL(x)
-  if(!is.null(z))
-  {
-    if(length(z) != obs)
-      stop("\nDimensions of 'x' and 'z' are not compatible.\n")
-    grid <- z
-  }
-  else
-    grid <- (1:obs)/obs
-  if (is.null(ez))
-    ez <- grid
-  eobs <- NROW(ez)
-  y.hat <- matrix(0, eobs, neq)
-  resid <- matrix(0, eobs, neq)
-  theta <- matrix(0, eobs, sum(nvar))
-  bw.N <- bw * obs/2
-  kernel.length <- 2 * floor(bw.N)+1
-  hmax <- max(kernel.length)
-  sqkernel <- matrix(0, nrow = hmax, ncol = neq, byrow = TRUE)
-  x2 <- ((hmax:(2 * hmax - 1))-(hmax+(2 * hmax - 1)) * 0.5)/obs
-  for (i in 1:neq)
-  {
-    kernel.temp <- .kernel(x2, bw[i], tkernel = tkernel)
-    index <- which(kernel.temp != 0)
-    sqkernel[index,i] <- sqrt(kernel.temp[index])
-  }
-  for (t in 1:eobs)
-  {
-    x2 <- grid - ez[t]
-    y.kernel <- NULL
-    x.kernel <- vector ("list", neq)
-    index.kernel <- max(1, floor(max(bw.N))+2 - t):min(hmax, obs - t + floor(max(bw.N)) + 1)
-    myindex <- max(1, ceiling(t - max(bw.N))):min(obs, floor(t + max(bw.N)))
-    eSigma <- eigen(Sigma[,,t], TRUE)
-    lambda <- eSigma$values
-    if (any(lambda <= 0))
-      stop("\n'Sigma' is not positive definite\n")
-    A <- diag(lambda^-0.5)  %*%  t(eSigma$vector) %x% Matrix::Diagonal(length(index.kernel))
-    for (i in 1:neq)
-    {
-      mykernel <- sqkernel[index.kernel, i]
-      y.kernel <- cbind(y.kernel, y[myindex, i]*mykernel)
-      xtemp <- x[[i]][myindex, ]*mykernel
-      if(est == "ll")
-        xtemp <- cbind (xtemp, xtemp * x2[myindex])
-      x.kernel[[i]] <- xtemp
-    }
-    x.star <- try(A %*% Matrix::bdiag(x.kernel), silent = TRUE)
-    y.star <- try(A %*% methods::as(y.kernel, "sparseVector"), silent = TRUE)
-    s0 <- Matrix::crossprod(x.star)
-    T0 <- Matrix::crossprod(x.star, y.star)
-    result <- try(drop(Matrix::solve(s0, T0)), silent = TRUE)
-    if(class(result) == "try-error")
-      result <- try(drop(Matrix::solve(s0, T0, tol = .Machine$double.xmin)), silent = TRUE)
-    if(class(result) == "try-error")
-      stop("\nSystem is computationally singular, the inverse cannot be calculated. 
-           Possibly, the 'bw' is too small for values in 'ez'.\n")
-    if(est =="ll")
-    {
-      temp <- result[1:nvar[1]]
-      for(i in 2:neq)
-        temp <- c(temp, result[(1:nvar[i]) + 2 * sum(nvar[1:(i-1)])])
-      theta[t, ] <- temp
-    }
-    else
-      theta[t, ] <- result
-    if(!is.null(R))
-    {
-      Sinv <- Matrix::solve(s0)
-      theta[t, ] <- theta[t, ] - Sinv %*% t(R) %*%
-        Matrix::solve(R %*% Sinv %*% t(R)) %*% (R %*% theta[t, ] - r)
-    }
-    xt.diag <- as.matrix(Matrix::bdiag(lapply(x,"[",t, ,drop = FALSE)))
-    y.hat[t, ] <-  xt.diag %*% theta[t, ]
-  }
-  if(!is.predict)
-    resid <- as.matrix(y - y.hat)
-  return(list( tvcoef = theta, fitted = y.hat, residuals = resid ))
 }

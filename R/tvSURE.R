@@ -47,7 +47,7 @@
 #' time varying constraints in econometric models, \emph{Statistica Sinica}.
 #'
 #'
-#' @keywords time varying regression models, nonparametric statistics
+#' @keywords time varying regression models nonparametric statistics
 #' @aliases tvsure-class tvsure
 #' @rdname tvSURE
 #' @importFrom systemfit systemfit
@@ -55,8 +55,10 @@
 #' @param z A vector containing the smoothing variable.
 #' @param ez (optional) A scalar or vector with the smoothing estimation values. If 
 #' values are included then the vector \code{z} is used.
-#' @param bw An opcional scalar or vector of length the number of equations. It represents the bandwidth in
+#' @param bw An optional scalar or vector of length the number of equations. It represents the bandwidth in
 #' the estimation of trend coefficients. If NULL, it is selected by cross validation.
+#' @param cv.block A positive scalar with the size of the block in leave one block out cross-validation.
+#' By default 'cv.block = 0' meaning leave one out cross-validation.
 #' @param data A matrix or data frame containing variables in the formula.
 #' @param method A character, a matrix of dimensions neq x neq or an array of dimensions obs x neq x neq, where
 #' \code{obs} is the number of observations and \code{neq} is the number of equations.
@@ -136,7 +138,7 @@
 #'}
 #'
 #'@export
-tvSURE <- function (formula, z = NULL, ez = NULL, bw = NULL, data,  
+tvSURE <- function (formula, z = NULL, ez = NULL, bw = NULL, cv.block = 0, data,  
                     method = c("tvOLS", "tvFGLS", "tvGLS"), Sigma = NULL, 
                     est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"),
                     bw.cov = NULL, singular.ok = TRUE, R = NULL, r = NULL,
@@ -144,11 +146,11 @@ tvSURE <- function (formula, z = NULL, ez = NULL, bw = NULL, data,
 {
   is.data <- inherits(data, c("data.frame", "matrix"))
   if(!is.data)
-    stop("\nParameter 'data' should be entered and it should be a matrix or a data.frame.\n")
+    stop("\nArgument 'data' should be entered and it should be a 'matrix' or a 'data.frame'.\n")
   if(class(formula) != "list")
-    stop("\n'formula' must be a list of formulas. \n")
+    stop("\nArgument 'formula' must be a list of formulas. \n")
   if(!all(lapply(formula, class) == "formula"))
-    stop("\nList 'x' must contain only objects of class 'formula'")
+    stop("\nArgument 'formula' ormula must contain only objects of class 'formula'")
   neq <- length(formula)
   if(neq < 2)
     stop("\nThe list 'formula' should contain at least two equations for multivariate analysis.\n")
@@ -156,17 +158,8 @@ tvSURE <- function (formula, z = NULL, ez = NULL, bw = NULL, data,
     if(any(is.na(Sigma)))
       stop("\nNAs in Sigma.\n")
   method <- match.arg(method)
-  if(is.null(Sigma) & method == "tvGLS")
-  {
-    method <- "tvOLS"
-    warning("\nSigma is NULL, tvOLS will be performed.\n")
-  }
   tkernel <- match.arg(tkernel)
   est <- match.arg(est)
-  if(!(tkernel %in% c("Epa", "Gaussian")))
-    tkernel <- "Epa"
-  if(!(est %in% c("lc", "ll")))
-    est <- "lc"
   nvar <- numeric(neq)
   if(is.null(names(formula)))
   {
@@ -222,7 +215,7 @@ tvSURE <- function (formula, z = NULL, ez = NULL, bw = NULL, data,
     if (is.null(bw))
     {
       cat("Calculating regression bandwidth...\n")
-      bw <- bw(x = x, y = y, z = z, est = est, tkernel = tkernel, 
+      bw <- bw(x = x, y = y, z = z, cv.block = cv.block, est = est, tkernel = tkernel, 
                singular.ok = singular.ok)
     }
     else
@@ -242,7 +235,8 @@ tvSURE <- function (formula, z = NULL, ez = NULL, bw = NULL, data,
     if (is.null(bw))
     {
       cat("Calculating regression bandwidth...\n")
-      bw <- bw(x = x, y = y, z = z, est = est, tkernel = tkernel, singular.ok = singular.ok)
+      bw <- bw(x = x, y = y, z = z, cv.block = cv.block, est = est, tkernel = tkernel, 
+               singular.ok = singular.ok)
     }
     else
     {
@@ -255,7 +249,7 @@ tvSURE <- function (formula, z = NULL, ez = NULL, bw = NULL, data,
     if(is.null(bw.cov))
     {
       cat("Calculating variance-covariance estimation bandwidth...\n")
-      bw.cov <- bwCov(x = result$residuals, tkernel = tkernel)
+      bw.cov <- bwCov(x = result$residuals, cv.block = cv.block, tkernel = tkernel)
     }
     Sigma <- tvCov(x = result$residuals, bw = bw.cov, tkernel = tkernel)
     result <- tvGLS(x = x, y = y, z = z, ez = ez, bw = bw, Sigma = Sigma, R = R, r = r,
@@ -325,8 +319,8 @@ tvSURE <- function (formula, z = NULL, ez = NULL, bw = NULL, data,
   colnames(tvcoef) <- var.names
   result <- list(tvcoef =  tvcoef, Lower = NULL, Upper = NULL, Sigma = Sigma,
                  fitted = fitted, residuals = resid, x = x, y = y, z = z, ez = ez,
-                 bw = bw, obs = obs, neq = neq, nvar = nvar, method = method, 
-                 est =  est, tkernel = tkernel, bw.cov = bw.cov, 
+                 bw = bw, cv.block = cv.block, obs = obs, neq = neq, nvar = nvar, 
+                 method = method, est =  est, tkernel = tkernel, bw.cov = bw.cov, 
                  level = 0, runs = 0, tboot = NULL, BOOT = NULL,
                  R = R, r = r, control = control, formula = formula, call = cl)
   class(result) <- "tvsure"

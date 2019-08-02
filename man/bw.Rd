@@ -12,10 +12,10 @@
 \usage{
 bw(x, ...)
 
-\method{bw}{default}(x, y, z = NULL, est = c("lc", "ll"),
-  tkernel = c("Epa", "Gaussian"), singular.ok = TRUE, ...)
+\method{bw}{default}(x, y, z = NULL, cv.block = 0, est = c("lc",
+  "ll"), tkernel = c("Epa", "Gaussian"), singular.ok = TRUE, ...)
 
-\method{bw}{list}(x, y, z = NULL, est = c("lc", "ll"),
+\method{bw}{list}(x, y, z = NULL, cv.block = 0, est = c("lc", "ll"),
   tkernel = c("Epa", "Gaussian"), singular.ok = TRUE, ...)
 
 \method{bw}{tvlm}(x, ...)
@@ -34,6 +34,9 @@ bw(x, ...)
 \item{y}{A matrix or vector with the dependent variable(s).}
 
 \item{z}{A vector with the variable over which coefficients are smooth over.}
+
+\item{cv.block}{A positive scalar with the size of the block in leave-one block-out cross-validation.
+By default 'cv.block=0' meaning leave-one-out cross-validation.}
 
 \item{est}{The nonparametric estimation method, one of "lc" (default) for linear constant
 or "ll" for local linear.}
