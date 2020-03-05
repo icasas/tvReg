@@ -6,9 +6,17 @@
 \alias{tvirf.}
 \title{Time-Varying Impulse Response Function}
 \usage{
-tvIRF(x, impulse = NULL, response = NULL, n.ahead = 10,
-  ortho = TRUE, ortho.cov = c("tv", "const"), bw.cov = NULL,
-  cumulative = FALSE, ...)
+tvIRF(
+  x,
+  impulse = NULL,
+  response = NULL,
+  n.ahead = 10,
+  ortho = TRUE,
+  ortho.cov = c("tv", "const"),
+  bw.cov = NULL,
+  cumulative = FALSE,
+  ...
+)
 }
 \arguments{
 \item{x}{An object of class \code{tvvar}.}
@@ -51,7 +59,7 @@ positions of the impulse(s) variable(s).}
 \item{n.ahead}{Number of ahead impulse response functions.}
 \item{ortho}{Logical, orthogonal or not impuluse response function.}
 \item{ortho.cov}{Character, either 'const' or 'tv' (default). This 
-parameter is used when the orthogonal TV-IRF is calculated. The default 
+parameter is used when the orthogonal TVIRF is calculated. The default 
 is using an error time-varying variance-covariance.}
 \item{bw.cov}{A scalar with the bandwidth to estimate the errors 
 variance-covariance matrix. If NULL, it is calculated by cross-validation.}

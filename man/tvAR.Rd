@@ -6,10 +6,20 @@
 \alias{tvar}
 \title{Time-Varying Autoregressive Model}
 \usage{
-tvAR(y, p = 1, z = NULL, ez = NULL, bw = NULL, cv.block = 0,
-  type = c("const", "none"), exogen = NULL, fixed = NULL,
-  est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"),
-  singular.ok = TRUE)
+tvAR(
+  y,
+  p = 1,
+  z = NULL,
+  ez = NULL,
+  bw = NULL,
+  cv.block = 0,
+  type = c("const", "none"),
+  exogen = NULL,
+  fixed = NULL,
+  est = c("lc", "ll"),
+  tkernel = c("Epa", "Gaussian"),
+  singular.ok = TRUE
+)
 }
 \arguments{
 \item{y}{A vector with the dependent variable.}
@@ -45,7 +55,7 @@ one of Epanesnikov ("Epa") or "Gaussian".}
 }
 \value{
 An object of class \code{tvar} with the following components:
-\item{tvcoef}{A vector of dimension obs (obs = number of observations - number lags),
+\item{coefficients}{A vector of dimension obs (obs = number of observations - number lags),
  with the time-varying coefficients estimates.}
 \item{fitted}{The fitted values.}
 \item{residuals}{Estimation residuals.}
@@ -63,7 +73,7 @@ An object of class \code{tvar} with the following components:
 \item{level}{Confidence interval range.}
 \item{runs}{Number of bootstrap replications.}
 \item{tboot}{Type of bootstrap.}
-\item{BOOT}{List with all bootstrap replications of \code{tvcoef}, if done.}
+\item{BOOT}{List with all bootstrap replications of \code{coefficients}, if done.}
 }
 \description{
 \code{tvAR} is used to fit an autorregressive model with time varying coefficients.
@@ -87,11 +97,11 @@ RQ <- RV2$RQ_lag_sqrt
 HAR <- arima(RV, order = c(1, 0, 0), xreg = cbind (RV_week, RV_month))
 print(HAR)
 
-##Chen et al (2017) TVC-HAR model 
+##Chen et al (2017) TVCHAR model 
 TVCHAR <- tvAR (RV, p = 1, exogen = cbind (RV_week, RV_month), bw = 20)
 print(TVCHAR)
 
-##Casas et al (2018) TV-HARQ model
+##Casas et al (2018) TVHARQ model
 tvHARQ <- tvAR (RV, p = 1, exogen = cbind (RV_week, RV_month), 
 z=RQ, bw = 0.0062)
 print(tvHARQ)

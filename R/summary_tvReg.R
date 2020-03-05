@@ -1,7 +1,7 @@
 #' Print results of functions in tvReg
 #' 
 #' Print some results for objects with class attribute \code{tvlm}, \code{tvar}, \code{tvvar},
-#' \code{tvirf}, \code{tvsure}.
+#' \code{tvirf}, \code{tvsure} and \code{tvplm}.
 #' 
 #' These functions print a few results from the time-varying estimated coefficients
 #' @param object An object used to select a method.
@@ -18,8 +18,8 @@ summary.tvlm <- function(object,  digits = max(3, getOption("digits") - 3), ... 
 {
    cat("\nCall: \n")
    print(object$call)
-   cat("\nClass: tvlm \n")
-   result <- object$tvcoef
+   cat("\nClass: ", class(object), "\n")
+   result <- object$coefficients
    bw <- round(object$bw, digits = digits)
    lower <- object$Lower
    upper <- object$Upper
@@ -36,11 +36,12 @@ summary.tvlm <- function(object,  digits = max(3, getOption("digits") - 3), ... 
      cat(text1, "\n")
      print(apply(lower, 2, summary), digits = digits)
      text1 <- paste("\nUPPER (", level, "%) confidence interval:", sep ="")
+     cat(text1, "\n")
      print(apply(upper, 2, summary), digits = digits)
    }
    cat("\nBandwidth: ", bw)
    SSR <- sum(object$residuals^2)
-   SST <- sum((object$y- mean(object$y))^2)
+   SST <- sum((object$y - mean(object$y))^2)
    R2 <- round(1 - SSR/SST, digits = digits)
    cat("\nPseudo R-squared: ", R2, "\n\n")
    invisible(object)
@@ -51,15 +52,18 @@ summary.tvlm <- function(object,  digits = max(3, getOption("digits") - 3), ... 
 #' @export 
 summary.tvar <- summary.tvlm
 
+#' @rdname summary.tvReg
+#' @method summary tvplm
+#' @export 
+summary.tvplm <- summary.tvlm
 
-#' @inheritParams summary.tvlm
 #' @aliases summary summary.tvsure
 #' @rdname summary.tvReg
 #' @method summary tvsure
 #' @export
 summary.tvsure <- function (object,  digits = max(3, getOption("digits") - 3), ...)
 {
-  result <- object$tvcoef
+  result <- object$coefficients
   bw <- round(object$bw, digits = digits)
   if (length(bw) == 1)
     bw <- rep(bw, object$neq)
@@ -96,7 +100,6 @@ summary.tvsure <- function (object,  digits = max(3, getOption("digits") - 3), .
   invisible(object)
 }
 
-#' @inheritParams summary.tvlm
 #' @aliases summary summary.tvvar
 #' @rdname summary.tvReg
 #' @method summary tvvar
@@ -105,7 +108,7 @@ summary.tvvar <- function (object,  digits = max(3, getOption("digits") - 3), ..
 {
   cat("\nCall: \n")
   print(object$call)
-  result <- object$tvcoef
+  result <- object$coefficients
   bw <- round(object$bw, digits = digits)
   if (length(bw) == 1)
     bw <- rep(bw, object$neq)
@@ -129,7 +132,6 @@ summary.tvvar <- function (object,  digits = max(3, getOption("digits") - 3), ..
   invisible(object)
 }
 
-#' @inheritParams summary.tvlm
 #' @aliases summary summary.tvirf
 #' @rdname summary.tvReg
 #' @method summary tvirf

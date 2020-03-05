@@ -3,19 +3,44 @@
 \name{tvGLS}
 \alias{tvGLS}
 \alias{tvGLS.list}
+\alias{tvGLS.matrix}
 \alias{tvGLS.tvsure}
 \title{Time-Varying Generalised Least Squares}
 \usage{
 tvGLS(x, ...)
 
-\method{tvGLS}{list}(x, y, z = NULL, ez = NULL, bw, Sigma = NULL,
-  R = NULL, r = NULL, est = c("lc", "ll"), tkernel = c("Epa",
-  "Gaussian"), ...)
+\method{tvGLS}{list}(
+  x,
+  y,
+  z = NULL,
+  ez = NULL,
+  bw,
+  Sigma = NULL,
+  R = NULL,
+  r = NULL,
+  est = c("lc", "ll"),
+  tkernel = c("Epa", "Gaussian"),
+  ...
+)
+
+\method{tvGLS}{matrix}(
+  x,
+  y,
+  z = NULL,
+  ez = NULL,
+  bw,
+  Sigma = NULL,
+  R = NULL,
+  r = NULL,
+  est = c("lc", "ll"),
+  tkernel = c("Epa", "Gaussian"),
+  ...
+)
 
 \method{tvGLS}{tvsure}(x, ...)
 }
 \arguments{
-\item{x}{an object used to select a method.}
+\item{x}{An object used to select a method.}
 
 \item{...}{Other arguments passed to specific methods.}
 
@@ -34,15 +59,17 @@ values are included then the vector z is used.}
 
 \item{r}{A numeric vector.}
 
-\item{est}{Either "lc" or "ll".}
+\item{est}{The nonparametric estimation method, one of "lc" (default) for linear constant
+or "ll" for local linear.}
 
-\item{tkernel}{Either "Gaussian" or "Epa".}
+\item{tkernel}{The type of kernel used in the coefficients estimation method,
+one of Epanesnikov ("Epa") or "Gaussian".}
 }
 \value{
 \code{tvGLS} returns a list containing:
-\item{tvcoef}{An array of dimension obs x nvar x neq (obs = number of observations, nvar = number of variables
+\item{coefficients}{An array of dimension obs x nvar x neq (obs = number of observations, nvar = number of variables
 in each equation, neq = number of equations in the system) with the time-varying coefficients estimates.}
-\item{fitted}{A matrix of dimension obs x neq with the fited values from the estimation.}
+\item{fitted}{A matrix of dimension obs x neq with the fitted values from the estimation.}
 \item{residuals}{A matrix of dimension obs x neq with the residuals from the estimation.}
 }
 \description{

@@ -13,7 +13,7 @@
 #' @param singular.ok	Logical. If FALSE, a singular model is an error.
 #' @return An object of class 'tvvar'
 #' The object of class \code{tvvar} have the following components:
-#' \item{tvcoef}{An array of dimension obs x neq (obs = number of observations,
+#' \item{coefficients}{An array of dimension obs x neq (obs = number of observations,
 #' neq = number of equations in the system) with the time-varying coefficients estimates.}
 #' \item{fitted}{The fitted values.}
 #' \item{residuals}{Estimation residuals.}
@@ -63,7 +63,7 @@ tvVAR <- function (y, p = 1, z = NULL, ez = NULL, bw = NULL, cv.block = 0, type 
       stop("\nArgument 'z' should be 'numeric' or a 'vector'.\n")
     z <- as.numeric(z)[-c(1:p)]
   }
-  if (ncol(y) < 2)
+  if (NCOL(y) < 2)
     stop("\nMatrix 'y' should contain at least two variables. For univariate
           analysis consider the 'tvAR' function.\n")
   tkernel <- match.arg(tkernel)
@@ -71,7 +71,7 @@ tvVAR <- function (y, p = 1, z = NULL, ez = NULL, bw = NULL, cv.block = 0, type 
   type <- match.arg(type)
   if (is.null(colnames(y)))
   {
-    colnames(y) <- paste("y", 1:ncol(y), sep = "")
+    colnames(y) <- paste("y", 1:NCOL(y), sep = "")
     warning(paste("No column names supplied in y, using:",
                   paste(colnames(y), collapse = ", "), ", instead.\n"))
   }
@@ -100,11 +100,11 @@ tvVAR <- function (y, p = 1, z = NULL, ez = NULL, bw = NULL, cv.block = 0, type 
   if (!(is.null(exogen)))
   {
     exogen <- as.matrix(exogen)
-    if (!identical(nrow(exogen), nrow(y))) {
+    if (!identical(NROW(exogen), NROW(y))) {
       stop("\nDifferent row size of 'y' and exogen.\n")
     }
     if (is.null(colnames(exogen))) {
-      colnames(exogen) <- paste("exo", 1:ncol(exogen),
+      colnames(exogen) <- paste("exo", 1:NCOL(exogen),
                                 sep = "")
     }
     colnames(exogen) <- make.names(colnames(exogen))
@@ -126,7 +126,7 @@ tvVAR <- function (y, p = 1, z = NULL, ez = NULL, bw = NULL, cv.block = 0, type 
       y <- yend[, i]
       results <- tvOLS(x = rhs, y = y, z = z, bw = bw[i], est = est, tkernel = tkernel,
                        singular.ok = singular.ok)
-      equation[[colnames(yend)[i]]] <- results$tvcoef
+      equation[[colnames(yend)[i]]] <- results$coefficients
       colnames(equation[[colnames(yend)[i]]]) <- colnames(rhs)
       resid[,i] <- results$residuals
       fitted[, i] <- results$fitted
@@ -138,11 +138,11 @@ tvVAR <- function (y, p = 1, z = NULL, ez = NULL, bw = NULL, cv.block = 0, type 
     names(bw) <- "bw.mean"
   else
     names(bw) <- paste("bw.", names(equation), sep = "")
-  result <- list(tvcoef = equation, Lower = NULL, Upper = NULL,  fitted = fitted,
+  result <- list(coefficients = equation, Lower = NULL, Upper = NULL,  fitted = fitted,
                  residuals = resid, y = yend, x = rhs, z = z, y.orig = y.orig,
                  bw = bw, cv.block = cv.block, exogen = exogen, p = p, type = type, obs = sample, 
                  totobs = sample + p, neq = neq, est = est, tkernel = tkernel, 
-                 singular.ok = singular.ok)
+                 singular.ok = singular.ok, call = match.call())
   class(result) <- "tvvar"
   return(result)
 }

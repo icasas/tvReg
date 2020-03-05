@@ -3,7 +3,7 @@
 #' Calculate bandwidth(s) by cross-validation for functions tvSURE, tvVAR and tvLM.
 #'
 #' @rdname bw
-#' @param x an object used to select a method.
+#' @param x An object used to select a method.
 #' @param ... Other parameters passed to specific methods.
 #' @return \code{bw} returns a vector or a scalar with the bandwith to estimate the mean or the covariance
 #' residuals, fitted values.
@@ -49,7 +49,7 @@ bw.default <- function(x, y, z = NULL, cv.block = 0, est = c("lc", "ll"), tkerne
     stop("There are NA values in your data, please enter only complete cases. \n")
   tkernel <- match.arg(tkernel)
   est <- match.arg(est)
-  cv.block <- abs(cv.block)
+  cv.block <- floor(abs(cv.block))
   y <- as.matrix(y)
   x <- as.matrix(x)
   neq <- NCOL(y)
@@ -58,13 +58,13 @@ bw.default <- function(x, y, z = NULL, cv.block = 0, est = c("lc", "ll"), tkerne
     stop("The number of equations in 'x' and 'y' are different \n")
   if(is.null(z))
   {
-    upper <- 20
+    upper <- 5
     lower <- 5/obs
     top <- 1
   }
   else
   {
-    top <- max(z)- min(z)
+    top <- max(z) - min(z)
     upper <- top * 5
     dist <- diff(sort(z))
     lower <- min(dist)
@@ -87,7 +87,7 @@ bw.default <- function(x, y, z = NULL, cv.block = 0, est = c("lc", "ll"), tkerne
                                  cv.block = cv.block, est = est, tkernel = tkernel, 
                                  singular.ok = singular.ok),
                     silent = TRUE)
-      if (class(result)  !=  "list")
+      if (!inherits(result, "list"))
         value <- .Machine$double.xmax
       else
       {
@@ -104,7 +104,7 @@ bw.default <- function(x, y, z = NULL, cv.block = 0, est = c("lc", "ll"), tkerne
   }
   if(iter == 10)
     warning("Maximum number of iterations reached in bandwidth calculation: either the function
-            is constant, or no convergence of bandwidth. \n")
+            is constant, no convergence of bandwidth, or cv.block is too big. \n")
   return(bw)
 }
 
@@ -132,7 +132,7 @@ bw.default <- function(x, y, z = NULL, cv.block = 0, est = c("lc", "ll"), tkerne
 bw.list <- function(x, y, z = NULL, cv.block = 0, est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"),
                     singular.ok = TRUE, ...)
 {
-  if(!is.list(x))
+  if(!inherits(x, "list"))
     stop("'x' should be a list of matrices. \n")
   neq <- length(x)
   if(neq < 2)
@@ -147,7 +147,7 @@ bw.list <- function(x, y, z = NULL, cv.block = 0, est = c("lc", "ll"), tkernel =
   tkernel <- match.arg(tkernel)
   est <- match.arg(est)
   bw <- numeric(neq)
-  cv.block <- abs(cv.block)
+  cv.block <- floor(abs(cv.block))
   if(is.null(z))
   {
     upper <- 2
@@ -178,7 +178,7 @@ bw.list <- function(x, y, z = NULL, cv.block = 0, est = c("lc", "ll"), tkernel =
                                  upper = upper, x = x[[j]], y = y[, j], z = z,
                                  cv.block = cv.block, est = est, tkernel = tkernel, 
                                  singular.ok = singular.ok), silent = TRUE)
-      if (class(result)  !=  "list")
+      if (!inherits(result, "list"))
         value <- .Machine$double.xmax
       else
       {
@@ -200,17 +200,16 @@ bw.list <- function(x, y, z = NULL, cv.block = 0, est = c("lc", "ll"), tkernel =
 }
 #' @rdname bw
 #' @method bw tvlm
-#'
 #' @export
 
 bw.tvlm <- function(x, ...)
 {
-  y <- x$x
+  y <- x$y
   z <- x$z
   est <- x$est
   tkernel <- x$tkernel
   singular.ok <- x$singular.ok
-  cv.block <- x$cv.block
+  cv.block <- floor(abs(x$cv.block))
   x <- x$x
   return(bw (x, y, z, cv.block, est, tkernel, singular.ok))
 }
@@ -233,6 +232,172 @@ bw.tvvar <- bw.tvlm
 #' @export
 bw.tvsure <- bw.tvlm
 
+#' @rdname bw
+#' @method bw tvplm
+#' @export
+
+bw.tvplm <- function(x, ...)
+{
+  if(!inherits(x, "tvplm"))
+    stop("'x' should be a 'tvplm' object. \n")
+  y <- x$y
+  z <- x$z
+  cv.block <- floor(abs(x$cv.block))
+  obs <- x$obs
+  neq <- x$neq
+  method <- x$method
+  est <- x$est
+  tkernel <- x$tkernel
+  x <- x$x
+  if(is.null(z))
+  {
+    upper <- 20
+    lower <- 5/obs
+    top <- 1
+  }
+  else
+  {
+    top <- max(z)- min(z)
+    upper <- top * 5
+    dist <- diff(sort(z))
+    lower <- min(dist)
+  }
+  iter <- 0
+  value <- .Machine$double.xmax
+  while(value == .Machine$double.xmax)
+  {
+    if(iter == 10)
+    {
+      value <- 0
+      bw <- 100
+      break()
+    }
+    if (method != "within")
+      result <- try(stats::optim(stats::runif(1, lower, top), .tvRE.cv, method = "Brent",
+                                 lower = lower, upper = upper, x = x, y = y, z = z, 
+                                 neq = neq, obs = obs, cv.block = cv.block, est = est, 
+                                 tkernel = tkernel),
+                    silent = FALSE)
+    else 
+      result <- try(stats::optim(stats::runif(1, lower, top), .tvFE.cv, method = "Brent",
+                                 lower = lower, upper = top, x = x, y = y, z = z, 
+                                 neq = neq, obs = obs, cv.block = cv.block,  est = est, 
+                                 tkernel = tkernel),
+                    silent = FALSE)
+    if (!inherits(result, "list"))
+      value <- .Machine$double.xmax
+    else
+    {
+      if(is.na(result$value))
+        value <- .Machine$double.xmax
+      else
+      {
+        value <- result$value 
+        bw <- result$par
+      }
+    }
+    iter <- iter + 1
+  }
+  if(iter == 10)
+    warning("Maximum number of iterations reached in bandwidth calculation: either the function
+              is constant, or no convergence of bandwidth. \n")
+  return(abs(bw))  
+}
+
+#' 
+#' Panel Model Bandwidth Calculation by Cross-Validation
+#' \emph{bwPanel} calculates a single bandwidth to estimate the time-varying 
+#' coefficients of a panel data modelc
+#' @param method A character with the choice of panel model/estimation method:
+#' If method = \code{tvPOLS} (default) then the data is pooled estimated with time-varying OLS. 
+#' No individual or time effects are estimated
+#' If method = \code{tvFE} then individual effects which might be correlated with 
+#' the regressors are estimated.
+#' If method = \code{tvRE} then individual effects are considered random and independent
+#' of the regressors.
+#' @return A scalar.
+#' @import plm
+#' @method bw pdata.frame
+#' @rdname bw
+#' @export
+bw.pdata.frame<-function(x, z = NULL, method, cv.block = 0, 
+                  est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"), ...)
+{  
+  dimen <- plm::pdim(x)
+  obs <- dimen$nT$N
+  neq <- dimen$nT$n
+  obs <- dimen$nT$T
+  y <- stats::model.extract(x, "response")
+  if (stats::is.empty.model(x))
+    stop ("No regressors in the model. \n")
+  else
+  {
+    terms <- attr(x, "terms")
+    x <- stats::model.matrix(terms, x)
+    var.names <- colnames(x)
+  }
+  nvar <-  NCOL (x)
+  tkernel <- match.arg(tkernel)
+  est <- match.arg(est)
+  if(is.null(z))
+  {
+    upper <- 20
+    lower <- 5/obs
+    top <- 1
+  }
+  else
+  {
+    top <- max(z)- min(z)
+    upper <- top * 5
+    dist <- diff(sort(z))
+    lower <- min(dist)
+  }
+  value <- .Machine$double.xmax
+  iter <- 0
+  while(value == .Machine$double.xmax)
+  {
+    if(iter == 10)
+    {
+      value <- 0
+      bw <- top
+      break()
+    }
+
+    if (method != "tvFE")
+      result <- try(stats::optim(stats::runif(1, lower, top), .tvRE.cv, method = "Brent",
+                                 lower = lower, upper = upper, x = x, y = y, z = z, 
+                                 neq = neq, obs = obs, cv.block = cv.block, est = est, 
+                                 tkernel = tkernel),
+                    silent = FALSE)
+    else 
+      result <- try(stats::optim(stats::runif(1, lower, top), .tvFE.cv, method = "Brent",
+                                 lower = lower, upper = top, x = x, y = y, z = z, 
+                                 neq = neq, obs = obs, cv.block = cv.block,  est = est, 
+                                 tkernel = tkernel),
+                    silent = FALSE)
+    if (!inherits(result, "list"))
+        value <- .Machine$double.xmax
+    else
+    {
+      if(is.na(result$value))
+        value <- .Machine$double.xmax
+      else
+      {
+        value <- result$value 
+        bw <- result$par
+      }
+    }
+    iter <- iter + 1
+  }
+  if(iter == 10)
+    warning("Maximum number of iterations reached in bandwidth calculation: either the function
+            is constant, or no convergence of bandwidth. \n")
+
+  return(abs(result$par))  
+}
+
+
+
 #' 
 #' Covariance Bandwidth Calculation by Cross-Validation
 #' \emph{bwCov} calculates a single bandwidth to estimate the time-varying variance-
@@ -252,7 +417,7 @@ bw.tvsure <- bw.tvlm
 #' @export
 bwCov <- function(x, cv.block = 0, est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"))
 {
-  if(!is.matrix(x) & !is.data.frame(x))
+  if(!inherits(x, c("matrix", "data.frame")))
     stop("'x' should be a matrix or a data.frame.\n")
   tkernel <- match.arg(tkernel)
   est <- match.arg(est)
@@ -274,7 +439,7 @@ bwCov <- function(x, cv.block = 0, est = c("lc", "ll"), tkernel = c("Epa", "Gaus
                                lower = 5/obs, upper = 20, x = x, cv.block = cv.block,
                                est = est, tkernel = tkernel),
                   silent = TRUE)
-    if (class(result)  !=  "list")
+    if (!inherits(result, "list"))
       value <- .Machine$double.xmax
     else
     {

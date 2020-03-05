@@ -2,7 +2,7 @@
 % Please edit documentation in R/tvA.R
 \name{tvAcoef}
 \alias{tvAcoef}
-\title{Time-Varying Coefficient Arrays of the Lagged Endogenous Variables of a TV-VAR (no intercept).}
+\title{Time-Varying Coefficient Arrays of the Lagged Endogenous Variables of a TVVAR (no intercept).}
 \usage{
 tvAcoef(x)
 }

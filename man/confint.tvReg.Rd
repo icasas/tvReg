@@ -5,22 +5,56 @@
 \alias{confint.tvar}
 \alias{confint.tvsure}
 \alias{confint.tvirf}
+\alias{confint.tvplm}
 \title{Confidence Intervals for Objects in tvReg}
 \usage{
-\method{confint}{tvlm}(object, parm, level = 0.95, runs = 100,
-  tboot = c("wild", "wild2"), ...)
+\method{confint}{tvlm}(
+  object,
+  parm,
+  level = 0.95,
+  runs = 100,
+  tboot = c("wild", "wild2"),
+  ...
+)
 
-\method{confint}{tvar}(object, parm, level = 0.95, runs = 100,
-  tboot = c("wild", "wild2"), ...)
+\method{confint}{tvar}(
+  object,
+  parm,
+  level = 0.95,
+  runs = 100,
+  tboot = c("wild", "wild2"),
+  ...
+)
 
-\method{confint}{tvsure}(object, parm, level = 0.95, runs = 100,
-  tboot = c("wild", "wild2"), ...)
+\method{confint}{tvsure}(
+  object,
+  parm,
+  level = 0.95,
+  runs = 100,
+  tboot = c("wild", "wild2"),
+  ...
+)
 
-\method{confint}{tvirf}(object, parm, level = 0.95, runs = 100,
-  tboot = c("wild", "wild2"), ...)
+\method{confint}{tvirf}(
+  object,
+  parm,
+  level = 0.95,
+  runs = 100,
+  tboot = c("wild", "wild2"),
+  ...
+)
+
+\method{confint}{tvplm}(
+  object,
+  parm,
+  level = 0.95,
+  runs = 100,
+  tboot = c("wild", "wild2"),
+  ...
+)
 }
 \arguments{
-\item{object}{Object of class \code{tvsure}, class \code{tvvar} or class \code{tvirf}.}
+\item{object}{An object used to select a method.}
 
 \item{parm}{A specification of which parameters are to be given confidence intervals, 
 either a vector of numbers or a vector of names. If missing, all parameters are considered.}
@@ -40,11 +74,11 @@ an object of class \code{tvsure} with BOOT, Lower and Upper different from NULL.
 }
 \description{
 confint is used to estimate the bootstrap confidence intervals for objects with class
-attribute \code{tvlm}, \code{tvar}, \code{tvirf}, \code{tvsure}.
+attribute \code{tvlm}, \code{tvar}, \code{tvirf}, \code{tvsure} and \code{tvplm}.
 }
 \examples{
 \dontrun{
-##Calculation of confidence intervals for a TV-LM model
+##Calculation of confidence intervals for a TVLM model
 
 ##Generation of time-varying coefficients linear model
 set.seed(42)

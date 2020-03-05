@@ -6,9 +6,19 @@
 \alias{tvvar}
 \title{Time-varying Vector Autoregressive Models}
 \usage{
-tvVAR(y, p = 1, z = NULL, ez = NULL, bw = NULL, cv.block = 0,
-  type = c("const", "none"), exogen = NULL, est = c("lc", "ll"),
-  tkernel = c("Epa", "Gaussian"), singular.ok = TRUE)
+tvVAR(
+  y,
+  p = 1,
+  z = NULL,
+  ez = NULL,
+  bw = NULL,
+  cv.block = 0,
+  type = c("const", "none"),
+  exogen = NULL,
+  est = c("lc", "ll"),
+  tkernel = c("Epa", "Gaussian"),
+  singular.ok = TRUE
+)
 }
 \arguments{
 \item{y}{A matrix with dimention obs x neq (obs = number of observations and
@@ -40,7 +50,7 @@ By default 'cv.block = 0' meaning leave one out cross-validation.}
 \value{
 An object of class 'tvvar'
 The object of class \code{tvvar} have the following components:
-\item{tvcoef}{An array of dimension obs x neq (obs = number of observations,
+\item{coefficients}{An array of dimension obs x neq (obs = number of observations,
 neq = number of equations in the system) with the time-varying coefficients estimates.}
 \item{fitted}{The fitted values.}
 \item{residuals}{Estimation residuals.}

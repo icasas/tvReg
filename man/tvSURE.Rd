@@ -6,11 +6,24 @@
 \alias{tvsure}
 \title{Time-Varying Seemingly Unrelated Regression Equations Model}
 \usage{
-tvSURE(formula, z = NULL, ez = NULL, bw = NULL, cv.block = 0, data,
-  method = c("tvOLS", "tvFGLS", "tvGLS"), Sigma = NULL, est = c("lc",
-  "ll"), tkernel = c("Epa", "Gaussian"), bw.cov = NULL,
-  singular.ok = TRUE, R = NULL, r = NULL,
-  control = tvsure.control(...), ...)
+tvSURE(
+  formula,
+  z = NULL,
+  ez = NULL,
+  bw = NULL,
+  cv.block = 0,
+  data,
+  method = c("tvOLS", "tvFGLS", "tvGLS"),
+  Sigma = NULL,
+  est = c("lc", "ll"),
+  tkernel = c("Epa", "Gaussian"),
+  bw.cov = NULL,
+  singular.ok = TRUE,
+  R = NULL,
+  r = NULL,
+  control = tvreg.control(...),
+  ...
+)
 }
 \arguments{
 \item{formula}{A list of formulas, one for each equation.}
@@ -54,8 +67,8 @@ neq = number of equations).}
 \item{r}{An optional vector of length the number of restrictions. By default it contains zeros.}
 
 \item{control}{list of control parameters.  The default is constructed by
-the function \code{\link{tvsure.control}}.  See the documentation of
-\code{\link{tvsure.control}} for details.}
+the function \code{\link{tvreg.control}}.  See the documentation of
+\code{\link{tvreg.control}} for details.}
 
 \item{...}{Other parameters passed to specific methods.}
 }
@@ -63,7 +76,7 @@ the function \code{\link{tvsure.control}}.  See the documentation of
 \code{tvSURE} returns a list of the class \code{tvsure} containing the results of the whole system, results of the estimation
 and confidence instervals if chosen.
 The object of class \code{tvsure} have the following components:
-\item{tvcoef}{An array of dimension obs x nvar x neq (obs = number of observations, nvar = number of variables
+\item{coefficients}{An array of dimension obs x nvar x neq (obs = number of observations, nvar = number of variables
 in each equation, neq = number of equations in the system) with the time-varying coefficients estimates.}
 \item{Lower}{If \code{level} non equal zero, an array of dimension obs x nvar x neq containing the confidence 
 interval lower band.}
@@ -87,7 +100,7 @@ interval upper band.}
 \item{level}{Confidence interval range.}
 \item{runs}{Number of bootstrap replications.}
 \item{tboot}{Type of bootstrap.}
-\item{BOOT}{List with all bootstrap replications of \code{tvcoef}, if done.}
+\item{BOOT}{List with all bootstrap replications of \code{coefficients}, if done.}
 \item{R}{Restrictions matrix.}
 \item{r}{Restrictions vector.}
 \item{formula}{Initial formula.}
@@ -165,9 +178,3 @@ time varying constraints in econometric models, \emph{Statistica Sinica}.
 \code{\link{bw}}, \code{\link{tvCov}},  \code{\link{tvVAR}}, 
 \code{\link{confint}}, \code{\link{plot}}, \code{\link{print}} and \code{\link{summary}}
 }
-\keyword{models}
-\keyword{nonparametric}
-\keyword{regression}
-\keyword{statistics}
-\keyword{time}
-\keyword{varying}

@@ -3,12 +3,12 @@
 #' \code{tvGLS} estimates time-varying coefficients of SURE using the kernel smoothing GLS.
 #'
 #'
-#' @param x an object used to select a method.
+#' @param x An object used to select a method.
 #' @param ... Other arguments passed to specific methods.
 #' @return \code{tvGLS} returns a list containing:
-#' \item{tvcoef}{An array of dimension obs x nvar x neq (obs = number of observations, nvar = number of variables
+#' \item{coefficients}{An array of dimension obs x nvar x neq (obs = number of observations, nvar = number of variables
 #' in each equation, neq = number of equations in the system) with the time-varying coefficients estimates.}
-#' \item{fitted}{A matrix of dimension obs x neq with the fited values from the estimation.}
+#' \item{fitted}{A matrix of dimension obs x neq with the fitted values from the estimation.}
 #' \item{residuals}{A matrix of dimension obs x neq with the residuals from the estimation.}
 #' @export
 #' @import Matrix
@@ -41,8 +41,7 @@ tvGLS<- function(x, ...) UseMethod("tvGLS", x)
 #' @param Sigma An array.
 #' @param R A matrix.
 #' @param r A numeric vector.
-#' @param est Either "lc" or "ll".
-#' @param tkernel Either "Gaussian" or "Epa".
+#' @inheritParams tvLM
 #' @examples
 #' data(FF5F)
 #' x <- list()
@@ -65,7 +64,7 @@ tvGLS<- function(x, ...) UseMethod("tvGLS", x)
 tvGLS.list <- function(x, y, z = NULL, ez = NULL, bw, Sigma = NULL, R = NULL, r = NULL,
                        est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"), ...)
 {
-  if(!is.list(x))
+  if(!inherits(x, "list"))
     stop("\n'x' should be a list of matrices. \n")
   is.predict <- ifelse (is.null(ez), FALSE, TRUE)
   tkernel <- match.arg(tkernel)
@@ -139,9 +138,9 @@ tvGLS.list <- function(x, y, z = NULL, ez = NULL, bw, Sigma = NULL, R = NULL, r 
     s0 <- Matrix::crossprod(x.star)
     T0 <- Matrix::crossprod(x.star, y.star)
     result <- try(qr.solve(s0, T0), silent = TRUE)
-    if(class(result) == "try-error")
+    if(inherits(result, "try-error"))
       result <- try(qr.solve(s0, T0, tol = .Machine$double.xmin ), silent = TRUE)
-    if(class(result) == "try-error")
+    if(inherits(result, "try-error"))
       stop("\nSystem is computationally singular, the inverse cannot be calculated. 
            Possibly, the 'bw' is too small for values in 'ez'.\n")
     if(est =="ll")
@@ -164,11 +163,121 @@ tvGLS.list <- function(x, y, z = NULL, ez = NULL, bw, Sigma = NULL, R = NULL, r 
   }
   if(!is.predict)
     resid <- as.matrix(y - fitted)
-  return(list( tvcoef = theta, fitted = fitted, residuals = resid))
+  return(list( coefficients = theta, fitted = fitted, residuals = resid))
 }
 
 #' @rdname tvGLS
-#' @inheritParams tvGLS
+#' @method tvGLS matrix
+#' @export
+tvGLS.matrix <- function(x, y, z = NULL, ez = NULL, bw, Sigma = NULL, R = NULL, r = NULL,
+                       est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"), ...)
+{
+  if(!inherits (x, "matrix"))
+    stop("\n'x' should be a 'matrix'. \n")
+  is.predict <- ifelse (is.null(ez), FALSE, TRUE)
+  tkernel <- match.arg(tkernel)
+  est <- match.arg(est)
+  y <- as.matrix(y)
+  neq <- length(x)
+  for (i in 1:neq)
+    x[[i]] <- as.matrix(x[[i]])
+  obs <- NROW(x[[1]])
+  if(!identical(neq, NCOL(y)) | !identical(obs, NROW(y)))
+    stop("The number of equations in 'x' and 'y' are different \n")
+  if(is.null(Sigma))
+    Sigma <- array(rep(diag(1, neq), obs), dim = c(neq, neq, obs))
+  if(length(bw) != 1 & length(bw) != neq)
+    stop("\nThere must be a single bandwith or a bandwidth for each equation.\n")
+  nvar <- numeric(neq)
+  for (i in 1:neq)
+    nvar[i] <- NCOL(x[[i]])
+  if(!is.null(z))
+  {
+    if(length(z) != obs)
+    {
+      stop("\nDimensions of 'y' and 'z' are not compatible.\n")
+    }
+    grid <- z
+  }
+  else
+    grid <- (1:obs)/obs
+  if (is.null(ez))
+    ez <- grid
+  eobs <- NROW(ez)
+  if (length(bw) == 1)
+    bw <- rep(bw, neq)
+  if(!is.null(R))
+  {
+    R <- as.matrix(R)
+    if(NCOL(R) != sum(nvar))
+      stop("\nWrong dimension of 'R', it should have as many columns as variables 
+           in the whole system. \n")
+    if (is.null(r))
+      r <- rep(0, NROW(R))
+    else if (length(r) == 1)
+      r <- rep(r, NROW(R))
+    else if (length(r) != NROW(R) & length(r) != 1)
+      stop("\nWrong dimension of 'r', it should be as long as the number of 
+           rows in 'R'. \n")
+  }
+  fitted <- matrix(0, eobs, neq)
+  resid <- matrix(0, eobs, neq)
+  theta <- matrix(0, eobs, sum(nvar))
+  for (t in 1:eobs)
+  {
+    tau0 <- grid - ez[t]
+    y.kernel <- NULL
+    x.kernel <- vector ("list", neq)
+    eSigma <- eigen(Sigma[,,t], TRUE)
+    if (any(eSigma$value <= 0))
+      stop("\n'Sigma' is not positive definite.\n")
+    A <- diag(eSigma$values^-0.5) %*% t(eSigma$vectors) %x% Matrix::Diagonal(obs)
+    for (i in 1:neq)
+    {
+      mykernel <- sqrt(.kernel(x = tau0, bw = bw[i], tkernel = tkernel))
+      y.kernel <- cbind(y.kernel, y[, i] * mykernel)
+      xtemp <- x[[i]] * mykernel
+      if(est == "ll")
+        xtemp <- cbind(xtemp, xtemp * tau0)
+      x.kernel[[i]] <- xtemp
+    }
+    x.star <- A %*% Matrix::bdiag(x.kernel)
+    y.star <- A %*% methods::as(y.kernel, "sparseVector")
+    s0 <- Matrix::crossprod(x.star)
+    T0 <- Matrix::crossprod(x.star, y.star)
+    result <- try(qr.solve(s0, T0), silent = TRUE)
+    if(inherits(result, "try-error"))
+      result <- try(qr.solve(s0, T0, tol = .Machine$double.xmin ), silent = TRUE)
+    if(inherits(result, "try-error"))
+      stop("\nSystem is computationally singular, the inverse cannot be calculated. 
+           Possibly, the 'bw' is too small for values in 'ez'.\n")
+    if(est =="ll")
+    {
+      temp <- result[1:nvar[1]]
+      for(i in 2:neq)
+        temp <- c(temp, result[(1:nvar[i]) + 2 * sum(nvar[1:(i-1)])])
+      theta[t, ] <- temp
+    }
+    else
+      theta[t, ] <- result
+    if(!is.null(R))
+    {
+      Sinv <- qr.solve(s0)
+      theta[t, ] <- drop(theta[t, ] - Sinv %*% t(R) %*%
+                           qr.solve(R %*% Sinv %*% t(R)) %*% (R %*% theta[t, ] - r))
+    }
+    xt.diag <- as.matrix(Matrix::bdiag(lapply(x,"[",t, ,drop = FALSE)))
+    fitted[t, ] <- xt.diag %*% theta[t, ]
+  }
+  if(!is.predict)
+    resid <- as.matrix(y - fitted)
+  return(list( coefficients = theta, fitted = fitted, residuals = resid))
+}
+
+
+
+
+#' @rdname tvGLS
 #' @method tvGLS tvsure
 #' @export
 tvGLS.tvsure <- function(x, ...)

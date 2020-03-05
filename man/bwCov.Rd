@@ -6,8 +6,7 @@
 \emph{bwCov} calculates a single bandwidth to estimate the time-varying variance-
 covariance matrix.}
 \usage{
-bwCov(x, cv.block = 0, est = c("lc", "ll"), tkernel = c("Epa",
-  "Gaussian"))
+bwCov(x, cv.block = 0, est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"))
 }
 \arguments{
 \item{x}{A matrix or a data frame.}

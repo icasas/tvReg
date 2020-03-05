@@ -2,13 +2,13 @@
 #' Predict Methods for Objects in tvReg.
 #'
 #' Predict methods for objects with class attribute \code{tvlm}, \code{tvar}, 
-#' \code{tvvar}, \code{tvirf} and \code{tvsure}. This function needs new values of 
+#' \code{tvvar}, \code{tvirf}, \code{tvsure} and \code{tvplm}. This function needs new values of 
 #' variables y (response), x (regressors), exogen (exogenous variables, when used),
 #' and  z (smoothing variable). 
-#' @param object Object of class \code{tvlm}, \code{tvar}, \code{tvvar} or \code{tvsure}.
-#' @param newy A vector with new values of the response variable 
+#' @param object An object used to select a method.
 #' @param newx A dataframe with new values of all variables in x. No need to 
 #' input the intercept.
+#' @param newdata A vector or matrix with new values of the lags included in the model.
 #' @param newz A vector with new values of the smoothing variable.
 #' @param newexogen A matrix or vector with the new value of the exogenous variables.
 #' Only for predictions of 'tvar' and 'tvvar' objects.
@@ -18,7 +18,7 @@
 #' @method predict tvlm
 #' @seealso \code{\link{forecast}}.
 #' @examples
-#' ## Example of TV-LM prediction with coefficients as 
+#' ## Example of TVLM prediction with coefficients as 
 #' ## functions of the realized quarticity
 #' 
 #' data("RV")
@@ -36,11 +36,13 @@ predict.tvlm<-function (object, newx, newz, ...)
 {
   if(!inherits(object, c("tvlm")))
     stop("\nArgument 'object' should be entered and it should have class 'tvlm'.\n")
+  if(is.null(newx))
+    return(stats::fitted(object, ...))
   if(is.null(object$z))
     stop("\nYour model coefficients are functions of time, use function 
          'forecast' with argument 'n.ahead' as horizon.\n")
   if(!inherits(newx, c("data.frame", "matrix", "numeric", "vector")))
-    stop("\nArgument 'newx' should be entered and it should be a numeric vector if there is only
+    stop("\nArgument 'newx' should a numeric vector if there is only
          one row or a 'matrix' or a 'data.frame' for more than one row.\n")
   if(!inherits(newz, c( "numeric", "vector")))
     stop("\nArgument 'newz' should be entered and it should be a numeric vector.\n")
@@ -56,7 +58,7 @@ predict.tvlm<-function (object, newx, newz, ...)
     newx <- cbind(rep(1, n.ahead), newx)
   prediction <- numeric(n.ahead)
   object$ez <- newz
-  theta <- tvOLS(object)$tvcoef
+  theta <- tvOLS(object)$coefficients
   for (t in 1:n.ahead)
     prediction[t] <- theta[t, ]%*%newx[t, ]
   return(prediction)
@@ -65,7 +67,7 @@ predict.tvlm<-function (object, newx, newz, ...)
 #' @rdname predict-tvReg
 #' @method predict tvar
 #' @examples 
-#' ## Example of TV-AR prediction with coefficients as 
+#' ## Example of TVAR prediction with coefficients as 
 #' ## functions of the realized quarticity
 #' 
 #' exogen = RV2[, c("RV_week", "RV_month")]
@@ -76,21 +78,27 @@ predict.tvlm<-function (object, newx, newz, ...)
 #' newexogen <- RV[2002:2004, c("RV_week", "RV_month")]
 #' predict(tvHARQ2, newylag,  newz, newexogen = newexogen)
 #' @export
-predict.tvar<-function (object, newy, newz, newexogen = NULL, ...) 
+predict.tvar<-function (object, newdata, newz, newexogen = NULL, ...) 
 {
   if(!inherits(object, c("tvar")))
     stop("\nArgument 'object' should be entered and it should have class 'tvar'.\n")
+  if(is.null(newdata))
+    return(stats::fitted(object, ...))
   if(is.null(object$z))
     stop("\nYour model coefficients are functions of time, use function 
          'forecast' with argument 'n.ahead' as horizon.\n")
-  if(!inherits(newy, c("numeric", "vector")))
-    stop("\nArgument 'newy' should be entered and it should be a numeric vector.\n")
+  if(!inherits(newdata, c("vector", "numeric", "data.frame", "matrix")))
+    stop("\nArgument 'newdata' should be a numeric vector or matrix.\n")
   if(!inherits(newz, c( "numeric", "vector")))
     stop("\nArgument 'newz' should be entered and it should be a numeric vector.\n")
   if (!identical(NCOL(newexogen), NCOL(object$exogen))) 
     stop("\nWrong dimension in 'newexogen'.\n")
+  if(!identical(NROW(newdata), NROW(newz)))
+    stop("\nDifferent number or row in 'newdata' and 'newz'.\n")
+  if(!identical(NROW(newdata), NROW(newexogen)) & !is.null(newexogen))
+    stop("\nDifferent number or row in 'newdata' and 'newexogen'.\n")
   n.ahead <- length(newz)
-  newx <- newy
+  newx <- newdata
   p <- object$p
   if(p == 1)
     newx <- matrix(newx, ncol = 1)
@@ -113,7 +121,7 @@ predict.tvar<-function (object, newy, newz, newexogen = NULL, ...)
     newx <- cbind(rep(1, n.ahead), newx)
   prediction <- numeric(n.ahead)
   object$ez <- newz
-  theta <- tvOLS(object)$tvcoef
+  theta <- tvOLS(object)$coefficients
   for (t in 1:n.ahead)
     prediction[t] <- theta[t, ]%*%newx[t, mask]
   return(prediction)
@@ -121,40 +129,46 @@ predict.tvar<-function (object, newy, newz, newexogen = NULL, ...)
 #' @rdname predict-tvReg
 #' @method predict tvvar
 #' @examples 
-#' ## Example of TV-VAR prediction with coefficients as 
+#' ## Example of TVVAR prediction with coefficients as 
 #' ## functions of a random ARMA (2,2) process
 #' 
 #' data(usmacro, package = "bvarsv")
-#' smoothing <- arima.sim(n = nrow(usmacro) + 3, 
+#' smoothing <- arima.sim(n = NROW(usmacro) + 3, 
 #' list(ar = c(0.8897, -0.4858), ma = c(-0.2279, 0.2488)), 
 #' sd = sqrt(0.1796))
 #' smoothing <- as.numeric(smoothing)
 #' tvVAR.z <- tvVAR(usmacro, p = 6, type = "const", 
-#'                z = smoothing[1:nrow(usmacro)], bw = c(16.3, 16.3, 16.3))
-#' newy <- data.frame(inf = c(2, 1, 6), une = c(5, 4, 9), tbi = c(1, 2.5, 3))
+#'                z = smoothing[1:NROW(usmacro)], bw = c(16.3, 16.3, 16.3))
+#' newdata <- data.frame(inf = c(2, 1, 6), une = c(5, 4, 9), tbi = c(1, 2.5, 3))
 #' newz <- c(0, 1.2, -0.2)
-#' predict(tvVAR.z, newy = newy, newz = newz)
+#' predict(tvVAR.z, newdata = newdata, newz = newz)
 #' 
 #' @export
-predict.tvvar<-function (object, newy, newz, newexogen = NULL, ...) 
+predict.tvvar<-function (object, newdata, newz, newexogen = NULL, ...) 
 {
   if(!inherits(object, c("tvvar")))
     stop("\nArgument 'object' should be entered and it should have class 'tvvar'.\n")
+  if(is.null(newdata))
+    return(stats::fitted(object, ...))
   if(is.null(object$z))
     stop("\nYour model coefficients are functions of time, use function 
          'forecast' with argument 'n.ahead' as horizon.\n")
-  if(!inherits(newy, c("vector", "numeric", "data.frame", "matrix")))
-    stop("\nArgument 'newy' should be entered and it should be a numeric vector if there is only
+  if(!inherits(newdata, c("vector", "numeric", "data.frame", "matrix")))
+    stop("\nArgument 'newdata' should be a numeric vector if there is only
          one row or a 'matrix' or a 'data.frame' for more than one row.\n")
   if(!inherits(newz, c( "numeric", "vector")))
     stop("\nArgument 'newz' should be entered and it should be a numeric vector.\n")
+  if(!identical(NROW(newdata), NROW(newz)))
+    stop("\nDifferent number or row in 'newdata' and 'newz'.\n")
+  if(!identical(NROW(newdata), NROW(newexogen)) & !is.null(newexogen))
+    stop("\nDifferent number or row in 'newdata' and 'newexogen'.\n")
   n.ahead <- length(newz)
   neq <- object$neq
   p <- object$p
-  newx <- newy
+  newx <- newdata
   nlags <- neq*p
   if(neq == 1)
-    newx <- matrix(newy, ncol = 1)
+    newx <- matrix(newdata, ncol = 1)
   newx <- as.matrix(newx)
   if(NROW(newx) != n.ahead)
     stop("\nDimensions of 'newx' and 'newz' are not compatible\n")
@@ -175,7 +189,7 @@ predict.tvvar<-function (object, newy, newz, newexogen = NULL, ...)
   prediction <- matrix(NA, nrow = n.ahead, ncol = neq)
   colnames(prediction) <- colnames(object$y)
   object$ez <- newz
-  theta <- tvOLS(object)$tvcoef
+  theta <- tvOLS(object)$coefficients
   rhs <- tail(object$x, 1)
   rhs <- as.numeric(rhs)
   for (t in 1:n.ahead)
@@ -197,10 +211,10 @@ predict.tvvar<-function (object, newy, newz, newexogen = NULL, ...)
 #' same name and order as they appear in argument 'data' from the 'tvsure'
 #' object
 #' @examples 
-#' ## Example of TV-SURE prediction with coefficients as 
+#' ## Example of TVSURE prediction with coefficients as 
 #' ## functions of an ARMA(2,2) process
 #' data("Kmenta", package = "systemfit")
-#' nobs <- nrow (Kmenta)
+#' nobs <- NROW (Kmenta)
 #' eqDemand <- consump ~ price + income
 #' eqSupply <- consump ~ price + farmPrice 
 #' system <- list(demand = eqDemand, supply = eqSupply)
@@ -221,11 +235,13 @@ predict.tvsure<-function (object, newdata, newz, ...)
 {
   if(!inherits(object, c("tvsure")))
     stop("\nArgument 'object' should be entered and it should have class 'tvsure'.\n")
+  if(is.null(newdata))
+    return(stats::fitted(object, ...))
   if(is.null(object$z))
     stop("\nYour model coefficients are functions of time, use function 
          'forecast' with argument 'n.ahead' as horizon.\n")
   if(!inherits(newdata, c("matrix", "data.frame")))
-    stop("\nArgument 'newdata' should be entered and it should be a 'matrix' or a 'data.frame'.\n")
+    stop("\nArgument 'newdata' should be a 'matrix' or a 'data.frame'.\n")
   if(!inherits(newz, c( "numeric", "vector")))
     stop("\nArgument 'newz' should be entered and it should be a numeric vector.\n")
   newdata <- as.matrix(newdata)
@@ -237,7 +253,7 @@ predict.tvsure<-function (object, newdata, newz, ...)
   newx <- list()
   newnames <- colnames(newdata)
   object$ez <- newz
-  theta <- update(object)$tvcoef
+  theta <- update(object)$coefficients
   prediction <- matrix(NA, nrow = n.ahead, ncol = neq)
   for (t in 1:n.ahead)
     for (eq in 1:neq)
@@ -256,5 +272,58 @@ predict.tvsure<-function (object, newdata, newz, ...)
       prediction[t, eq] <- theta[t, columns]%*%newx
     }
   colnames(prediction) <- names(object$formula)
+  return(prediction)
+}
+
+#' @rdname predict-tvReg
+#' @method predict tvplm
+#' @param newdata A pdata.frame with new values of all regressors, with the
+#' same name and order as they appear in argument 'data' from the 'tvplm'
+#' object
+#' @examples
+#' data(OECD)
+#' z <- runif(length(levels(OECD$year)), 10, 15)
+#' tvpols <- tvPLM(lhe~lgdp+pop65+pop14+public, z = z,
+#' index = c("country", "year"), data = OECD,  method ="pooling", bw =  2)
+#' newdata <- cbind(lgdp = c(10, 13), pop65 = c(9, 12), 
+#' pop14 = c(17, 30), public = c(13, 20))  
+#' newz <- runif(2, 10, 15)
+#' predict(tvpols, newdata = newdata, newz = newz)
+#' @export
+predict.tvplm<-function (object, newdata, newz, ...) 
+{
+  if(!inherits(object, c("tvplm")))
+    stop("\nArgument 'object' should be entered and it should have class 'tvplm'.\n")
+  if(is.null(newdata))
+    return(stats::fitted(object, ...))
+  if(is.null(object$z))
+    stop("\nYour model coefficients are functions of time, use function 
+         'forecast' with argument 'n.ahead' as horizon.\n")
+  if(!inherits(newdata, c("pdata.frame", "matrix", "data.frame")))
+    stop("\nArgument 'newdata' should be a 'pdata.frame', 
+         'matrix' or 'data.frame'.\n")
+  if(!inherits(newz, c( "numeric", "vector")))
+    stop("\nArgument 'newz' should be a numeric vector.\n")
+  n.ahead <- length(newz)
+  if(NROW(newdata) != n.ahead)
+    stop("\nDimensions of 'newdata' and 'newz' are incompatible.\n")
+  obs <- object$obs
+  neq <- object$neq
+  object$ez <- newz
+  object.up <- update(object)
+  theta <- object.up$coefficients
+  method <- object$method
+  if(method != "within")
+  {
+    prediction <- numeric(n.ahead)
+    for (t in 1:n.ahead)
+      prediction[t] <- crossprod(theta[t,], newdata[t,])
+    return(prediction)
+  }
+  prediction <- matrix(NA, nrow = n.ahead, ncol = neq)
+  for (t in 1:n.ahead)
+    prediction[t, ] <- crossprod(theta[t,], newdata[t,])
+  prediction <- sweep(prediction, 2, object.up$alpha, "+")
+  colnames(prediction) <- levels (object$index[, 1])
   return(prediction)
 }

@@ -140,3 +140,29 @@ NULL
 #' }
 #' @keywords datasets
 NULL
+
+#' Variables related to the problem of healthcare spending. 
+#' 
+#' @name OECD
+#' @docType data
+#'
+#' @references
+#' 
+#' Casas, I., Gao, J., Peng B., and Xie, S. (2019). Ferreira, E., and Orbe, S. (2017) 
+#' Modelling Time-Varying Income Elasticities of Health Care Expenditure for the OECD. 
+#' Available at SSRN: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3262326
+#' 
+#'
+#'
+#' @format A data frame with 680 rows and 7 columns. 
+#' \describe{
+#'   \item{country}{Australian dollar}
+#'   \item{year}{}
+#'   \item{lhe}{Log of country's healthcare spending}
+#'   \item{lgdp}{log of country's gdp}
+#'   \item{pop65}{Country's ratio of population greater than 65 years old}
+#'   \item{pop14}{Country's ratio of population younger than 15 years old}
+#'   \item{public}{Country's ratio of healthcare funding coming from the government}
+#' }
+#' @keywords datasets
+NULL

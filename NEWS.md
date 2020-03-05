@@ -1,3 +1,15 @@
+#tvReg 0.5.0
+
+* Added methods tvPLM, tvFE and tvRE methods to fit time-varying coefficients panel data models. Also added their corresponding confint, predict, forecast, plot, summary and print methods.
+
+* Added dataset OECD
+
+* Change all return argument "tvcoef" to "coefficients" to fit the standards of other packages in R
+
+* Allow the user to choose individual plots for each variable in models of class tvlm, tvar or tvplm
+
+* Fix of the bug in R-devel caused by matrix objects now also inheriting from class "array" which caused some problems in some "if" statements
+
 #tvReg 0.4.2
 
 * Added  modified or leave-(2l+1)-out cross-validation for bandwidth selection

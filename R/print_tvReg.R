@@ -1,14 +1,14 @@
 #' Print results of functions in tvReg
 #' 
 #' Print some results for objects with class attribute \code{tvlm}, \code{tvar}, \code{tvvar},
-#' \code{tvirf}, \code{tvsure}.
+#' \code{tvirf}, \code{tvsure} and \code{tvplm}.
 #' 
 #' These functions print a few results from the time-varying estimated coefficients
-#' @param x An x used to select a method.
+#' @param x An object used to select a method.
 #' @param digits An integer, indicating the minimal number of significant digits.
 #' @param ... Other parameters passed to specific methods.
-#' @seealso \code{\link{plot.tvlm}}, \code{\link{plot.tvvar}}, \code{\link{plot.tvvar}},
-#' \code{\link{plot.tvirf}},\code{\link{plot.tvsure}}
+#' @seealso \code{\link{plot.tvlm}}, \code{\link{plot.tvar}}, \code{\link{plot.tvvar}},
+#' \code{\link{plot.tvirf}},\code{\link{plot.tvsure}}, \code{\link{plot.tvplm}}
 #' @rdname print.tvReg
 #' @method print tvlm
 #' @export
@@ -16,7 +16,7 @@
 print.tvlm <- function(x,  digits = max(3, getOption("digits") - 3), ... ) 
 {
    cat("\nClass: ", class(x),"\n")
-   result <- x$tvcoef
+   result <- x$coefficients
    bw <- round(x$bw, digits = digits)
    lower <- x$Lower
    upper <- x$Upper
@@ -41,14 +41,19 @@ print.tvlm <- function(x,  digits = max(3, getOption("digits") - 3), ... )
 #' @export 
 print.tvar <- print.tvlm
 
-#' @inheritParams print.tvlm
+#' @rdname print.tvReg
+#' @method print tvplm
+#' @export 
+print.tvplm <- print.tvlm
+
+
 #' @rdname print.tvReg
 #' @method print tvsure
 #' @export
 print.tvsure <- function (x,  digits = max(3, getOption("digits") - 3), ...)
 {
   cat("\nClass: ", class(x),"\n")
-  result <- x$tvcoef
+  result <- x$coefficients
   neq <- x$neq
   nvar <- x$nvar
   names <- names(x$x)
@@ -58,7 +63,7 @@ print.tvsure <- function (x,  digits = max(3, getOption("digits") - 3), ...)
     bw <- rep (bw, x$neq)
   for (i in 1:neq)
   {
-    text1 <- paste("\nMean of TV-SURE coefficient estimates for equation \"", 
+    text1 <- paste("\nMean of TVSURE coefficient estimates for equation \"", 
                      names[i], "\":", sep ="")
       cat(text1, "\n")
       row <- paste(rep("=", nchar(text1)), collapse = "")
@@ -73,14 +78,14 @@ print.tvsure <- function (x,  digits = max(3, getOption("digits") - 3), ...)
   invisible(x)
 }
 
-#' @inheritParams print.tvlm
+
 #' @rdname print.tvReg
 #' @method print tvvar
 #' @export
 print.tvvar <- function (x,  digits = max(3, getOption("digits") - 3), ...)
 {
   cat("\nClass: ", class(x),"\n")
-  result <- x$tvcoef
+  result <- x$coefficients
   neq <- x$neq
   nvar <- ncol(x$datamat) - neq
   names <- colnames(x$y)
@@ -94,7 +99,7 @@ print.tvvar <- function (x,  digits = max(3, getOption("digits") - 3), ...)
   cat("\n")
   for (i in 1:neq)
   {
-    text1 <- paste("Mean of TV-VAR coefficient estimates for equation \"", 
+    text1 <- paste("Mean of TVVAR coefficient estimates for equation \"", 
                    names[i], "\":", sep = "")
     cat(text1, "\n")
     row <- paste(rep("=", nchar(text1)), collapse = "")
@@ -106,7 +111,7 @@ print.tvvar <- function (x,  digits = max(3, getOption("digits") - 3), ...)
   invisible(x)
 }
 
-#' @inheritParams print.tvlm
+
 #' @rdname print.tvReg
 #' @method print tvirf
 #' @export

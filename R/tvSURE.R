@@ -47,7 +47,6 @@
 #' time varying constraints in econometric models, \emph{Statistica Sinica}.
 #'
 #'
-#' @keywords time varying regression models nonparametric statistics
 #' @aliases tvsure-class tvsure
 #' @rdname tvSURE
 #' @importFrom systemfit systemfit
@@ -78,13 +77,13 @@
 #' neq = number of equations).
 #' @param r An optional vector of length the number of restrictions. By default it contains zeros.
 #' @param control list of control parameters.  The default is constructed by
-#' the function \code{\link{tvsure.control}}.  See the documentation of
-#' \code{\link{tvsure.control}} for details.
+#' the function \code{\link{tvreg.control}}.  See the documentation of
+#' \code{\link{tvreg.control}} for details.
 #' @param ... Other parameters passed to specific methods.
 #' @return \code{tvSURE} returns a list of the class \code{tvsure} containing the results of the whole system, results of the estimation
 #' and confidence instervals if chosen.
 #' The object of class \code{tvsure} have the following components:
-#' \item{tvcoef}{An array of dimension obs x nvar x neq (obs = number of observations, nvar = number of variables
+#' \item{coefficients}{An array of dimension obs x nvar x neq (obs = number of observations, nvar = number of variables
 #' in each equation, neq = number of equations in the system) with the time-varying coefficients estimates.}
 #' \item{Lower}{If \code{level} non equal zero, an array of dimension obs x nvar x neq containing the confidence 
 #' interval lower band.}
@@ -108,7 +107,7 @@
 #' \item{level}{Confidence interval range.}
 #' \item{runs}{Number of bootstrap replications.}
 #' \item{tboot}{Type of bootstrap.}
-#' \item{BOOT}{List with all bootstrap replications of \code{tvcoef}, if done.}
+#' \item{BOOT}{List with all bootstrap replications of \code{coefficients}, if done.}
 #' \item{R}{Restrictions matrix.}
 #' \item{r}{Restrictions vector.}
 #' \item{formula}{Initial formula.}
@@ -135,22 +134,22 @@
 #' fgls1.fit <- systemfit::systemfit(system, data = Kmenta, method = "SUR")
 #' ##tvSURE estimation
 #' tvfgls1.fit <- tvSURE(system, data = Kmenta, method = "tvFGLS")
-#'}
+#' }
 #'
 #'@export
 tvSURE <- function (formula, z = NULL, ez = NULL, bw = NULL, cv.block = 0, data,  
                     method = c("tvOLS", "tvFGLS", "tvGLS"), Sigma = NULL, 
                     est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"),
                     bw.cov = NULL, singular.ok = TRUE, R = NULL, r = NULL,
-                    control = tvsure.control(...), ...)
+                    control = tvreg.control(...), ...)
 {
   is.data <- inherits(data, c("data.frame", "matrix"))
   if(!is.data)
     stop("\nArgument 'data' should be entered and it should be a 'matrix' or a 'data.frame'.\n")
-  if(class(formula) != "list")
+  if(!inherits(formula,  "list"))
     stop("\nArgument 'formula' must be a list of formulas. \n")
   if(!all(lapply(formula, class) == "formula"))
-    stop("\nArgument 'formula' ormula must contain only objects of class 'formula'")
+    stop("\nArgument 'formula' must contain only objects of class 'formula'")
   neq <- length(formula)
   if(neq < 2)
     stop("\nThe list 'formula' should contain at least two equations for multivariate analysis.\n")
@@ -172,7 +171,6 @@ tvSURE <- function (formula, z = NULL, ez = NULL, bw = NULL, cv.block = 0, data,
       stop("\nEquation labels may not contain blanks (' ') or underscores ('_')")
   }
   results <- list()
-  cl <- match.call()
   callNoDots <- match.call(expand.dots = FALSE)
   mf <- callNoDots[c(1, match("data", names(callNoDots), 0))]
   mf$na.action <- as.name("na.pass")
@@ -189,24 +187,24 @@ tvSURE <- function (formula, z = NULL, ez = NULL, bw = NULL, cv.block = 0, data,
     y <- cbind(y, stats::model.extract(eval.mf, "response"))
     y.names <- c(y.names, formula[[i]][[2]])
     x[[i]] <- stats::model.matrix(terms, eval.mf)
-    nvar[i] <- ncol(x[[i]])
+    nvar[i] <- NCOL(x[[i]])
     if(is.null(colnames(x[[i]])))
       colnames(x[[i]]) <- paste("X", i, 1:nvar[i], sep = "")
   }
   names(x) <- eq.names
   colnames(y) <- y.names
-  obs <- nrow(y)
+  obs <- NROW(y)
   if(!is.null(R))
   {
     R <- as.matrix(R)
-    if(ncol(R) != sum(nvar))
+    if(NCOL(R) != sum(nvar))
       stop("\nWrong dimension of R, it should have as many columns as variables 
            in the whole system. \n")
     if (is.null(r))
-      r <- rep(0, nrow(R))
+      r <- rep(0, NROW(R))
     else if (length(r) == 1)
-      r <- rep(r, nrow(R))
-    else if (length(r) != nrow(R) & length(r) != 1)
+      r <- rep(r, NROW(R))
+    else if (length(r) != NROW(R) & length(r) != 1)
       stop("\nWrong dimension of r, it should be as long as the number of 
            rows in R. \n")
   }
@@ -257,7 +255,7 @@ tvSURE <- function (formula, z = NULL, ez = NULL, bw = NULL, cv.block = 0, data,
     itertemp <- 1
     tol <- control$tol
     maxiter <- control$maxiter
-    tolold <- sum(result$tvcoef^2)
+    tolold <- sum(result$coefficients^2)
     tolnew <- 0
     while((abs(tolold-tolnew)>tol) && (itertemp < maxiter))
     {
@@ -265,7 +263,7 @@ tvSURE <- function (formula, z = NULL, ez = NULL, bw = NULL, cv.block = 0, data,
       Sigma <- tvCov(bw = bw.cov, x = result$residuals, tkernel = tkernel)
       temp <- tvGLS(x = x, y = y, z = z, ez = ez, bw = bw, Sigma = Sigma, R = R, r = r,
                     est = est, tkernel = tkernel)
-      tolnew <- sqrt(sum((result$tvcoef - temp$tvcoef)^2)/sum(result$tvcoef^2))
+      tolnew <- sqrt(sum((result$coefficients - temp$coefficients)^2)/sum(result$coefficients^2))
       result <- temp
       itertemp <- itertemp + 1
     }
@@ -274,7 +272,7 @@ tvSURE <- function (formula, z = NULL, ez = NULL, bw = NULL, cv.block = 0, data,
   {
     if(is.matrix(Sigma))
     {
-      if(ncol(Sigma) != neq | nrow(Sigma) != neq)
+      if(NCOL(Sigma) != neq | NROW(Sigma) != neq)
         stop("\nWrong dimensions of Sigma. \n.")
       Sigma2 <- array(0, dim = c(neq, neq, obs))
       for (t in 1:obs)
@@ -304,7 +302,7 @@ tvSURE <- function (formula, z = NULL, ez = NULL, bw = NULL, cv.block = 0, data,
     result <- tvGLS(x = x, y = y, z = z, ez = ez, bw = mean(bw), Sigma = Sigma, R = R, r = r,
                     est = est, tkernel = tkernel)
   }
-  tvcoef <- result$tvcoef
+  coefficients <- result$coefficients
   resid <- result$residuals
   fitted <- result$fitted
   if(length(bw) == 1)
@@ -316,13 +314,13 @@ tvSURE <- function (formula, z = NULL, ez = NULL, bw = NULL, cv.block = 0, data,
   var.names <- NULL
   for(i in 1:neq)
     var.names <- c(var.names, paste(colnames(x[[i]]), ".", eq.names[i], sep = ""))
-  colnames(tvcoef) <- var.names
-  result <- list(tvcoef =  tvcoef, Lower = NULL, Upper = NULL, Sigma = Sigma,
+  colnames(coefficients) <- var.names
+  result <- list(coefficients =  coefficients, Lower = NULL, Upper = NULL, Sigma = Sigma,
                  fitted = fitted, residuals = resid, x = x, y = y, z = z, ez = ez,
                  bw = bw, cv.block = cv.block, obs = obs, neq = neq, nvar = nvar, 
                  method = method, est =  est, tkernel = tkernel, bw.cov = bw.cov, 
                  level = 0, runs = 0, tboot = NULL, BOOT = NULL,
-                 R = R, r = r, control = control, formula = formula, call = cl)
+                 R = R, r = r, control = control, formula = formula, call = match.call())
   class(result) <- "tvsure"
   return(result)
 }

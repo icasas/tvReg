@@ -1,8 +1,8 @@
 #' Confidence Intervals for Objects in tvReg
 #'
 #' confint is used to estimate the bootstrap confidence intervals for objects with class
-#' attribute \code{tvlm}, \code{tvar}, \code{tvirf}, \code{tvsure}.
-#' @param object Object of class \code{tvsure}, class \code{tvvar} or class \code{tvirf}.
+#' attribute \code{tvlm}, \code{tvar}, \code{tvirf}, \code{tvsure} and \code{tvplm}.
+#' @param object An object used to select a method.
 #' @param parm A specification of which parameters are to be given confidence intervals, 
 #' either a vector of numbers or a vector of names. If missing, all parameters are considered.
 #' @param level Numeric, the confidence level required (between 0 and 1). 
@@ -26,7 +26,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' ##Calculation of confidence intervals for a TV-LM model
+#' ##Calculation of confidence intervals for a TVLM model
 #' 
 #' ##Generation of time-varying coefficients linear model
 #' set.seed(42)
@@ -82,10 +82,10 @@ confint.tvlm <- function(object, parm, level = 0.95,
   object$level <- level
   object$tboot <- tboot
   object$runs <- runs
-  B <- object$tvcoef
+  B <- object$coefficients
   obs <- object$obs
   nvar <- ncol(object$x)
-  if(any(class(object) == "tvsure"))
+  if(inherits(object, "tvsure"))
   {  
     neq <- object$neq
     nvar <- object$nvar
@@ -97,7 +97,7 @@ confint.tvlm <- function(object, parm, level = 0.95,
   mat.l <- matrix(0, nrow = obs, ncol = sum(nvar))
   mat.u <- matrix(0, nrow = obs, ncol = sum(nvar))
   temp <- matrix(NA, nrow = obs, ncol = runs)
-  if(any(class(object) == "tvsure"))
+  if(inherits(object, "tvsure"))
   {
     for (m in 1:neq)
     {
@@ -132,11 +132,9 @@ confint.tvlm <- function(object, parm, level = 0.95,
     colnames(mat.l) <- colnames(B)
     colnames(mat.u) <- colnames(B)
   }
-  Lower <- mat.l
-  Upper <- mat.u
   object$BOOT <- BOOT
-  object$Lower <- Lower
-  object$Upper <- Upper
+  object$Lower <- mat.l
+  object$Upper <- mat.u
   return(object)
 }
 
@@ -157,7 +155,7 @@ confint.tvsure <- confint.tvlm
 confint.tvirf <- function(object, parm, level = 0.95, 
                           runs = 100, tboot = c("wild", "wild2") , ...)
 {
-  if (class(object) != "tvirf")
+  if (!inherits(object, "tvirf"))
     stop("\nConfidence intervals not implemented for this class.\n")
   if(runs <= 0)
     stop("\nVariable 'runs' accepts integer values greater than 0.\n")
@@ -234,6 +232,71 @@ confint.tvirf <- function(object, parm, level = 0.95,
   return(object)
 }
 
+#' @rdname confint.tvReg
+#' @method confint tvplm
+#' @export 
+#'
+confint.tvplm <- function(object, parm, level = 0.95,  
+                          runs = 100, tboot = c("wild", "wild2"), ...)
+{
+  if (!inherits(object, "tvplm"))
+    stop("\nConfidence intervals not implemented for this class.\n")
+  if(runs <= 0)
+    stop("\nVariable 'runs' accepts integer values greater than 0.\n")
+  if (level <= 0 | level > 1)
+    stop("\nVariable 'level' accepts values between 0 and 1.\n")
+  tboot <- match.arg(tboot)
+  BOOT <- object$BOOT
+  if(is.null(BOOT))
+  {
+    BOOT <- .tvboot(x = object, runs = runs, tboot = tboot)
+  }
+  else
+  {
+    if (object$tboot != tboot)
+    {
+      BOOT <- .tvboot(x = object, runs = runs, tboot = tboot)
+    }
+    else if (object$tboot == tboot & object$runs < runs)
+    {
+      temp <- .tvboot(x = object, runs = runs - object$runs, tboot = tboot)
+      BOOT <- c(object$BOOT, temp)
+    }
+  }
+  object$level <- level
+  object$runs <- runs
+  object$tboot <- tboot
+  obs <- object$obs
+  nvar <- object$nvar
+  B <- object$coefficients
+  mat.l <- matrix(NA, nrow = obs, ncol = nvar)
+  mat.u <- matrix(NA, nrow = obs, ncol = nvar)
+  temp <- matrix(NA, nrow = obs, ncol = runs)
+  alpha <-  1 - level
+  lower <- alpha/2
+  upper <- 1 - lower
+  Lower <- list()
+  Upper <- list()
+  for (l in 1:nvar) 
+  {
+    for (i in 1:runs) 
+    {
+      temp[,i] <- BOOT[[i]][,l]
+    }
+    sd.star <- apply(temp, 1, stats::sd)
+    c.hat <- apply(abs(temp-B[,l])/sd.star, 1, stats::quantile, 
+                   prob=upper, na.rm=TRUE)
+    mat.l[,l] <- B[, l ] - c.hat*sd.star
+    mat.u[,l] <- B[, l ] + c.hat*sd.star
+  }
+  colnames(mat.l) <- colnames(B)
+  colnames(mat.u) <- colnames(B)
+  object$BOOT <- BOOT
+  object$Lower <- mat.l
+  object$Upper <- mat.u
+  return(object)
+}
+
 #' @rdname tvReg-internals
 #' @keywords internal
 .tvLM.ci <- function(x, yboot)
@@ -247,7 +310,8 @@ confint.tvirf <- function(object, parm, level = 0.95,
     grid <- z
   else
     grid <- (1:obs)/obs
-  ez <- grid
+  if (is.null(ez))
+    ez <- grid
   tkernel <- x$tkernel
   est <- x$est
   nvar <- NCOL(x$x)
@@ -266,7 +330,7 @@ confint.tvirf <- function(object, parm, level = 0.95,
     for (k in 1:nboot)
     {
       result <- stats::lm.wfit(x = as.matrix(xtemp), y = yboot[k.index, k], w = kernel.bw[k.index])
-      BOOT[[k]] <-rbind(BOOT[[k]], result$coef[1:nvar])
+      BOOT[[k]] <-rbind(BOOT[[k]], result$coefficients[1:nvar])
     }
   }
   return(BOOT)
@@ -351,9 +415,9 @@ confint.tvirf <- function(object, parm, level = 0.95,
       y.star <- A %*% methods::as(y.kernel, "sparseVector")
       T0 <- Matrix::crossprod(x.star, y.star)
       result <- try(qr.solve(s0, T0), silent = TRUE)
-      if(class(result) == "try-error")
+      if(inherits(result, "try-error"))
         result <- try(qr.solve(s0, T0, tol = .Machine$double.xmin ), silent = TRUE)
-      if(class(result) == "try-error")
+      if(inherits(result, "try-error"))
         stop("\nSystem is computationally singular, the inverse cannot be calculated. 
              Possibly, the 'bw' is too small for values in 'ez'.\n")
       if(est =="ll")
@@ -415,9 +479,9 @@ confint.tvirf <- function(object, parm, level = 0.95,
         y.star <- A %*% methods::as(y.kernel, "sparseVector")
         T0 <- Matrix::crossprod(x.star, y.star)
         result <- try(qr.solve(s0, T0), silent = TRUE)
-        if(class(result) == "try-error")
+        if(inherits(result, "try-error"))
           result <- try(qr.solve(s0, T0, tol = .Machine$double.xmin ), silent = TRUE)
-        if(class(result) == "try-error")
+        if(inherits(result, "try-error"))
           stop("\nSystem is computationally singular, the inverse cannot be calculated. 
                Possibly, the 'bw' is too small for values in 'ez'.\n")
         if(est =="ll")
@@ -441,6 +505,95 @@ confint.tvirf <- function(object, parm, level = 0.95,
   return(BOOT)
 }
 
+.tvPLM.ci<-function(x, yboot)
+{
+  obs <- x$obs
+  nboot <- NCOL(yboot)
+  bw <- x$bw
+  z <- x$z
+  ez <- x$ez
+  if(!is.null(z))
+    grid <- z
+  else
+    grid <- (1:obs)/obs
+  if (is.null(ez))
+    ez <- grid
+  tkernel <- x$tkernel
+  est <- x$est
+  neq <- x$neq
+  nvar <- x$nvar
+  eobs <- NROW(ez)
+  method <- x$method
+  xnew <- matrix(NA, neq*eobs, nvar)
+  if(x$est == "ll")
+    xnew <- matrix(NA, neq*eobs, 2*nvar)
+  ynew <- yboot[, 1]
+  BOOT <- vector("list", nboot)
+  D <- t(cbind(rep(-1, neq-1), diag(1, neq-1)))%x%rep(1, obs)
+  for (t in 1:eobs)
+  { 
+    tau0 <- grid - ez[t]
+    xtemp <- x$x
+    if (est=="ll")
+      xtemp <- cbind(xtemp, xtemp * tau0)
+    if (method != "within")
+    {
+      kernel.bw <- sqrt(.kernel(tau0, bw, tkernel))
+      k.index <- which(kernel.bw != 0)
+      if (length (k.index) < 3)
+        stop("Bandwidth is too small for values in 'ez'.\n")
+      if(method == "pooling")
+        Sigma <- diag(1, eobs)
+      else
+        Sigma <- x$Sigma
+      eSigma <- eigen(Sigma, TRUE)
+      if (any(eSigma$value <= 0))
+        stop("\n'Sigma' is not positive definite.\n")
+      A <- diag(eSigma$values^-0.5) %*% t(eSigma$vectors)
+      for (i in 1:neq)
+      {
+        ind <- (i-1)*eobs + (1:eobs)
+        xnew[ind, ] <- A%*%(xtemp[ind,] * kernel.bw)
+      }
+      mat.inv <- qr.solve(crossprod(xnew))
+    }
+    else
+    {
+      kernel.bw <- .kernel(tau0, bw, tkernel)
+      k.index <- which(kernel.bw != 0)
+      if (length (k.index) < 3)
+        stop("Bandwidth is too small for values in 'ez'.\n")
+      WH <- diag(neq)%x%diag(kernel.bw)
+      x.tilde <- crossprod(xtemp, WH)
+      temp <- crossprod(D, WH)
+      MH <- diag(neq*obs) - D %*% solve(temp%*%D)%*%temp
+      SH <- crossprod(MH, WH)%*%MH
+      x.tilde <- crossprod(xtemp, SH)
+      s0 <- x.tilde %*% xtemp
+    }
+    for (k in 1:nboot)
+    {
+      if(method != "within")
+      {
+        for (i in 1:neq)
+        {
+          ind <- (i-1)*eobs + (1:eobs)
+          ynew[ind] <- A%*%(yboot[ind, k] * kernel.bw)
+        }
+        result <- mat.inv%*%crossprod(xnew, ynew)
+      }
+      else
+      {
+        T0 <- x.tilde %*% yboot[, k]
+        result <- try(qr.solve(s0, T0), silent = TRUE)
+        if(inherits(result, "try-error"))
+          result <- try(qr.solve(s0, T0, tol = .Machine$double.xmin ), silent = TRUE)
+      }
+      BOOT[[k]] <-rbind(BOOT[[k]], result[1:nvar])
+    }
+  }
+  return(BOOT)
+}
 
 
 

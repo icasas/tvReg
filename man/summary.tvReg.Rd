@@ -4,25 +4,23 @@
 \alias{summary.tvlm}
 \alias{summary}
 \alias{summary.tvar}
+\alias{summary.tvplm}
 \alias{summary.tvsure}
 \alias{summary.tvvar}
 \alias{summary.tvirf}
 \title{Print results of functions in tvReg}
 \usage{
-\method{summary}{tvlm}(object, digits = max(3, getOption("digits") - 3),
-  ...)
+\method{summary}{tvlm}(object, digits = max(3, getOption("digits") - 3), ...)
 
-\method{summary}{tvar}(object, digits = max(3, getOption("digits") - 3),
-  ...)
+\method{summary}{tvar}(object, digits = max(3, getOption("digits") - 3), ...)
 
-\method{summary}{tvsure}(object, digits = max(3, getOption("digits") -
-  3), ...)
+\method{summary}{tvplm}(object, digits = max(3, getOption("digits") - 3), ...)
 
-\method{summary}{tvvar}(object, digits = max(3, getOption("digits") - 3),
-  ...)
+\method{summary}{tvsure}(object, digits = max(3, getOption("digits") - 3), ...)
 
-\method{summary}{tvirf}(object, digits = max(3, getOption("digits") - 3),
-  ...)
+\method{summary}{tvvar}(object, digits = max(3, getOption("digits") - 3), ...)
+
+\method{summary}{tvirf}(object, digits = max(3, getOption("digits") - 3), ...)
 }
 \arguments{
 \item{object}{An object used to select a method.}
@@ -33,7 +31,7 @@
 }
 \description{
 Print some results for objects with class attribute \code{tvlm}, \code{tvar}, \code{tvvar},
-\code{tvirf}, \code{tvsure}.
+\code{tvirf}, \code{tvsure} and \code{tvplm}.
 }
 \details{
 These functions print a few results from the time-varying estimated coefficients

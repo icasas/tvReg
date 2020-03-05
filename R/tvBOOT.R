@@ -37,6 +37,39 @@
 }
 
 # @rdname tvReg-internals
+#' @method .tvboot tvplm
+#' @keywords internal
+#'
+.tvboot.tvplm <- function (x , runs = 100, tboot = "wild")
+{
+  B <- x$coefficients
+  BOOT <- vector("list", runs)
+  resorig <- matrix(x$residuals, nrow = x$obs, ncol = x$neq)
+  resorig = scale(resorig, scale = FALSE)
+  residup <- resorig * -0.6180339887498949025257 # (1-sqrt(5))*0.5
+  residdown <- resorig * 1.618033988749894902526 # (1+sqrt(5))*0.5
+  fitted <- x$fitted
+  X.tilde <- x$x
+  bw <- x$bw
+  obs <- x$obs
+  neq <- x$neq
+  yboot <- matrix(NA, nrow = obs*neq, ncol = runs)
+  for (i in 1:runs){
+    if (tboot=="wild"){
+      index <- ifelse(apply(resorig, 2, stats::rbinom, size=1, prob=0.7236067977499789360962)==1, TRUE, FALSE)
+      resid <- residup
+      resid [!index] <- residdown[!index]
+      ystar <- fitted + as.numeric(resid)
+    }else if (tboot=="wild2"){
+      resid <- resorig*stats::rnorm(obs*neq)
+      ystar <- fitted + resid
+    }
+    yboot[, i] <- ystar
+  }
+  return(.tvPLM.ci(x, yboot))
+}
+
+# @rdname tvReg-internals
 #' @method .tvboot tvsure
 #' @keywords internal
 #'
@@ -78,7 +111,7 @@
   ortho.cov <- x$ortho.cov
   n.ahead <- x$n.ahead
   x <- x$x
-  if (class(x) == "tvvar")
+  if (inherits(x, "tvvar"))
   {
     VAR <- eval.parent(x)
   }

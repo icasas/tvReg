@@ -22,7 +22,7 @@
 #' If supplied, only NA entries in fixed will be varied.
 #' 
 #' @return An object of class \code{tvar} with the following components:
-#' \item{tvcoef}{A vector of dimension obs (obs = number of observations - number lags),
+#' \item{coefficients}{A vector of dimension obs (obs = number of observations - number lags),
 #'  with the time-varying coefficients estimates.}
 #' \item{fitted}{The fitted values.}
 #' \item{residuals}{Estimation residuals.}
@@ -40,7 +40,7 @@
 #' \item{level}{Confidence interval range.}
 #' \item{runs}{Number of bootstrap replications.}
 #' \item{tboot}{Type of bootstrap.}
-#' \item{BOOT}{List with all bootstrap replications of \code{tvcoef}, if done.}
+#' \item{BOOT}{List with all bootstrap replications of \code{coefficients}, if done.}
 #' 
 #' @seealso  \code{\link{bw}}, \code{\link{tvLM}}, \code{\link{confint}}, 
 #' \code{\link{plot}}, \code{\link{print}} and \code{\link{summary}}
@@ -59,11 +59,11 @@
 #' HAR <- arima(RV, order = c(1, 0, 0), xreg = cbind (RV_week, RV_month))
 #' print(HAR)
 #' 
-#' ##Chen et al (2017) TVC-HAR model 
+#' ##Chen et al (2017) TVCHAR model 
 #' TVCHAR <- tvAR (RV, p = 1, exogen = cbind (RV_week, RV_month), bw = 20)
 #' print(TVCHAR)
 #' 
-#' ##Casas et al (2018) TV-HARQ model
+#' ##Casas et al (2018) TVHARQ model
 #' tvHARQ <- tvAR (RV, p = 1, exogen = cbind (RV_week, RV_month), 
 #' z=RQ, bw = 0.0062)
 #' print(tvHARQ)
@@ -142,13 +142,14 @@ tvAR <- function (y, p = 1, z = NULL, ez = NULL, bw = NULL, cv.block = 0, type =
   }
   results <- tvOLS(x = datamat, y = yend, z = z, ez = ez, bw = bw, est = est, tkernel = tkernel,
                    singular.ok = singular.ok)
-  tvcoef <- results$tvcoef
-  colnames(tvcoef) <- colnames(rhs)[mask]
-  result <- list(tvcoef = tvcoef, Lower = NULL, Upper = NULL,  fitted = results$fitted,
+  coefficients <- results$coefficients
+  colnames(coefficients) <- colnames(rhs)[mask]
+  result <- list(coefficients = coefficients, Lower = NULL, Upper = NULL,  fitted = results$fitted,
                  residuals = results$resid, x = datamat, y = yend, z = z, ez = ez, y.orig = y.orig, 
                  bw = bw, cv.block = cv.block, mask = mask, exogen = exogen, p = p, type = type, obs = sample, 
-                 totobs = sample + p, est = est, tkernel = tkernel, level = 0, runs = 0, tboot = NULL, BOOT = NULL)
-  class(result) <- c("tvar")
+                 totobs = sample + p, est = est, tkernel = tkernel, level = 0, runs = 0, tboot = NULL, 
+                 BOOT = NULL, call = match.call())
+  class(result) <- "tvar"
   return(result)
 }
 

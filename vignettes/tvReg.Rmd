@@ -28,18 +28,18 @@ library(tvReg)
 ```
 
 
-# Single equation models: the TV-LM and TV-AR 
+# Single equation models: the TVLM and TVAR 
 
 The general formula of these models is:
 $$
 y_t = X_t' \beta_t + u_t,  \hspace{0.3cm} t = 1, \ldots, T  \ \ \ (1)
 $$
-where $X_t = (X_{0t}, X_{1t}, \ldots, X_{dt})'$ and $\beta_t = (\beta_{0t}, \beta_{1t}, \ldots, \beta_{dt})'$ are vectors and $u_t$ is a random variable. When $X_t$ contains lags of $y_t$ then we have the time-varying coefficients AR model (TV-AR) which is fitted by function *tvAR*. When $X_t$ contains only exogenous variables, then the model is denoted by TV-LM and it is fitted by function *tvLM*.
+where $X_t = (X_{0t}, X_{1t}, \ldots, X_{dt})'$ and $\beta_t = (\beta_{0t}, \beta_{1t}, \ldots, \beta_{dt})'$ are vectors and $u_t$ is a random variable. When $X_t$ contains lags of $y_t$ then we have the time-varying coefficients AR model (TVAR) which is fitted by function *tvAR*. When $X_t$ contains only exogenous variables, then the model is denoted by TVLM and it is fitted by function *tvLM*.
 
 
 ## Standard usage of *tvLM*
 
-Function *tvLM* fits a TV-LM to the data using the *tvOLS* method in the estimation. The only mandatory argument is *formula* which should be a single formula for a single equation model. This formula follows the standard regression formula in *R* (see documentation of *formula*). An object of the class attribute *tvlm* is returned. 
+Function *tvLM* fits a TVLM to the data using the *tvOLS* method in the estimation. The only mandatory argument is *formula* which should be a single formula for a single equation model. This formula follows the standard regression formula in *R* (see documentation of *formula*). An object of the class attribute *tvlm* is returned. 
 
 The following example demonstrates the functionality of *tvLM* on generated data and compares it with the *lm* estimation. The latter assumes that the model coefficients are constant. The data generating process of the example below has time-varying coefficients and therefore its estimation with function *lm* will only find a central value of the time-varying coefficients.
 
@@ -69,9 +69,9 @@ where the coefficients are functions of a rescaled time period $\tau = t/T$ with
  ##Plot the estimates of beta1
  par (mar = c(4,4,1,1), oma = c(1,1,1,1))
  plot(tau,beta[, 1], type = "l", main = "", ylab = expression(beta[1]),
- xlab = expression(tau), ylim = range(beta[,1], model.tvLM$tvcoef[, 1]))
+ xlab = expression(tau), ylim = range(beta[,1], model.tvLM$coefficients[, 1]))
  abline(h = coef.lm[1], col = 2)
- lines(tau, model.tvLM$tvcoef[, 1], col=4)
+ lines(tau, model.tvLM$coefficients[, 1], col=4)
  legend("topright", c(expression(beta[1]), "lm", "tvlm"), col = c(1, 2, 4), 
         bty = "n", lty = 1, cex = 0.8)
 ```
@@ -126,7 +126,7 @@ The user can provide additional optional arguments to modify the default estimat
  ylab = expression(beta[1]), xlab = expression(z[t]),
  ylim = range(beta[,1], coefficients(model.tvLM2)[, 1]))
  abline(h = coef.lm[1], col = 2)
- lines(z[sort.index], model.tvLM2$tvcoef[sort.index, 1], col = 4)
+ lines(z[sort.index], model.tvLM2$coefficients[sort.index, 1], col = 4)
  legend("top", c(expression(beta[1]), "lm", "tvLM"), col = c(1, 2, 4), bty = "n", 
         lty = 1, cex = 0.5)
 ```
@@ -154,9 +154,9 @@ As the *tvOLS* method wraps the *lm.wfit* method, which at default allows the fi
 
 ## Standard usage of *tvAR*
 
-A TV-AR model is a special case of TV-LM in which regressors contain lagged variables of the dependent variable, *y*. The number of lags included depend on the model order *p*. Other exogenous variables may be included in the model using argument *exogen*. An intercept is included by default unless the user enters *type= "none"* into the function call. Econometrically, this function also wraps estimator *tvOLS* which needs a bandwidth *bw* that is automatically selected by cross-validation when the user does not enter any number. An object of the class attribute *tvar* is returned.
+A TVAR model is a special case of TVLM in which regressors contain lagged variables of the dependent variable, *y*. The number of lags included depend on the model order *p*. Other exogenous variables may be included in the model using argument *exogen*. An intercept is included by default unless the user enters *type= "none"* into the function call. Econometrically, this function also wraps estimator *tvOLS* which needs a bandwidth *bw* that is automatically selected by cross-validation when the user does not enter any number. An object of the class attribute *tvar* is returned.
 
-The following examples demonstrates the functionality of *tvAR* on generated data, and compares it with the output of the *ar.ols* method from the *stats* package. Specifically, the following TV-AR(2) process is considered,
+The following examples demonstrates the functionality of *tvAR* on generated data, and compares it with the output of the *ar.ols* method from the *stats* package. Specifically, the following TVAR(2) process is considered,
 
 $$
 y_t  = \beta_{1t} y_{t-1}+ \beta_{2t} y_{t-2} + u_t, \ \ t = 1, \ldots, T,
@@ -182,7 +182,7 @@ with coefficients $\beta_{1t} = 0.5 \cos(2\pi \tau)$ and $\beta_{2t} = (\tau -0.
  model.tvAR.2p <- tvAR(Y, p = 2, type = "none", est = "ll")
 ```
 
-The smoothing variable in the chunk above is time. The lines of code below show an example of a TV-AR(1) process whose coefficient is a function of a uniform random variable in [-1, 1]. In particular, $\beta_{1t} = (z_t -0.5)^2$. It also calculates the coefficient 80% confidence interval and plot the estimates.
+The smoothing variable in the chunk above is time. The lines of code below show an example of a TVAR(1) process whose coefficient is a function of a uniform random variable in [-1, 1]. In particular, $\beta_{1t} = (z_t -0.5)^2$. It also calculates the coefficient 80% confidence interval and plot the estimates.
 
 ```{r tvAR.z}
 ##Simulate a AR(1) process with coefficients depending on z
@@ -234,7 +234,7 @@ The default model contains an intercept (i.e., it has a mean different from zero
 ### Autoregressive model with coefficent restrictions
 An autoregressive process of order *p* does not necessarily contain all the previous p-lags of $y_t$. Argument *fixed*, with the same format as in the function *arima* from the package *stats*, permits to impose these restrictions. The order of variables in the model is: intercept (if any), lag 1, lag 2, $\ldots$, lag p and exogenous variable (if any). By default, the argument *fixed* is a vector of *NA*s with length the number of coefficients in the model. The user can enter a vector in the argument *fixed* with zeros in the positions corresponding to the restricted coefficients.
 
-The example below uses the simulated variable *Y* from above and fits a TV-AR(6), but only the first, third and sixth lags are considered in the model, the model has an intercept and there are no exogenous variables. 
+The example below uses the simulated variable *Y* from above and fits a TVAR(6), but only the first, third and sixth lags are considered in the model, the model has an intercept and there are no exogenous variables. 
 
 ```{r tvAR2, eval = FALSE}
  ##Estimate only coefficient from odd lags and the intercept
@@ -242,15 +242,13 @@ The example below uses the simulated variable *Y* from above and fits a TV-AR(6)
 ```
 
 
-# Multi-equation linear models: the TV-SURE and TV-VAR models 
+# Multi-equation linear models: the TVSURE and TVVAR models 
 
 The formula of systems of linear models can be generally express as in (1) with $y_t = (y_{1t}, y_{2t}, \ldots, y_{Mt})'$ for $M$ the number of equations in the system. Similarly, the error term $u_t =(u_{1t}, u_{2t}, \ldots, u_{Mt})'$ and the $\Sigma_t$ is the variance-covariance matrix that defines the dependency of the error terms of all equations. Variables $X_t$ and $\beta_t$ are matrices. 
 
 Regarding systems of equations, the *tvSURE* function fits a time-varying seemingly unrelated equations models. Its main argument is *formula* which is a list of objects of the class attribute *formula*, one formula for each equation. Equations may have a different number of regressors and these do not have to be the same. 
 
 Another multi-equation model included in the package is the time-varying vector autoregressive in function *tvVAR* whose main arguments are a matrix of dependent variables *y* and the number of lags *p*. It returns an object of the class attribute *tvvar*. Coefficients of the *tvVAR* are not interpretable, instead the time-varying coefficients impulse response function is coded in function *tvIRF*. The latter takes an object of the class attribute *tvvar* and returns an object of the class attribute *tvirf*. 
-
-
 
 
 ## Standard usage of the tvSURE
@@ -291,8 +289,6 @@ plot(model.tvOLS)
 print(model.tvOLS)
 ```
 
-
-
 ## User options of *tvSURE*
 The user can provide additional optional arguments to modify the default estimation. Refer to section 'User options of *tvLM*' to understand the usage of arguments *z*, *data*, *bw*, *est*, *tkernel* and *singular.ok*. Note that the current version only allows one single random variable *z* for all equations. The *tvSURE* function wraps estimators *tvOLS* and *tvGLS*. 
 
@@ -327,7 +323,7 @@ control = list(tol = 0.001, maxiter = 100))
 
 ### Coefficient restrictions
 
-The user can restrict certain coefficients using arguments *R* and *r*. Note that the restriction is setting those coefficients to a constant. Restrictions can aid statistical inference to test certain conditions.  Matrix *R* has as many rows as restrictions in *r* and as many columns as regressors in the model. In this case, Model (\ref{eq:Kmenta}) has 7 coefficients which are ordered as they appear in the list of formulas. Note that the time-varying coefficient of the variable *trend* is redundant when an intercept is included in the second equation of the TV-SURE. Therefore, we want to restrict its coefficient two zero. We would also like to impose $\beta_{11, t} - \beta_{21, t} = 0.5$:
+The user can restrict certain coefficients using arguments *R* and *r*. Note that the restriction is setting those coefficients to a constant. Restrictions can aid statistical inference to test certain conditions.  Matrix *R* has as many rows as restrictions in *r* and as many columns as regressors in the model. In this case, Model (\ref{eq:Kmenta}) has 7 coefficients which are ordered as they appear in the list of formulas. Note that the time-varying coefficient of the variable *trend* is redundant when an intercept is included in the second equation of the TVSURE. Therefore, we want to restrict its coefficient two zero. We would also like to impose $\beta_{11, t} - \beta_{21, t} = 0.5$:
 
 $$
 \left(\begin{array}{ccccccc}
@@ -349,13 +345,49 @@ tvfgls.rest <- tvSURE(system, data = Kmenta, method = "tvFGLS",
 R = Rrestr, r = qrestr, bw = tvfgls1.fit$bw, bw.cov = tvfgls1.fit$bw.cov)
 ```
 
+
+## Standard usage of *tvPLM*
+The *tvPLM* method is inspired by the  *plm* from the package *plm*. It converts *data* into an object of the class attribute *pdata.frame* using argument *index* to define the cross-section and time dimensions. If *index = NULL* (default), the two first columns of *data* define the two dimensions.
+
+The *tvPLM* wraps the *tvRE* and *tvFE* methods to estimate the coefficients of time-varying panel data models.
+
+## User options of *tvPLM*
+The user can provide additional optional arguments to modify the default estimation. See section ``Standard usage of *tvLM*" for details on arguments *z*, *data*, *bw*, *est* and *tkernel*. Note that the current version only allows one single smoothing random variable, *z*, for all equations. Furthermore, argument *method* defines the estimator used. The possible choices are: "pooling" (default), "random" and "within".
+
+##  Application to health policy
+
+The income elasticity of healthcare expenditure is defined as the percentage change in healthcare expenditure in response to the percentage change in income per capita. If this elasticity is greater than one, then healthcare expenditure grows faster than income, as luxury goods do, and is driven by market forces alone. The heterogeneity of health systems among countries and time periods have motivated the use panel data models for example in Gerdtham et al (1992) who use a fixed effects (FE) model. In addition to the income per capita, measured by the log GDP, the literature has identify the ratio of population over 65 years old, population uner 15 years old and the ratio of public funding of healcare as important variables in this problem. The income elasticity estimate with a FE developed in thepackate *plm* is greater than 1, a counter-intuitive result. This issue is resolved using the TVFE developed in the \pkg{tvReg}. Find the code below:
+
+```{r tvPLM,  eval = TRUE}
+data("OECD")
+print(names(OECD))
+elast.fe <- plm::plm(lhe ~ lgdp + pop65 + pop14 + public, data = OECD, 
+                     index = c("country", "year"), model = "within")
+elast.tvfe <- tvPLM (lhe ~ lgdp + pop65 + pop14 + public, data = OECD, 
+                     index = c("country", "year"), method = "within", bw = 0.8)
+elast.fe <- confint(elast.fe)
+elast.tvfe <- confint(elast.tvfe)
+plot(elast.tvfe, vars = 1, ylim = c(0.45, 1.3))
+graphics::par(mfrow = c(1, 1), 
+                mar = c(4, 4, 2, 1), oma = c(0, 0, 0, 0))
+x.axis <- 1:elast.tvfe$obs
+par(new = TRUE)
+plot(x.axis, rep(mean(elast.fe[1,]), elast.tvfe$obs), ylim = c(0.45, 1.3),
+     ylab ="", xlab ="", type = "l")
+graphics::polygon(c(rev(x.axis), x.axis), 
+                  c(rep(rev(elast.fe[1, 2]), elast.tvfe$obs),
+                    rep(elast.fe[1, 1], elast.tvfe$obs)),
+                  col = "grey10", border = NA, fillOddEven = TRUE)
+lines(x.axis, rep(mean(elast.fe[1,]), elast.tvfe$obs), col ="white")
+```
+
 ## Standard usage of *tvVAR* and *tvIRF*
 
-A time-varying coefficients vector autoregressive (TV-VAR) model is a system of TV-AR models. The dependent variable, *y*, is a matrix with as many columns as equations. Regressors are often the same for each equation and they consist of the lagged values of *y*, where the number of lags is given in argument *p*; an intercept if argument *type="const"* and other exogenous variables entered in argument *exogen*. Econometrically, the *tvOLS* is called to calculate the estimates for each equation independently using one bandwidth per equation. The user can enter a single scalar in *bw* or a vector of scalars, one bandwidth for each equation. If *bw = NULL*, one bandwidth for each equation is selected by cross-validation. 
+A time-varying coefficients vector autoregressive (TVVAR) model is a system of TVAR models. The dependent variable, *y*, is a matrix with as many columns as equations. Regressors are often the same for each equation and they consist of the lagged values of *y*, where the number of lags is given in argument *p*; an intercept if argument *type="const"* and other exogenous variables entered in argument *exogen*. Econometrically, the *tvOLS* is called to calculate the estimates for each equation independently using one bandwidth per equation. The user can enter a single scalar in *bw* or a vector of scalars, one bandwidth for each equation. If *bw = NULL*, one bandwidth for each equation is selected by cross-validation. 
 
 As in the other models, the kernel and the estimation methodology can be chosen in arguments *tkernel* and *est*. The return is an object of the class attribute *tvvar* which can be used to estimate the time-varying impulse response function with function *tvIRF*. The smoothing variable is time by default, but another random variable can be used by entering it in argument *z*.
 
-Example below uses the macroeconomic data from Primiceri (2005). Three variables are included in dataset *usmacro* from package *bvarsv*: inflation rate (*inf*), unemployment rate (*une*) and treasury bill interest rate (*tbi*) for the United States. The mathematical model under study follows the expression of a TV-VAR(4):
+Example below uses the macroeconomic data from Primiceri (2005). Three variables are included in dataset *usmacro* from package *bvarsv*: inflation rate (*inf*), unemployment rate (*une*) and treasury bill interest rate (*tbi*) for the United States. The mathematical model under study follows the expression of a TVVAR(4):
 
 $$
 \text{inf}_t = a_{t}^1 +\sum_{i=1}^4 b_{it}^ 1 \ \text{inf}_{t-i} +\sum_{i=1}^4 c_{it}^1 \ \text{une}_{t-i} +\sum_{i=1}^4 d_{it}^1\ \text{tbi}_{t-i} +u _{t}^1
@@ -369,7 +401,7 @@ $$
 \text{tbi}_t = a_{t}^3 +\sum_{i=1}^4 b_{it}^ 3 \ \text{inf}_{t-i} +\sum_{i=1}^4 c_{it}^3 \ \text{une}_{t-i} +\sum_{i=1}^4 d_{it}^3\ \text{tbi}_{t-i} +u _{t}^3.
 $$
 
-A constant coefficients VAR(4) is estimated using function *VAR* from package *vars* and a TV-VAR(4) is estimated with *tvVAR*.
+A constant coefficients VAR(4) is estimated using function *VAR* from package *vars* and a TVVAR(4) is estimated with *tvVAR*.
 
 ```{r tvVAR}
 ##Inflation rate, unemployment rate and treasury bill interest rate for the US,
@@ -392,13 +424,13 @@ The main argument *x* is an object of the class attribute *tvvar* obtained from 
 The user has the option to pick a subset of impulse variables and/or response variables using arguments *impulse* and *response*.
 
 ### Horizon
-The horizon of the TV-IRF coefficients can be chosen by the user with argument *n.ahead*, the default is 10.
+The horizon of the TVIRF coefficients can be chosen by the user with argument *n.ahead*, the default is 10.
 
-### Orthogonal TV-IRF
+### Orthogonal TVIRF
 The *tvIRF* calculates one impulse response function for each point in time. It is likely that the errors variance-covariance matrix of a process with time-varying coefficients is also time-varying. Those, the default of
 argument *ortho.cov = "tv"*. Note that the user can enter a value of the bandwidth for the covariance matrix estimation in *bw.cov*. This function calls function *tvCov* in the calculation of the MA ($\infty$) coefficients. It is possible to use a constant variance-covariance matrix by setting *ortho.cov = "const"*.
 
-The chunk below shows how to obtain the IRF and TV-IRF from the previous monetary policy example.
+The chunk below shows how to obtain the IRF and TVIRF from the previous monetary policy example.
 
 ```{r tvIRF}
 ##Estimate a the impulse response functions with irf and tvIRF from 
@@ -410,7 +442,7 @@ model.tvIRF <- tvIRF(model.tvVAR)
 model.tvIRF <- confint(model.tvIRF, runs = 30)
 ```
 
-Note that there is one IRF for each point in time. The *plot* method of class attribute *tvirf* displays the mean value of all the IRF over all the time period. However, if the user desires to plot the TV-IRF of a particular time, for example value 100 as below, then it is entered in the argument *obs.index*. This *plot* method also permits to choose a particular response and impulse variables.
+Note that there is one IRF for each point in time. The *plot* method of class attribute *tvirf* displays the mean value of all the IRF over all the time period. However, if the user desires to plot the TVIRF of a particular time, for example value 100 as below, then it is entered in the argument *obs.index*. This *plot* method also permits to choose a particular response and impulse variables.
 
 ```{r tvIRF2}
 ##Plot the mean all tvIRF over time
@@ -422,8 +454,8 @@ plot(model.tvIRF, obs.index = 100, impulse = "tbi", response = "inf")
 ```
 
 
-### Cumulative TV-IRF
-If the user desires to obtain the cumulative TV-IRF values, then argument  *cumulative* must be set to *TRUE*. See example below.
+### Cumulative TVIRF
+If the user desires to obtain the cumulative TVIRF values, then argument  *cumulative* must be set to *TRUE*. See example below.
 
 ```{r tvIRF3}
 ##Estimate a the tvIRF with time-varying covariance function
@@ -480,7 +512,7 @@ In our the time-varying coefficient models, we refer to prediction when the smoo
 
 ## Usage of prediction and forecast in tvReg
 
-The *forecast* method is implemented for the class attributes *tvlm*, *tvar*, *tvvar* and *tvsure*. As an example, the three days ahead forecast of model *tvHAR*, which is an extension of the HAR model of Corsi (2008) to allow for time-varying coefficients. This is a TV-AR(1) model with two exogenous variables: an average of a weekly realized variance and an average of a monthly week variance. The argument *newexogen* needs three values for time points 2002, 2003 and 2004 and variable *n.ahead* is set to three. 
+The *forecast* method is implemented for the class attributes *tvlm*, *tvar*, *tvvar* and *tvsure*. As an example, the three days ahead forecast of model *tvHAR*, which is an extension of the HAR model of Corsi (2008) to allow for time-varying coefficients. This is a TVAR(1) model with two exogenous variables: an average of a weekly realized variance and an average of a monthly week variance. The argument *newexogen* needs three values for time points 2002, 2003 and 2004 and variable *n.ahead* is set to three. 
 
 ```{r Forecast, eval = TRUE}
 data(RV)

@@ -1,5 +1,5 @@
 ^_pkgdown\.yml$
-^README\.Rmd$
+^README\.md$
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^docs$

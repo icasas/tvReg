@@ -4,24 +4,32 @@
 \alias{plot.tvsure}
 \alias{plot.tvlm}
 \alias{plot.tvar}
+\alias{plot.tvplm}
 \alias{plot.tvvar}
 \alias{plot.tvirf}
 \title{Plot Methods for Objects in tvReg}
 \usage{
-\method{plot}{tvsure}(x, eqs = NULL, vars = NULL,
-  plot.type = c("multiple", "single"), ...)
+\method{plot}{tvsure}(x, eqs = NULL, vars = NULL, plot.type = c("multiple", "single"), ...)
 
 \method{plot}{tvlm}(x, ...)
 
 \method{plot}{tvar}(x, ...)
 
+\method{plot}{tvplm}(x, ...)
+
 \method{plot}{tvvar}(x, ...)
 
-\method{plot}{tvirf}(x, obs.index = NULL, impulse = NULL,
-  response = NULL, plot.type = c("multiple", "single"), ...)
+\method{plot}{tvirf}(
+  x,
+  obs.index = NULL,
+  impulse = NULL,
+  response = NULL,
+  plot.type = c("multiple", "single"),
+  ...
+)
 }
 \arguments{
-\item{x}{An x used to select a method.}
+\item{x}{An object used to select the method.}
 
 \item{eqs}{A vector of integers. Equation(s) number(s) of the coefficients to be plotted.}
 
@@ -42,9 +50,9 @@ the estimation using a non time-varying VAR method).}
 }
 \description{
 Plot methods for objects with class attribute \code{tvlm}, \code{tvar}, \code{tvvar},
-\code{tvirf}, \code{tvsure}.
+\code{tvirf}, \code{tvsure} or \code{tvplm}.
 }
 \seealso{
 \code{\link{tvLM}}, \code{\link{tvAR}}, \code{\link{tvVAR}},
-\code{\link{tvSURE}}
+\code{\link{tvSURE}}, \code{\link{tvPLM}}
 }

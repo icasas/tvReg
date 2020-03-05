@@ -1,24 +1,24 @@
 #' Plot Methods for Objects in tvReg
 #'
 #' Plot methods for objects with class attribute \code{tvlm}, \code{tvar}, \code{tvvar},
-#' \code{tvirf}, \code{tvsure}.
+#' \code{tvirf}, \code{tvsure} or \code{tvplm}.
 #' @rdname plot.tvReg
 #' @method plot tvsure
-#' @param x An x used to select a method.
+#' @param x An object used to select the method.
 #' @param ... Other parameters passed to specific methods.
 #' @param eqs A vector of integers. Equation(s) number(s) of the coefficients to be plotted.
 #' @param vars A vector of integers. Variable number(s) of the coefficients to be plotted.
 #' @param plot.type	Character, if multiple all plots are drawn in a single device,
 #' otherwise the plots are shown consecutively.
 #' @seealso \code{\link{tvLM}}, \code{\link{tvAR}}, \code{\link{tvVAR}},
-#' \code{\link{tvSURE}}
+#' \code{\link{tvSURE}}, \code{\link{tvPLM}}
 #'
 #' @export
 #'
 plot.tvsure <- function(x, eqs = NULL, vars = NULL, 
                         plot.type = c("multiple", "single") , ...)
 {
-  if (class(x) != "tvsure")
+  if (!inherits(x, "tvsure"))
     stop("\nPlot not implemented for this class.\n")
   if(!is.null(vars) & any(vars <= 0))
     stop("\nInvalid number in 'vars'\n")
@@ -30,8 +30,8 @@ plot.tvsure <- function(x, eqs = NULL, vars = NULL,
   on.exit(graphics::par(op))
   if (!any(plot.type %in% c("multiple", "single")))
     stop("\nParameter plot.type only takes values \"multiple\" and \"single\". \n")
-  tvcoef <- x$tvcoef
-  if(is.null(tvcoef))
+  coefficients <- x$coefficients
+  if(is.null(coefficients))
     stop("\nThe time-varying coefficients array is NULL. \n")
   Lower <- x$Lower
   Upper <- x$Upper
@@ -50,7 +50,7 @@ plot.tvsure <- function(x, eqs = NULL, vars = NULL,
   {
     sort.index <- sort.int(z, index.return = TRUE)$ix
     x.axis <- z[sort.index]
-    tvcoef <- tvcoef[sort.index, , , drop = FALSE]
+    coefficients <- coefficients[sort.index, , , drop = FALSE]
     sub <- expression(z[t])
     if(!is.null(lower))
     {
@@ -69,7 +69,7 @@ plot.tvsure <- function(x, eqs = NULL, vars = NULL,
     if(!is.null(vars))
       var.names <- var.names[vars]
     plotvars <- which(colnames(x$x[[i]]) %in% var.names)
-    coef <- tvcoef[, (sum(nvar[1:i])-nvar[i]+1):sum(nvar[1:i]), drop = FALSE]
+    coef <- coefficients[, (sum(nvar[1:i])-nvar[i]+1):sum(nvar[1:i]), drop = FALSE]
     lower <- Lower[, (sum(nvar[1:i])-nvar[i]+1):sum(nvar[1:i]), drop = FALSE]
     upper <- Upper[, (sum(nvar[1:i])-nvar[i]+1):sum(nvar[1:i]), drop = FALSE]
     coef <- coef[, plotvars, drop = FALSE]
@@ -138,9 +138,9 @@ plot.tvsure <- function(x, eqs = NULL, vars = NULL,
 #'
 plot.tvlm <- function(x, ...)
 {
-  if (!any(class(x) %in% c("tvlm", "tvar")))
+  if (!any(class(x) %in% c("tvlm", "tvar", "tvplm")))
     stop("\nPlot not implemented for this class.\n")
-  .univariatePlot (x)
+  .univariatePlot (x, ...)
 }
 
 #' @rdname plot.tvReg
@@ -148,22 +148,34 @@ plot.tvlm <- function(x, ...)
 #' @export 
 plot.tvar <- plot.tvlm
 
+#' @rdname plot.tvReg
+#' @method plot tvplm
+#' @export 
+plot.tvplm <- plot.tvlm
+
 #' @name tvReg-internals
 #' @aliases .univariatePlot
 #' @title tvReg internal and secondary functions
 #' @keywords internal
-.univariatePlot <-function(x, ...)
+.univariatePlot <-function(x, vars = NULL, ylim = NULL, ...)
 {
-  tvcoef <- x$tvcoef
-  if(is.null(tvcoef))
+  coefficients <- x$coefficients
+  if(is.null(coefficients))
     stop("\nThe time-varying coefficients matrix is NULL. \n")
+  nvar <- NCOL(coefficients)
+  obs <- NROW(coefficients)
+  var.names <- colnames(x$coefficients)
+  if(is.null(vars))
+    vars <- 1:NCOL(coefficients)
+  if(is.character(vars))
+    stop("\nPlease enter the variable(s) number(s) instead of their name(s) in 'vars'.\n")
+  if(any(vars <= 0) | any(vars > nvar))
+    stop("\nInvalid variable number in 'vars'.\n")
+  coefficients <- as.matrix(coefficients)
   op <- graphics::par(no.readonly = TRUE)
   on.exit(graphics::par(op))
   lower <- x$Lower
   upper <- x$Upper
-  nvar <- NCOL(tvcoef)
-  obs <- NROW(tvcoef)
-  var.names <- colnames(tvcoef)
   z <- x$z
   sub <- "t"
   x.axis <- 1:obs
@@ -171,12 +183,12 @@ plot.tvar <- plot.tvlm
   {
     sort.index <- sort.int(z, index.return = TRUE)$ix
     x.axis <- z[sort.index]
-    tvcoef <- x$tvcoef[sort.index, , drop = FALSE]
+    coefficients <- as.matrix(x$coefficients[sort.index, vars , drop = FALSE])
     xlabel <- "z"
     if(!is.null(lower))
     {
-      lower <- lower[sort.index, , drop = FALSE]
-      upper <- upper[sort.index, , drop = FALSE]
+      lower <- as.matrix(lower[sort.index, vars , drop = FALSE])
+      upper <- as.matrix(upper[sort.index, vars , drop = FALSE])
     }
     sub <- expression(z[t])
   }
@@ -185,25 +197,30 @@ plot.tvar <- plot.tvlm
                  x$runs, " runs")
   graphics::par(mfrow = c(1, 1), 
                 mar = c(4, 4, 2, 1), oma = c(0, 0, 0, 0))
-  for ( j in 1:nvar)
+  is.ylim <- is.null(ylim)
+  for (j in vars)
   {
-    ylim <- range(tvcoef[, j])
-    if(!is.null (lower))
-      ylim <- range(ylim, lower[, j], upper[, j])
-    graphics::plot(x.axis, tvcoef[, j], xlab = "", ylab = var.names[j], 
+    if(is.ylim)
+    {
+      ylim <- range(coefficients[, j])
+      if(!is.null (lower))
+        ylim <- range(ylim, lower[, j], upper[, j]) 
+    }
+    graphics::plot(x.axis, coefficients[, j], xlab = "", ylab = var.names[j], 
                    type = "l", ylim = ylim, axes = FALSE, ...)
     if(!is.null(lower))
     {
       graphics::polygon(c(rev(x.axis), x.axis), c(rev(upper[, j]), lower[, j]),
                         col = "grey80", border = NA, fillOddEven = TRUE)
-      graphics::lines(x.axis, tvcoef[, j])
+      graphics::lines(x.axis, coefficients[, j])
       
     }
     graphics::axis(2, at = pretty(ylim)[-1])
     graphics::axis(1, at = pretty(x.axis)[-1])
     graphics::box()
     graphics::mtext(sub, 1, line = 3, outer = FALSE, ...)
-    if(nvar > 1)
+    if(length
+       (vars) > 1)
       graphics::par(ask = TRUE)
   }
 }
@@ -214,7 +231,7 @@ plot.tvar <- plot.tvlm
 #'
 plot.tvvar <- function(x, ...)
 {
-  if (class(x) != "tvvar")
+  if (!inherits(x, "tvvar"))
     stop("\nPlot not implemented for this class.\n")
   op <- graphics::par(no.readonly = TRUE)
   on.exit(graphics::par(op))
@@ -251,7 +268,6 @@ plot.tvvar <- function(x, ...)
 #' @param obs.index  Scalar (optional), the time at which the impulse response is plotted.
 #' If left NULL, the mean over the whole period is plotted (this values should be similar to
 #' the estimation using a non time-varying VAR method).
-#' @inheritParams plot.tvsure
 #' @export
 #'
 plot.tvirf <- function (x, obs.index = NULL, impulse = NULL, response = NULL,

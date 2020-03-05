@@ -3,6 +3,7 @@
 \name{print.tvlm}
 \alias{print.tvlm}
 \alias{print.tvar}
+\alias{print.tvplm}
 \alias{print.tvsure}
 \alias{print.tvvar}
 \alias{print.tvirf}
@@ -12,6 +13,8 @@
 
 \method{print}{tvar}(x, digits = max(3, getOption("digits") - 3), ...)
 
+\method{print}{tvplm}(x, digits = max(3, getOption("digits") - 3), ...)
+
 \method{print}{tvsure}(x, digits = max(3, getOption("digits") - 3), ...)
 
 \method{print}{tvvar}(x, digits = max(3, getOption("digits") - 3), ...)
@@ -19,7 +22,7 @@
 \method{print}{tvirf}(x, digits = max(3, getOption("digits") - 3), ...)
 }
 \arguments{
-\item{x}{An x used to select a method.}
+\item{x}{An object used to select a method.}
 
 \item{digits}{An integer, indicating the minimal number of significant digits.}
 
@@ -27,12 +30,12 @@
 }
 \description{
 Print some results for objects with class attribute \code{tvlm}, \code{tvar}, \code{tvvar},
-\code{tvirf}, \code{tvsure}.
+\code{tvirf}, \code{tvsure} and \code{tvplm}.
 }
 \details{
 These functions print a few results from the time-varying estimated coefficients
 }
 \seealso{
-\code{\link{plot.tvlm}}, \code{\link{plot.tvvar}}, \code{\link{plot.tvvar}},
-\code{\link{plot.tvirf}},\code{\link{plot.tvsure}}
+\code{\link{plot.tvlm}}, \code{\link{plot.tvar}}, \code{\link{plot.tvvar}},
+\code{\link{plot.tvirf}},\code{\link{plot.tvsure}}, \code{\link{plot.tvplm}}
 }

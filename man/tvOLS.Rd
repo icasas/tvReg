@@ -10,8 +10,17 @@
 \usage{
 tvOLS(x, ...)
 
-\method{tvOLS}{matrix}(x, y, z = NULL, ez = NULL, bw, est = c("lc",
-  "ll"), tkernel = c("Epa", "Gaussian"), singular.ok = TRUE, ...)
+\method{tvOLS}{matrix}(
+  x,
+  y,
+  z = NULL,
+  ez = NULL,
+  bw,
+  est = c("lc", "ll"),
+  tkernel = c("Epa", "Gaussian"),
+  singular.ok = TRUE,
+  ...
+)
 
 \method{tvOLS}{tvlm}(x, ...)
 
@@ -20,7 +29,7 @@ tvOLS(x, ...)
 \method{tvOLS}{tvvar}(x, ...)
 }
 \arguments{
-\item{x}{an object used to select a method.}
+\item{x}{An object used to select a method.}
 
 \item{...}{Other arguments passed to specific methods.}
 
@@ -33,17 +42,18 @@ values are included then the vector z is used.}
 
 \item{bw}{A numeric vector.}
 
-\item{est}{The nonparametric estimation method, one of "lc" (default) for linear constant or "ll" for local linear.}
+\item{est}{The nonparametric estimation method, one of "lc" (default) for linear constant
+or "ll" for local linear.}
 
-\item{tkernel}{The type of kernel used in the coefficients estimation method, one of Epanesnikov ("Epa") or "Gaussian".}
+\item{tkernel}{The type of kernel used in the coefficients estimation method,
+one of Epanesnikov ("Epa") or "Gaussian".}
 
 \item{singular.ok}{Logical. If FALSE, a singular model is an error.}
 }
 \value{
-\code{tvGLS} returns a list containing:
-\item{tvcoef}{A vector of length obs, number of observations with
-the time-varying estimates.}
-\item{fitted}{A vector of length obs with the fited values from the estimation.}
+\code{tvOLS} returns a list containing:
+\item{coefficients}{A vector of length obs, number of observations time observations.}
+\item{fitted}{A vector of length obs with the fitted values from the estimation.}
 \item{residuals}{A vector of length obs with the residuals from the estimation.}
 }
 \description{
@@ -57,7 +67,7 @@ X <- data.frame(X1 = rnorm(500), X2 = rchisq(500, df = 4))
 error <- rt(500, df = 10)
 y <- apply(X*beta, 1, sum) + error
 coef.lm <- stats::lm(y~0+X1+X2, data = X)$coef
-coef.tvlm <-  tvOLS(x = as.matrix(X), y = y, bw = 0.1)$tvcoef
+coef.tvlm <-  tvOLS(x = as.matrix(X), y = y, bw = 0.1)$coefficients
 plot(tau, beta[, 1], type="l", main="", ylab = expression(beta[1]), xlab = expression(tau),
 ylim = range(beta[,1], coef.tvlm[, 1]))
 abline(h = coef.lm[1], col = 2)

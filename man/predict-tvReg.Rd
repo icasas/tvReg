@@ -5,18 +5,21 @@
 \alias{predict.tvar}
 \alias{predict.tvvar}
 \alias{predict.tvsure}
+\alias{predict.tvplm}
 \title{Predict Methods for Objects in tvReg.}
 \usage{
 \method{predict}{tvlm}(object, newx, newz, ...)
 
-\method{predict}{tvar}(object, newy, newz, newexogen = NULL, ...)
+\method{predict}{tvar}(object, newdata, newz, newexogen = NULL, ...)
 
-\method{predict}{tvvar}(object, newy, newz, newexogen = NULL, ...)
+\method{predict}{tvvar}(object, newdata, newz, newexogen = NULL, ...)
 
 \method{predict}{tvsure}(object, newdata, newz, ...)
+
+\method{predict}{tvplm}(object, newdata, newz, ...)
 }
 \arguments{
-\item{object}{Object of class \code{tvlm}, \code{tvar}, \code{tvvar} or \code{tvsure}.}
+\item{object}{An object used to select a method.}
 
 \item{newx}{A dataframe with new values of all variables in x. No need to 
 input the intercept.}
@@ -25,26 +28,24 @@ input the intercept.}
 
 \item{...}{Other arguments passed to specific methods.}
 
-\item{newy}{A vector with new values of the response variable}
+\item{newdata}{A pdata.frame with new values of all regressors, with the
+same name and order as they appear in argument 'data' from the 'tvplm'
+object}
 
 \item{newexogen}{A matrix or vector with the new value of the exogenous variables.
 Only for predictions of 'tvar' and 'tvvar' objects.}
-
-\item{newdata}{A dataframe with new values of all regressors, with the
-same name and order as they appear in argument 'data' from the 'tvsure'
-object}
 }
 \value{
 An object of class matrix or vector with the prediction.
 }
 \description{
 Predict methods for objects with class attribute \code{tvlm}, \code{tvar}, 
-\code{tvvar}, \code{tvirf} and \code{tvsure}. This function needs new values of 
+\code{tvvar}, \code{tvirf}, \code{tvsure} and \code{tvplm}. This function needs new values of 
 variables y (response), x (regressors), exogen (exogenous variables, when used),
 and  z (smoothing variable).
 }
 \examples{
-## Example of TV-LM prediction with coefficients as 
+## Example of TVLM prediction with coefficients as 
 ## functions of the realized quarticity
 
 data("RV")
@@ -57,7 +58,7 @@ newx <- cbind(RV$RV_lag[2002:2004], RV$RV_week[2002:2004],
 newz <- RV$RQ_lag_sqrt[2002:2004]
 predict(tvHARQ, newx, newz)
 
-## Example of TV-AR prediction with coefficients as 
+## Example of TVAR prediction with coefficients as 
 ## functions of the realized quarticity
 
 exogen = RV2[, c("RV_week", "RV_month")]
@@ -67,24 +68,24 @@ newylag <- RV$RV[2002:2004]
 newz <- RV$RQ_lag_sqrt[2002:2004]
 newexogen <- RV[2002:2004, c("RV_week", "RV_month")]
 predict(tvHARQ2, newylag,  newz, newexogen = newexogen)
-## Example of TV-VAR prediction with coefficients as 
+## Example of TVVAR prediction with coefficients as 
 ## functions of a random ARMA (2,2) process
 
 data(usmacro, package = "bvarsv")
-smoothing <- arima.sim(n = nrow(usmacro) + 3, 
+smoothing <- arima.sim(n = NROW(usmacro) + 3, 
 list(ar = c(0.8897, -0.4858), ma = c(-0.2279, 0.2488)), 
 sd = sqrt(0.1796))
 smoothing <- as.numeric(smoothing)
 tvVAR.z <- tvVAR(usmacro, p = 6, type = "const", 
-               z = smoothing[1:nrow(usmacro)], bw = c(16.3, 16.3, 16.3))
-newy <- data.frame(inf = c(2, 1, 6), une = c(5, 4, 9), tbi = c(1, 2.5, 3))
+               z = smoothing[1:NROW(usmacro)], bw = c(16.3, 16.3, 16.3))
+newdata <- data.frame(inf = c(2, 1, 6), une = c(5, 4, 9), tbi = c(1, 2.5, 3))
 newz <- c(0, 1.2, -0.2)
-predict(tvVAR.z, newy = newy, newz = newz)
+predict(tvVAR.z, newdata = newdata, newz = newz)
 
-## Example of TV-SURE prediction with coefficients as 
+## Example of TVSURE prediction with coefficients as 
 ## functions of an ARMA(2,2) process
 data("Kmenta", package = "systemfit")
-nobs <- nrow (Kmenta)
+nobs <- NROW (Kmenta)
 eqDemand <- consump ~ price + income
 eqSupply <- consump ~ price + farmPrice 
 system <- list(demand = eqDemand, supply = eqSupply)
@@ -100,6 +101,14 @@ newdata <- data.frame(consump = c(95, 100, 102), price = c(90, 100, 103),
 newz <- tail(smoothing, 3)
 predict(tvOLS.z.fit, newdata = newdata, newz = newz)
 
+data(OECD)
+z <- runif(length(levels(OECD$year)), 10, 15)
+tvpols <- tvPLM(lhe~lgdp+pop65+pop14+public, z = z,
+index = c("country", "year"), data = OECD,  method ="pooling", bw =  2)
+newdata <- cbind(lgdp = c(10, 13), pop65 = c(9, 12), 
+pop14 = c(17, 30), public = c(13, 20))  
+newz <- runif(2, 10, 15)
+predict(tvpols, newdata = newdata, newz = newz)
 }
 \seealso{
 \code{\link{forecast}}.

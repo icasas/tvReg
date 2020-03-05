@@ -8,15 +8,33 @@
 \alias{bw.tvar}
 \alias{bw.tvvar}
 \alias{bw.tvsure}
+\alias{bw.tvplm}
+\alias{bw.pdata.frame}
 \title{Bandwidth Selection by Cross-Validation}
 \usage{
 bw(x, ...)
 
-\method{bw}{default}(x, y, z = NULL, cv.block = 0, est = c("lc",
-  "ll"), tkernel = c("Epa", "Gaussian"), singular.ok = TRUE, ...)
+\method{bw}{default}(
+  x,
+  y,
+  z = NULL,
+  cv.block = 0,
+  est = c("lc", "ll"),
+  tkernel = c("Epa", "Gaussian"),
+  singular.ok = TRUE,
+  ...
+)
 
-\method{bw}{list}(x, y, z = NULL, cv.block = 0, est = c("lc", "ll"),
-  tkernel = c("Epa", "Gaussian"), singular.ok = TRUE, ...)
+\method{bw}{list}(
+  x,
+  y,
+  z = NULL,
+  cv.block = 0,
+  est = c("lc", "ll"),
+  tkernel = c("Epa", "Gaussian"),
+  singular.ok = TRUE,
+  ...
+)
 
 \method{bw}{tvlm}(x, ...)
 
@@ -25,9 +43,21 @@ bw(x, ...)
 \method{bw}{tvvar}(x, ...)
 
 \method{bw}{tvsure}(x, ...)
+
+\method{bw}{tvplm}(x, ...)
+
+\method{bw}{pdata.frame}(
+  x,
+  z = NULL,
+  method,
+  cv.block = 0,
+  est = c("lc", "ll"),
+  tkernel = c("Epa", "Gaussian"),
+  ...
+)
 }
 \arguments{
-\item{x}{an object used to select a method.}
+\item{x}{An object used to select a method.}
 
 \item{...}{Other parameters passed to specific methods.}
 
@@ -45,12 +75,22 @@ or "ll" for local linear.}
 one of Epanesnikov ("Epa") or "Gaussian".}
 
 \item{singular.ok}{Logical. If FALSE, a singular model is an error.}
+
+\item{method}{A character with the choice of panel model/estimation method:
+If method = \code{tvPOLS} (default) then the data is pooled estimated with time-varying OLS. 
+No individual or time effects are estimated
+If method = \code{tvFE} then individual effects which might be correlated with 
+the regressors are estimated.
+If method = \code{tvRE} then individual effects are considered random and independent
+of the regressors.}
 }
 \value{
 \code{bw} returns a vector or a scalar with the bandwith to estimate the mean or the covariance
 residuals, fitted values.
 
 A scalar or a vector of scalars.
+
+A scalar.
 }
 \description{
 Calculate bandwidth(s) by cross-validation for functions tvSURE, tvVAR and tvLM.

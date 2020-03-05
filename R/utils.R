@@ -1,6 +1,7 @@
-#' Create List of Control Parameters for tvSURE
+#' Create List of Control Parameters for tvSURE and tvPLM
 #'
-#' Create a list of control pararameters for function \code{\link{tvSURE}}.
+#' Create a list of control pararameters for the \code{\link{tvSURE}} and
+#' \code{\link{tvPLM}} methods.
 #' All control parameters that are not passed to this function are set to
 #' default values.
 #'
@@ -15,7 +16,7 @@
 #' @return A list of the above components.
 #'
 #' @export
-tvsure.control <- function(maxiter = 1, tol = 1e-05)
+tvreg.control <- function(maxiter = 100, tol = 1e-05)
 {
   result <- list()
   if (maxiter <= 0 || round(maxiter) != maxiter) {

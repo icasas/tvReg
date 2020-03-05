@@ -3,12 +3,11 @@
 #' \code{tvOLS} estimate time-varying coefficient of univariate 
 #' linear models using the kernel smoothing OLS.
 #'
-#' @param x an object used to select a method.
+#' @param x An object used to select a method.
 #' @param ... Other arguments passed to specific methods.
-#' @return \code{tvGLS} returns a list containing:
-#' \item{tvcoef}{A vector of length obs, number of observations with
-#' the time-varying estimates.}
-#' \item{fitted}{A vector of length obs with the fited values from the estimation.}
+#' @return \code{tvOLS} returns a list containing:
+#' \item{coefficients}{A vector of length obs, number of observations time observations.}
+#' \item{fitted}{A vector of length obs with the fitted values from the estimation.}
 #' \item{residuals}{A vector of length obs with the residuals from the estimation.}
 #' @export
 #' @import methods
@@ -21,7 +20,7 @@ tvOLS <- function(x, ...) UseMethod("tvOLS", x)
 #' @param ez (optional) A scalar or vector with the smoothing values. If 
 #' values are included then the vector z is used.
 #' @param bw A numeric vector.
-#' @inheritParams tvSURE
+#' @inheritParams tvLM
 #' @param singular.ok	Logical. If FALSE, a singular model is an error.
 #' @examples
 #' tau <- seq(1:500)/500
@@ -30,7 +29,7 @@ tvOLS <- function(x, ...) UseMethod("tvOLS", x)
 #' error <- rt(500, df = 10)
 #' y <- apply(X*beta, 1, sum) + error
 #' coef.lm <- stats::lm(y~0+X1+X2, data = X)$coef
-#' coef.tvlm <-  tvOLS(x = as.matrix(X), y = y, bw = 0.1)$tvcoef
+#' coef.tvlm <-  tvOLS(x = as.matrix(X), y = y, bw = 0.1)$coefficients
 #' plot(tau, beta[, 1], type="l", main="", ylab = expression(beta[1]), xlab = expression(tau),
 #' ylim = range(beta[,1], coef.tvlm[, 1]))
 #' abline(h = coef.lm[1], col = 2)
@@ -78,12 +77,12 @@ tvOLS.matrix <- function(x, y, z = NULL, ez = NULL, bw, est = c("lc", "ll"),
     if (est=="ll")
       xtemp <- cbind(xtemp, xtemp * tau0[k.index])
     result <- stats::lm.wfit(x = as.matrix(xtemp), y = y[k.index], w = kernel.bw[k.index])
-    theta[t,] <- result$coef[1:nvar]
+    theta[t,] <- result$coefficients[1:nvar]
     fitted[t] <- crossprod(x[t, !is.na(theta[t,])], theta[t, !is.na(theta[t,])])
   }
   if(!is.predict)
     resid <- y - fitted
-  return(list(tvcoef = theta, fitted = fitted, residuals = resid))
+  return(list(coefficients = theta, fitted = fitted, residuals = resid))
 }
 
 #' @rdname tvOLS
@@ -115,13 +114,13 @@ tvOLS.tvvar <- function(x, ...)
   {
     results <- tvOLS(x = rhs, y = x$y[, i], z = x$z, ez = x$ez, bw = x$bw[i], est = x$est, tkernel = x$tkernel, 
                      singular.ok = x$singular.ok)
-    equation[[eqnames[i]]] <- results$tvcoef
+    equation[[eqnames[i]]] <- results$coefficients
     colnames(equation[[eqnames[i]]]) <- colnames(rhs)
     resid[, i] <- results$residuals
     fitted[, i] <- results$fitted
   }
   
-  return(list(tvcoef = equation, fitted = fitted, residuals = resid))
+  return(list(coefficients = equation, fitted = fitted, residuals = resid))
 }
 
 
@@ -163,7 +162,7 @@ tvOLS.tvvar <- function(x, ...)
     ytemp <- y[k.index]
     result <- stats::lm.wfit(x = as.matrix(xtemp), y = ytemp, w = kernel.bw[k.index],
                              singular.ok = singular.ok)
-    theta[t,] <- result$coef[1:nvar]
+    theta[t,] <- result$coefficients[1:nvar]
     fitted[t] <- crossprod(x[t, !is.na(theta[t,])], theta[t, !is.na(theta[t,])])
   }
   mse <- mean((y - fitted)^2)

@@ -5,6 +5,7 @@
 \alias{update.tvar}
 \alias{update.tvvar}
 \alias{update.tvsure}
+\alias{update.tvplm}
 \title{Update and Re-fit the Models of package tvReg}
 \usage{
 \method{update}{tvlm}(object, ...)
@@ -14,9 +15,11 @@
 \method{update}{tvvar}(object, ...)
 
 \method{update}{tvsure}(object, ...)
+
+\method{update}{tvplm}(object, ...)
 }
 \arguments{
-\item{object}{An object of any class in package tvReg}
+\item{object}{An object of any class in package tvReg.}
 
 \item{...}{Other parameters passed to specific methods.}
 }

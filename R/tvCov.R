@@ -100,10 +100,10 @@ tvCov <- function(x, bw, est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"))
   resid.2 <- numeric(obs)
   if(length(bw)>1) 
     bw <- stats::median(bw)
-  time.grid <- 1:obs
+  grid <- 1:obs/obs
   for (t in 1:obs)
   {
-    tau0 <- (time.grid-t)/obs
+    tau0 <- grid - grid[t]
     kernel.bw <- .kernel(tau0, bw, tkernel = tkernel)/bw
     kernel.bw[max(1, t-cv.block):min(t+cv.block, obs)] <- 0
     w0 <- sum(kernel.bw)
@@ -134,3 +134,55 @@ tvCov <- function(x, bw, est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"))
   }
   return(mean(resid.2))
 }
+
+#' Estimated variance-covariance matrix from TVPOLS
+#'
+#' \code{tvLM} is used to fit a time-varying coefficients linear model
+#'
+#' Models for \code{tvLM} are specified symbolically using the same formula
+#' format than function \code{lm}. A typical model has the form \emph{response} ~ \emph{terms}
+#' where response is the (numeric) response vector and terms is a series of terms which
+#' specifies a linear predictor for response. A terms specification of the form
+#' first + second indicates all the terms in first together with all the terms
+#' in second with duplicates removed. A specification of the form first:second indicates
+#' the set of terms obtained by taking the interactions of all terms in first with all
+#' terms in second. The specification first*second indicates the cross of first and second.
+#' This is the same as first + second + first:second.
+#'
+#' A formula has an implied intercept term. To remove this use either
+#' y ~ x - 1 or y ~ 0 + x.
+#'
+#' @rdname tvLM
+#' @aliases tvlm-class tvlm
+#' @param formula An object of class formula.
+#' @param z A vector with the smoothing variable.
+#' @param ez (optional) A scalar or vector with the smoothing estimation values. If 
+#' values are included then the vector \code{z} is used.
+#' @param data An optional data frame or matrix.
+#' @param bw An opcional scalar. It represents the bandwidth in
+#' the estimation of trend coefficients. If NULL, it is selected by cross validation. 
+#' @param cv.block A positive scalar with the size of the block in leave one block out cross-validation.
+#' By default 'cv.block=0' meaning leave one out cross-validation.
+#' @param est The nonparametric estimation method, one of "lc" (default) for linear constant
+#'  or "ll" for local linear.
+#' @param tkernel The type of kernel used in the coefficients estimation method,
+#' one of Epanesnikov ("Epa") or "Gaussian".
+#' @param singular.ok	Logical. If FALSE, a singular model is an error.
+#'
+#' @return An object of class \code{tvlm}
+#' The object of class \code{tvlm} have the following components:
+#' \item{coefficients}{A matrix of dimensions}
+#' \item{fitted}{The fitted values.}
+#' \item{residuals}{Estimation residuals.}
+#' \item{x}{A matrix with the regressors data.}
+#' \item{y}{A vector with the dependent variable data.}
+#' \item{z}{A vector with the smoothing variable.}
+#' \item{ez}{A vector with the smoothing estimation variable.}
+#' \item{bw}{Bandwidth of mean estimation.}
+#' \item{est}{Nonparametric estimation methodology.}
+#' \item{tkernel}{Kernel used in estimation.}
+#' \item{level}{Confidence interval range.}
+#' \item{runs}{Number of bootstrap replications.}
+#' \item{tboot}{Type of bootstrap.}
+#' \item{BOOT}{List with all bootstrap replications of \code{coefficients}, if done.}
+#' 

@@ -6,9 +6,17 @@
 \alias{tvlm}
 \title{Time-Varying Coefficients Linear Models}
 \usage{
-tvLM(formula, z = NULL, ez = NULL, data, bw = NULL, cv.block = 0,
-  est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"),
-  singular.ok = TRUE)
+tvLM(
+  formula,
+  z = NULL,
+  ez = NULL,
+  data,
+  bw = NULL,
+  cv.block = 0,
+  est = c("lc", "ll"),
+  tkernel = c("Epa", "Gaussian"),
+  singular.ok = TRUE
+)
 }
 \arguments{
 \item{formula}{An object of class formula.}
@@ -37,7 +45,7 @@ one of Epanesnikov ("Epa") or "Gaussian".}
 \value{
 An object of class \code{tvlm}
 The object of class \code{tvlm} have the following components:
-\item{tvcoef}{A matrix of dimensions}
+\item{coefficients}{A matrix of dimensions}
 \item{fitted}{The fitted values.}
 \item{residuals}{Estimation residuals.}
 \item{x}{A matrix with the regressors data.}
@@ -50,7 +58,7 @@ The object of class \code{tvlm} have the following components:
 \item{level}{Confidence interval range.}
 \item{runs}{Number of bootstrap replications.}
 \item{tboot}{Type of bootstrap.}
-\item{BOOT}{List with all bootstrap replications of \code{tvcoef}, if done.}
+\item{BOOT}{List with all bootstrap replications of \code{coefficients}, if done.}
 }
 \description{
 \code{tvLM} is used to fit a time-varying coefficients linear model
@@ -91,10 +99,10 @@ RV2 <- head(RV, 2000)
 ##Bollerslev t al. (2016) HARQ model
 HARQ <- with(RV2, lm(RV ~ RV_lag + I(RV_lag * RQ_lag_sqrt) + RV_week + RV_month))
 
-#Casas et al. (2018) TV-HARQ model
+#Casas et al. (2018) TVHARQ model
 tvHARQ <- with(RV2, tvLM (RV ~ RV_lag + RV_week + RV_month, z = RQ_lag_sqrt, 
                          bw = 0.0061))
-boxplot(data.frame(tvHARQ = tvHARQ$tvcoef[,2] * RV2$RV_lag,
+boxplot(data.frame(tvHARQ = tvHARQ$coefficients[,2] * RV2$RV_lag,
                    HARQ = (HARQ$coef[2] + HARQ$coef[3] * RV2$RQ_lag_sqrt)*RV2$RV_lag),
                    main = expression (RV[t-1]), outline = FALSE)
                  
