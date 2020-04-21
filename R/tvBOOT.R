@@ -44,17 +44,18 @@
 {
   B <- x$coefficients
   BOOT <- vector("list", runs)
-  resorig <- matrix(x$residuals, nrow = x$obs, ncol = x$neq)
-  resorig = scale(resorig, scale = FALSE)
+  obs <- x$obs
+  neq <- x$neq
+  resorig <- matrix(x$residuals, nrow = obs, ncol = neq)
+  resorig <- apply(resorig, 2, scale, scale = FALSE)
   residup <- resorig * -0.6180339887498949025257 # (1-sqrt(5))*0.5
   residdown <- resorig * 1.618033988749894902526 # (1+sqrt(5))*0.5
   fitted <- x$fitted
   X.tilde <- x$x
   bw <- x$bw
-  obs <- x$obs
-  neq <- x$neq
   yboot <- matrix(NA, nrow = obs*neq, ncol = runs)
-  for (i in 1:runs){
+  for (i in 1:runs)
+  {
     if (tboot=="wild"){
       index <- ifelse(apply(resorig, 2, stats::rbinom, size=1, prob=0.7236067977499789360962)==1, TRUE, FALSE)
       resid <- residup

@@ -73,8 +73,8 @@ tvFE.matrix<-function(x, y, z = NULL, ez = NULL, bw, neq, obs,
     MH <- diag(neq*obs) - D %*% solve(temp%*%D)%*%temp
     SH <- crossprod(MH, WH)%*%MH
     x.tilde <- crossprod(xtemp, SH)
-    T0 <- x.tilde %*% y
     s0 <- x.tilde %*% xtemp
+    T0 <- x.tilde %*% y
     result <- try(qr.solve(s0, T0), silent = TRUE)
     if(inherits(result, "try-error"))
       result <- try(qr.solve(s0, T0, tol = .Machine$double.xmin ), silent = TRUE)
@@ -89,8 +89,9 @@ tvFE.matrix<-function(x, y, z = NULL, ez = NULL, bw, neq, obs,
     fitted[t+((1:neq)-1)*eobs] <- xtheta[t+((1:neq)-1)*eobs]
   }
   alpha <- apply(alpha, 2, mean)
+  fitted <- fitted + D %*% alpha
   if(!is.predict)
-    resid <- y - fitted - D %*% alpha
+    resid <- y - fitted 
   return(list(coefficients = theta, fitted = fitted, residuals = resid, alpha = c(-sum(alpha), alpha)))
 }
 

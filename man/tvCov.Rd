@@ -4,12 +4,21 @@
 \alias{tvCov}
 \title{Time-varying Variance-Covariance Estimation}
 \usage{
-tvCov(x, bw, est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"))
+tvCov(
+  x,
+  bw = NULL,
+  cv.block = 0,
+  est = c("lc", "ll"),
+  tkernel = c("Epa", "Gaussian")
+)
 }
 \arguments{
 \item{x}{A matrix.}
 
 \item{bw}{A scalar.}
+
+\item{cv.block}{A positive scalar with the size of the block in leave-one block-out cross-validation.
+By default 'cv.block=0' meaning leave-one-out cross-validation.}
 
 \item{est}{A character, either "lc" or "ll" for local constant or local linear.}
 

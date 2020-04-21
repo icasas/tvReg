@@ -172,7 +172,7 @@ print(names(OECD))
 elast.fe <- plm::plm(lhe ~ lgdp + pop65 + pop14 + public, data = OECD, 
                      index = c("country", "year"), model = "within")
 elast.tvfe <- tvPLM (lhe ~ lgdp + pop65 + pop14 + public, data = OECD, 
-                     index = c("country", "year"), method = "within", bw = 0.8)
+                     index = c("country", "year"), method = "within", bw = 0.6)
 elast.fe <- confint(elast.fe)
 elast.tvfe <- confint(elast.tvfe)
 plot(elast.tvfe, vars = 1, ylim = c(0.45, 1.3))
@@ -252,7 +252,7 @@ print(Sigma.hat[, , 1])
 data(RV)
 RV2 <- head(RV, 2001)
 ##Estimate/train tvHAR model
-tvHAR <- with(RV2, tvAR (RV, p = 1, bw = 20, exogen = cbind(RV_week, RV_month)))
+tvHAR <- with(RV2, tvAR (RV, p = 1, bw = 0.8, exogen = cbind(RV_week, RV_month)))
 ##Define the forecast horizon (n.ahead) and the future values of the exogenous variables
 newexogen <- cbind(RV$RV_week[2002:2004], RV$RV_month[2002:2004])
 ##3-step-ahead forecast
@@ -260,7 +260,7 @@ forecast(tvHAR, n.ahead = 3, newexogen = newexogen)
 
 ## ----Predict, eval = TRUE-----------------------------------------------------
 tvHARQ <- with(RV2, tvLM (RV ~ RV_lag + RV_week + RV_month, z = RQ_lag_sqrt, 
-                bw = 0.006))
+                bw = 0.003))
 newx <- cbind(RV$RV_lag[2002:2004], RV$RV_week[2002:2004], RV$RV_month[2002:2004])
 newz <- RV$RQ_lag_sqrt[2002:2004]
 predict(tvHARQ, newx, newz)

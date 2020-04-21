@@ -1,14 +1,22 @@
+#tvReg 0.5.2
+
+* Fix bug in `tvPLM` and change the limits of the Epanechnikov kernel.
+
+#tvReg 0.5.1
+
+* Fix bug in method `tvSURE` when using constraints. Method `confint` works.
+
 #tvReg 0.5.0
 
-* Added methods tvPLM, tvFE and tvRE methods to fit time-varying coefficients panel data models. Also added their corresponding confint, predict, forecast, plot, summary and print methods.
+* Added methods `tvPLM`, `tvRE` and `tvFE` and methods to fit time-varying coefficients panel data models. Also added their corresponding`confint`, `predict`, `forecast`, `plot`, `summary` and `print` methods.
 
 * Added dataset OECD
 
-* Change all return argument "tvcoef" to "coefficients" to fit the standards of other packages in R
+* Change all return argument `tvcoef` to `coefficients` to fit the standards of other packages in R
 
 * Allow the user to choose individual plots for each variable in models of class tvlm, tvar or tvplm
 
-* Fix of the bug in R-devel caused by matrix objects now also inheriting from class "array" which caused some problems in some "if" statements
+* Fix of the bug in R-devel caused by matrix objects now also inheriting from class `array` which caused some problems in some "if" statements
 
 #tvReg 0.4.2
 

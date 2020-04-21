@@ -58,7 +58,7 @@ bw.default <- function(x, y, z = NULL, cv.block = 0, est = c("lc", "ll"), tkerne
     stop("The number of equations in 'x' and 'y' are different \n")
   if(is.null(z))
   {
-    upper <- 5
+    upper <- 20
     lower <- 5/obs
     top <- 1
   }
@@ -150,7 +150,7 @@ bw.list <- function(x, y, z = NULL, cv.block = 0, est = c("lc", "ll"), tkernel =
   cv.block <- floor(abs(cv.block))
   if(is.null(z))
   {
-    upper <- 2
+    upper <- 20
     lower <- 5/obs
     top <- 0.5
   }

@@ -47,7 +47,7 @@ We want to estimate the following model:
 $$
 y_t  = \beta_{1t} X_{1t}+ \beta_{2t} X_{2t} + u_t, \ \ t = 1, \ldots, T,
 $$
-where the coefficients are functions of a rescaled time period $\tau = t/T$ with $T = 1000$. In particular, $\beta_{1t}= \sin(2\pi\tau)$ and $\beta_{2t} = 2\tau$. The regressors, $X_{1t} \sim N(0, 1)$ and $X_{2t} \sim \chi^2(4)$, are independent of the error term, $u_t \sim t(10)$. 
+where the coefficients are functions of a rescaled time period $\tau = t/T$ with $T = 1000$. In particular, $\beta_{1t}= \sin(2\pi\tau)$ and $\beta_{2t} = 2\tau$. The regressors, $X_{1t} \sim N(0, 1)$ and $X_{2t} \sim \chi^2_4$, are independent of the error term, $u_t \sim t_{10}$. 
 
 
 ```{r tvLM}
@@ -242,7 +242,7 @@ The example below uses the simulated variable *Y* from above and fits a TVAR(6),
 ```
 
 
-# Multi-equation linear models: the TVSURE and TVVAR models 
+# Multi-equation linear models
 
 The formula of systems of linear models can be generally express as in (1) with $y_t = (y_{1t}, y_{2t}, \ldots, y_{Mt})'$ for $M$ the number of equations in the system. Similarly, the error term $u_t =(u_{1t}, u_{2t}, \ldots, u_{Mt})'$ and the $\Sigma_t$ is the variance-covariance matrix that defines the dependency of the error terms of all equations. Variables $X_t$ and $\beta_t$ are matrices. 
 
@@ -364,7 +364,7 @@ print(names(OECD))
 elast.fe <- plm::plm(lhe ~ lgdp + pop65 + pop14 + public, data = OECD, 
                      index = c("country", "year"), model = "within")
 elast.tvfe <- tvPLM (lhe ~ lgdp + pop65 + pop14 + public, data = OECD, 
-                     index = c("country", "year"), method = "within", bw = 0.8)
+                     index = c("country", "year"), method = "within", bw = 0.6)
 elast.fe <- confint(elast.fe)
 elast.tvfe <- confint(elast.tvfe)
 plot(elast.tvfe, vars = 1, ylim = c(0.45, 1.3))
@@ -518,7 +518,7 @@ The *forecast* method is implemented for the class attributes *tvlm*, *tvar*, *t
 data(RV)
 RV2 <- head(RV, 2001)
 ##Estimate/train tvHAR model
-tvHAR <- with(RV2, tvAR (RV, p = 1, bw = 20, exogen = cbind(RV_week, RV_month)))
+tvHAR <- with(RV2, tvAR (RV, p = 1, bw = 0.8, exogen = cbind(RV_week, RV_month)))
 ##Define the forecast horizon (n.ahead) and the future values of the exogenous variables
 newexogen <- cbind(RV$RV_week[2002:2004], RV$RV_month[2002:2004])
 ##3-step-ahead forecast
@@ -542,7 +542,7 @@ The *predict* method is implemented for the same four class attribues than the *
 
 ```{r Predict, eval = TRUE}
 tvHARQ <- with(RV2, tvLM (RV ~ RV_lag + RV_week + RV_month, z = RQ_lag_sqrt, 
-                bw = 0.006))
+                bw = 0.003))
 newx <- cbind(RV$RV_lag[2002:2004], RV$RV_week[2002:2004], RV$RV_month[2002:2004])
 newz <- RV$RQ_lag_sqrt[2002:2004]
 predict(tvHARQ, newx, newz)

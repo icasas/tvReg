@@ -353,7 +353,7 @@ confint.tvplm <- function(object, parm, level = 0.95,
   z <- x$z
   ez <- x$ez
   R <- x$R
-  r <- x$R
+  r <- x$r
   if(!is.null(z))
     grid <- z
   else
@@ -501,7 +501,7 @@ confint.tvplm <- function(object, parm, level = 0.95,
         BOOT[[k]] <- rbind (BOOT[[k]], theta[t,])
       }
     }
-    }
+  }
   return(BOOT)
 }
 
@@ -587,7 +587,7 @@ confint.tvplm <- function(object, parm, level = 0.95,
         T0 <- x.tilde %*% yboot[, k]
         result <- try(qr.solve(s0, T0), silent = TRUE)
         if(inherits(result, "try-error"))
-          result <- try(qr.solve(s0, T0, tol = .Machine$double.xmin ), silent = TRUE)
+          result <- try(qr.solve(s0, T0, tol = .Machine$double.xmin), silent = TRUE)
       }
       BOOT[[k]] <-rbind(BOOT[[k]], result[1:nvar])
     }

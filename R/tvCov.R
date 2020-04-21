@@ -9,6 +9,8 @@
 #' @importFrom MASS mvrnorm
 #' @param x A matrix.
 #' @param bw A scalar.
+#' @param cv.block A positive scalar with the size of the block in leave-one block-out cross-validation.
+#' By default 'cv.block=0' meaning leave-one-out cross-validation.
 #' @param est A character, either "lc" or "ll" for local constant or local linear.
 #' @param tkernel A character, either "Gaussian" or "Epa" kernel types.
 #'
@@ -39,7 +41,7 @@
 #'
 #' @export tvCov
 #'
-tvCov <- function(x, bw, est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"))
+tvCov <- function(x, bw = NULL, cv.block = 0, est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"))
 {
   x <- as.matrix(x)
   obs <- NROW(x)
@@ -48,6 +50,8 @@ tvCov <- function(x, bw, est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"))
   est <- match.arg(est)
   Sigma <- array(0, dim = c(neq, neq, obs))
   resid.2 <- numeric(obs)
+  if(is.null(bw))
+    bw <- bwCov(x, cv.block = abs(cv.block), est, tkernel)
   if(length(bw) > 1)
     bw <- stats::median(bw)
   time.grid <- 1:obs
