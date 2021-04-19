@@ -4,7 +4,8 @@
 \name{RV}
 \alias{RV}
 \title{Daily realized variance}
-\format{A data frame with 4529 rows and 6 variables.
+\format{
+A data frame with 4529 rows and 6 variables.
 \describe{
   \item{Date}{Daily data from Jan 3, 1990 until Dec 19, 2007 - without
   weekends and days off}
@@ -13,12 +14,13 @@
   \item{RV_week}{Weekly average realized variance at time t-1}
   \item{RV_month}{Monthly average realized variance at time t-1}
   \item{RQ_lag_sqrt}{Daily squared root of the realized quarticity at time t-1}
-}}
+}
+}
 \description{
 A dataset containing the daily realized variance, and some of its lags,
 obtained from 1-minute close prices of the S\&P 500. Similar data has
 been used in the HAR model in Corsi (2009), the HARQ and SHARQ models in
-Bollerslev et al (2016) and the tvHARQ and tvSHARQ models in 
+Bollerslev et al (2016) and the TVHARQ and TVSHARQ models in 
 Casas et al (2018). The time period runs from Jan 1990 until 
 Dec 2007 as in Bollerslev et al (2009).
 }

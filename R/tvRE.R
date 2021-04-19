@@ -23,16 +23,15 @@ tvRE <- function(x, ...) UseMethod("tvRE", x)
 #' values are included then the vector z is used.
 #' @param bw A numeric vector with the bandwidth.
 #' @param Sigma NULL (default) or a matrix of size obs x obs..
-#' @param neq A sclar with the number of equations
+#' @param neq A scalar with the number of equations
 #' @param obs A scalar with the number of time observations
 #' @param est The nonparametric estimation method, one of "lc" (default) for linear constant
 #'  or "ll" for local linear.
-#' @param tkernel The type of kernel used in the coefficients estimation method,
-#' one of Epanesnikov ("Epa") or "Gaussian".
+#' @param tkernel A character, either "Triweight" (default), "Epa" or "Gaussian" kernel function.
 #
 #' @export
 tvRE.matrix <-function(x, y, z = NULL, ez = NULL, bw, Sigma = NULL, neq, obs,
-               est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"), ...)
+               est = c("lc", "ll"), tkernel = c("Triweight", "Epa", "Gaussian"), ...)
 {
   x <- as.matrix(x)
   y <- as.numeric(y)
@@ -46,7 +45,7 @@ tvRE.matrix <-function(x, y, z = NULL, ez = NULL, bw, Sigma = NULL, neq, obs,
   if(!is.null(z))
   {
     if(length(z) != obs)
-      stop("\nDimensions of 'x' and 'z' are not compatible.\n")
+      stop("\nDimensions of 'x' and 'z' are not compatible. \nThe size of 'z' should be 'obs'.\n")
     grid <- z
   }
   else
@@ -66,8 +65,10 @@ tvRE.matrix <-function(x, y, z = NULL, ez = NULL, bw, Sigma = NULL, neq, obs,
   ynew <- y
   for (t in 1:eobs)
   {
-    tau0 <- grid - grid[t]
+    tau0 <- grid - ez[t]
     kernel.bw <- sqrt(.kernel(tau0, bw, tkernel))
+    if (length (kernel.bw != 0) < 3)
+      stop("Bandwidth is too small.\n")
     xtemp <- x
     if (est == "ll")
       xtemp <- cbind(xtemp, xtemp * tau0)
@@ -75,8 +76,6 @@ tvRE.matrix <-function(x, y, z = NULL, ez = NULL, bw, Sigma = NULL, neq, obs,
     if (any(eSigma$value <= 0))
       stop("\n'Sigma' is not positive definite.\n")
     A <- diag(eSigma$values^-0.5) %*% t(eSigma$vectors)
-    if (length (kernel.bw != 0) < 3)
-      stop("Bandwidth is too small.\n")
     for (i in 1:neq)
     {
       ind <- (i-1)*obs + (1:obs)
@@ -92,14 +91,11 @@ tvRE.matrix <-function(x, y, z = NULL, ez = NULL, bw, Sigma = NULL, neq, obs,
            Possibly, the 'bw' is too small for values in 'ez'.\n")
     theta[t,] <- result [1:nvar]
     for (i in 1:neq)
-      fitted[t+(i-1)*obs] <- sum(x[t+(i-1)*obs, ]*theta[t,])
-    alpha[t+((1:neq)-1)*obs] <- y[t+((1:neq)-1)*obs] - fitted[t+((1:neq)-1)*obs]
+      fitted[t+(i-1)*eobs] <- sum(x[t+(i-1)*obs, ]*theta[t,])
+    alpha[t+((1:neq)-1)*eobs] <- y[t+((1:neq)-1)*obs] - fitted[t+((1:neq)-1)*eobs]
   }
   for(i in 1:neq)
-  {
-    ind <- (i-1)*eobs + 1:eobs
-    alpha.i[i] <- mean(alpha[ind])
-  }
+    alpha.i[i] <- mean(alpha[(i-1)*obs + 1:obs])
   if(!is.predict)
   {
     resid <- y - fitted - rep(alpha.i, each = obs)
@@ -108,6 +104,8 @@ tvRE.matrix <-function(x, y, z = NULL, ez = NULL, bw, Sigma = NULL, neq, obs,
     Sigma <- matrix(u.var, obs, obs)
     diag(Sigma) <- mean(apply(resid.mat, 1, mean))
   }
+  else
+    fitted = resid <- NULL
   return(list(coefficients = theta, fitted = fitted, residuals = resid, 
               alpha = alpha.i, Sigma = Sigma))
 }
@@ -126,7 +124,7 @@ tvRE.tvplm <- function(x, ...)
 #' @keywords internal
 .tvRE.cv<-function(bw, x, y, z = NULL, neq, obs, cv.block = 0,
                    est = c("lc", "ll"), 
-                   tkernel = c("Epa", "Gaussian"))
+                   tkernel = c("Triweight", "Epa", "Gaussian"))
 {
   x <- as.matrix(x)
   nvar <- NCOL (x)
@@ -134,7 +132,7 @@ tvRE.tvplm <- function(x, ...)
   if(!is.null(z))
   {
     if(length(z) != obs)
-      stop("\nDimensions of 'x' and 'z' are not compatible\n")
+      stop("\nDimensions of 'x' and 'z' are not compatible. \nThe size of 'z' should be 'obs'.\n")
     grid <- z
   }
   else

@@ -7,7 +7,7 @@ AlwaysSaveHistory: Default
 EnableCodeIndexing: Yes
 UseSpacesForTab: Yes
 NumSpacesForTab: 2
-Encoding: ISO8859-1
+Encoding: UTF-8
 
 RnwWeave: Sweave
 LaTeX: pdfLaTeX
@@ -15,4 +15,6 @@ LaTeX: pdfLaTeX
 BuildType: Package
 PackageUseDevtools: Yes
 PackageInstallArgs: --no-multiarch --with-keep.source
+PackageBuildArgs: --no-html
+PackageBuildBinaryArgs: --no-html
 PackageRoxygenize: rd,collate,namespace,vignette

@@ -71,7 +71,7 @@ print.tvsure <- function (x,  digits = max(3, getOption("digits") - 3), ...)
       print(apply(result[, (sum(nvar[-c(i:neq)]) + 1):(sum(nvar[-c(i:neq)]) + nvar[i])], 
                   2, mean), digits = digits)
       cat("\nBandwidth: ", bw[i])
-      if (method == "tvFGLS")
+      if (method == "TVFGLS")
         cat("\t\t Covariance bandwidth: ", x$bw.cov)
       cat("\n\n")
   }
@@ -92,7 +92,7 @@ print.tvvar <- function (x,  digits = max(3, getOption("digits") - 3), ...)
   bw <- round(x$bw, digits = digits)
   if (length(bw) == 1)
     bw <- rep (bw, x$neq)
-  text1 <- "tvVAR Estimation Results:"
+  text1 <- "TVVAR Estimation Results:"
   cat(paste("\n", text1, "\n", sep = ""))
   row <- paste(rep("=", nchar(text1)), collapse = "")
   cat(row, "\n")
@@ -129,7 +129,7 @@ print.tvirf <-function(x, digits = max(3, getOption("digits") - 3), ...)
       text1 <- paste (text1, "Cumulative ", sep ="")
     if (x$ortho)
       text1 <- text1 <- paste(text1, "Orthogonal ", sep ="")
-    text1 <- paste (text1, "tvIRF Estimation Results:", sep ="")
+    text1 <- paste (text1, "TVIRF Estimation Results:", sep ="")
     cat(paste("\n", text1, "\n", sep = ""))
     row <- paste(rep("=", nchar(text1)), collapse = "")
     cat(row, "\n")
@@ -138,7 +138,7 @@ print.tvirf <-function(x, digits = max(3, getOption("digits") - 3), ...)
     {
       for (j in 1:length(x$response))
       {
-        text1 <- paste("\nSummary of tvIRF for impulse \"", 
+        text1 <- paste("\nSummary of TVIRF for impulse \"", 
                        impulse[i], "\" and response \"", 
                        response[j], "\"", sep ="")
         cat(text1, "\n")

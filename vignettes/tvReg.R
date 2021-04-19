@@ -261,7 +261,7 @@ forecast(tvHAR, n.ahead = 3, newexogen = newexogen)
 ## ----Predict, eval = TRUE-----------------------------------------------------
 tvHARQ <- with(RV2, tvLM (RV ~ RV_lag + RV_week + RV_month, z = RQ_lag_sqrt, 
                 bw = 0.003))
-newx <- cbind(RV$RV_lag[2002:2004], RV$RV_week[2002:2004], RV$RV_month[2002:2004])
+newdata <- cbind(RV$RV_lag[2002:2004], RV$RV_week[2002:2004], RV$RV_month[2002:2004])
 newz <- RV$RQ_lag_sqrt[2002:2004]
-predict(tvHARQ, newx, newz)
+predict(tvHARQ, newdata, newz)
 

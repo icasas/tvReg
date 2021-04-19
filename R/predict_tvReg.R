@@ -6,8 +6,9 @@
 #' variables y (response), x (regressors), exogen (exogenous variables, when used),
 #' and  z (smoothing variable). 
 #' @param object An object used to select a method.
-#' @param newx A dataframe with new values of all variables in x. No need to 
-#' input the intercept.
+#' @param newdata A data.frame, matrix or vector with new values of all independent variables. No need to 
+#' input the intercept. Note that this does not refer to the variables in 'exogen' which might be part of the 'tvar' 
+#' and 'tvvar' objects. Those must be included in 'newexogen'.
 #' @param newdata A vector or matrix with new values of the lags included in the model.
 #' @param newz A vector with new values of the smoothing variable.
 #' @param newexogen A matrix or vector with the new value of the exogenous variables.
@@ -24,43 +25,43 @@
 #' data("RV")
 #' RV2 <- head(RV, 2001)
 #' z <- RV2$RQ_lag_sqrt
-#' tvHARQ <- tvLM (RV ~ RV_lag + RV_week + RV_month, 
+#' TVHARQ <- tvLM (RV ~ RV_lag + RV_week + RV_month, 
 #'                  z = z, data = RV2, bw = 0.0062)
-#' newx <- cbind(RV$RV_lag[2002:2004], RV$RV_week[2002:2004],
+#' newdata <- cbind(RV$RV_lag[2002:2004], RV$RV_week[2002:2004],
 #'               RV$RV_month[2002:2004])
 #' newz <- RV$RQ_lag_sqrt[2002:2004]
-#' predict(tvHARQ, newx, newz)
+#' predict(TVHARQ, newdata, newz)
 #' 
 #' @export
-predict.tvlm<-function (object, newx, newz, ...) 
+predict.tvlm<-function (object, newdata, newz, ...) 
 {
   if(!inherits(object, c("tvlm")))
     stop("\nArgument 'object' should be entered and it should have class 'tvlm'.\n")
-  if(is.null(newx))
+  if(is.null(newdata))
     return(stats::fitted(object, ...))
   if(is.null(object$z))
     stop("\nYour model coefficients are functions of time, use function 
          'forecast' with argument 'n.ahead' as horizon.\n")
-  if(!inherits(newx, c("data.frame", "matrix", "numeric", "vector")))
-    stop("\nArgument 'newx' should a numeric vector if there is only
+  if(!inherits(newdata, c("data.frame", "matrix", "numeric", "vector")))
+    stop("\nArgument 'newdata' should a numeric vector if there is only
          one row or a 'matrix' or a 'data.frame' for more than one row.\n")
   if(!inherits(newz, c( "numeric", "vector")))
     stop("\nArgument 'newz' should be entered and it should be a numeric vector.\n")
   n.ahead <- length(newz)
   if(n.ahead == 1) 
-    newx <- matrix(newx, ncol = length(newx))
-  n.col <- NCOL(newx)
-  if(!identical(NROW(newx), n.ahead))
-    stop("\nDimensions of 'newx' and 'newz' are not compatible\n")
+    newdata <- matrix(newdata, ncol = length(newdata))
+  n.col <- NCOL(newdata)
+  if(!identical(NROW(newdata), n.ahead))
+    stop("\nDimensions of 'newdata' and 'newz' are not compatible\n")
   obs <- NROW(object$x) 
   is.intercept <- ("(Intercept)" %in% colnames(object$x))
   if(is.intercept & n.col == (NCOL(object$x) - 1))
-    newx <- cbind(rep(1, n.ahead), newx)
+    newdata <- cbind(rep(1, n.ahead), newdata)
   prediction <- numeric(n.ahead)
   object$ez <- newz
   theta <- tvOLS(object)$coefficients
   for (t in 1:n.ahead)
-    prediction[t] <- theta[t, ]%*%newx[t, ]
+    prediction[t] <- theta[t, ]%*%newdata[t, ]
   return(prediction)
 }
 
@@ -71,12 +72,12 @@ predict.tvlm<-function (object, newx, newz, ...)
 #' ## functions of the realized quarticity
 #' 
 #' exogen = RV2[, c("RV_week", "RV_month")]
-#' tvHARQ2 <- tvAR (RV2$RV, p = 1, exogen = exogen,  
+#' TVHARQ2 <- tvAR (RV2$RV, p = 1, exogen = exogen,  
 #'                       z = RV2[, "RQ_lag_sqrt"], bw = 0.0062)
 #' newylag <- RV$RV[2002:2004]
 #' newz <- RV$RQ_lag_sqrt[2002:2004]
 #' newexogen <- RV[2002:2004, c("RV_week", "RV_month")]
-#' predict(tvHARQ2, newylag,  newz, newexogen = newexogen)
+#' predict(TVHARQ2, newylag,  newz, newexogen = newexogen)
 #' @export
 predict.tvar<-function (object, newdata, newz, newexogen = NULL, ...) 
 {
@@ -114,7 +115,7 @@ predict.tvar<-function (object, newdata, newz, newexogen = NULL, ...)
   }
   n.col <- NCOL(newx)
   if(!identical(NROW(newx), n.ahead))
-    stop("\nDimensions of 'newx' and 'newz' are not compatible\n")
+    stop("\nDimensions of 'newdata' and 'newz' are not compatible\n")
   obs <- NROW(object$x) 
   is.intercept <- ("(Intercept)" %in% colnames(object$x))
   if(is.intercept & n.col == (NCOL(object$x) - 1))
@@ -137,11 +138,11 @@ predict.tvar<-function (object, newdata, newz, newexogen = NULL, ...)
 #' list(ar = c(0.8897, -0.4858), ma = c(-0.2279, 0.2488)), 
 #' sd = sqrt(0.1796))
 #' smoothing <- as.numeric(smoothing)
-#' tvVAR.z <- tvVAR(usmacro, p = 6, type = "const", 
+#' TVVAR.z <- tvVAR(usmacro, p = 6, type = "const", 
 #'                z = smoothing[1:NROW(usmacro)], bw = c(16.3, 16.3, 16.3))
 #' newdata <- data.frame(inf = c(2, 1, 6), une = c(5, 4, 9), tbi = c(1, 2.5, 3))
 #' newz <- c(0, 1.2, -0.2)
-#' predict(tvVAR.z, newdata = newdata, newz = newz)
+#' predict(TVVAR.z, newdata = newdata, newz = newz)
 #' 
 #' @export
 predict.tvvar<-function (object, newdata, newz, newexogen = NULL, ...) 
@@ -222,13 +223,13 @@ predict.tvvar<-function (object, newdata, newz, newexogen = NULL, ...)
 #'                        list(ar = c(0.8897, -0.4858), ma = c(-0.2279, 0.2488)), 
 #'                        sd = sqrt(0.1796))
 #' smoothing <- as.numeric(smoothing)
-#' tvOLS.z.fit <- tvSURE(system, data = Kmenta,  
+#' TVOLS.z <- tvSURE(system, data = Kmenta,  
 #'                       z = smoothing[1:nobs],  bw = c(7, 1.8),
 #'                       est = "ll")
 #' newdata <- data.frame(consump = c(95, 100, 102), price = c(90, 100, 103), 
 #'                       farmPrice = c(70, 95, 103), income = c(82, 94, 115))
 #' newz <- tail(smoothing, 3)
-#' predict(tvOLS.z.fit, newdata = newdata, newz = newz)
+#' predict(TVOLS.z, newdata = newdata, newz = newz)
 #' 
 #' @export
 predict.tvsure<-function (object, newdata, newz, ...) 
@@ -283,12 +284,12 @@ predict.tvsure<-function (object, newdata, newz, ...)
 #' @examples
 #' data(OECD)
 #' z <- runif(length(levels(OECD$year)), 10, 15)
-#' tvpols <- tvPLM(lhe~lgdp+pop65+pop14+public, z = z,
+#' TVPOLS <- tvPLM(lhe~lgdp+pop65+pop14+public, z = z,
 #' index = c("country", "year"), data = OECD,  method ="pooling", bw =  2)
 #' newdata <- cbind(lgdp = c(10, 13), pop65 = c(9, 12), 
 #' pop14 = c(17, 30), public = c(13, 20))  
 #' newz <- runif(2, 10, 15)
-#' predict(tvpols, newdata = newdata, newz = newz)
+#' predict(TVPOLS, newdata = newdata, newz = newz)
 #' @export
 predict.tvplm<-function (object, newdata, newz, ...) 
 {
@@ -325,5 +326,6 @@ predict.tvplm<-function (object, newdata, newz, ...)
     prediction[t, ] <- crossprod(theta[t,], newdata[t,])
   prediction <- sweep(prediction, 2, object.up$alpha, "+")
   colnames(prediction) <- levels (object$index[, 1])
+  #Fitted and residuals must be calculated here for bootstrap
   return(prediction)
 }

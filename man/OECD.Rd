@@ -4,16 +4,18 @@
 \name{OECD}
 \alias{OECD}
 \title{Variables related to the problem of healthcare spending.}
-\format{A data frame with 680 rows and 7 columns. 
+\format{
+A data frame with 680 rows and 7 columns. 
 \describe{
-  \item{country}{Australian dollar}
+  \item{country}{}
   \item{year}{}
   \item{lhe}{Log of country's healthcare spending}
   \item{lgdp}{log of country's gdp}
   \item{pop65}{Country's ratio of population greater than 65 years old}
   \item{pop14}{Country's ratio of population younger than 15 years old}
   \item{public}{Country's ratio of healthcare funding coming from the government}
-}}
+}
+}
 \description{
 Variables related to the problem of healthcare spending.
 }

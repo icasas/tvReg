@@ -12,7 +12,7 @@
 #' @param cv.block A positive scalar with the size of the block in leave-one block-out cross-validation.
 #' By default 'cv.block=0' meaning leave-one-out cross-validation.
 #' @param est A character, either "lc" or "ll" for local constant or local linear.
-#' @param tkernel A character, either "Gaussian" or "Epa" kernel types.
+#' @param tkernel A character, either "Triweight, "Epa" or "Gaussian" kernel functions.
 #'
 #' @return A matrix of dimension obs x neq x neq.
 #' 
@@ -41,8 +41,10 @@
 #'
 #' @export tvCov
 #'
-tvCov <- function(x, bw = NULL, cv.block = 0, est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"))
+tvCov <- function(x, bw = NULL, cv.block = 0, est = c("lc", "ll"), tkernel = c("Triweight", "Epa", "Gaussian"))
 {
+  if(!inherits(x, c("matrix", "data.frame")))
+    stop("'x' should be a matrix or a data.frame.\n")
   x <- as.matrix(x)
   obs <- NROW(x)
   neq <- NCOL(x)
@@ -88,12 +90,12 @@ tvCov <- function(x, bw = NULL, cv.block = 0, est = c("lc", "ll"), tkernel = c("
 #' @param x A matrix.
 #' @param bw A scalar.
 #' @param est A character, either "lc" or "ll" for local constant or local linear.
-#' @param tkernel A character, either "Gaussian" or "Epa" kernel types.
+#' @param tkernel A character, either "Triweight" (default), "Epa" or "Gaussian" kernel function.
 #'
 #' @return A scalar with the mean squared error.
 #' @keywords internal
 #'
-.tvCov.cv <- function(bw, x, cv.block = 0, est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"))
+.tvCov.cv <- function(bw, x, cv.block = 0, est = c("lc", "ll"), tkernel = c("Triweight", "Epa", "Gaussian"))
 {
   x <- as.matrix(x)
   obs <- NROW(x)
@@ -169,8 +171,7 @@ tvCov <- function(x, bw = NULL, cv.block = 0, est = c("lc", "ll"), tkernel = c("
 #' By default 'cv.block=0' meaning leave one out cross-validation.
 #' @param est The nonparametric estimation method, one of "lc" (default) for linear constant
 #'  or "ll" for local linear.
-#' @param tkernel The type of kernel used in the coefficients estimation method,
-#' one of Epanesnikov ("Epa") or "Gaussian".
+#' @param tkernel A character, either "Triweight" (default), "Epa" or "Gaussian" kernel function.
 #' @param singular.ok	Logical. If FALSE, a singular model is an error.
 #'
 #' @return An object of class \code{tvlm}

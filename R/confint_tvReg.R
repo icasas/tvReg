@@ -44,7 +44,6 @@
 #' 
 #' ##If a second confidence interval on the "same" object is calculated, 
 #' ##for example with a different level, the calculation is faster
-#' 
 #' tvci.80 <- confint(tvci, level = 0.8)
 #' }
 #' @importFrom stats confint
@@ -147,6 +146,16 @@ confint.tvar <- confint.tvlm
 #' @method confint tvsure 
 #' @export 
 confint.tvsure <- confint.tvlm
+
+#' @rdname confint.tvReg
+#' @method confint tvvar 
+#' @export 
+confint.tvvar <- function(object, parm, level = 0.95, 
+                          runs = 100, tboot = c("wild", "wild2") , ...)
+{
+  stop("\nNo function confint for class 'tvvar'\n")
+}
+
 
 #' @rdname confint.tvReg
 #' @method confint tvirf
@@ -302,7 +311,7 @@ confint.tvplm <- function(object, parm, level = 0.95,
 .tvLM.ci <- function(x, yboot)
 {
   obs <- NROW(yboot)
-  nboot <- NCOL(yboot)
+  runs <- NCOL(yboot)
   bw <- x$bw
   z <- x$z
   ez <- x$ez
@@ -318,7 +327,7 @@ confint.tvplm <- function(object, parm, level = 0.95,
   eobs <- NROW(ez)
   theta <- matrix(0, eobs, nvar)
   x <- x$x
-  BOOT <- vector("list", nboot)
+  BOOT <- vector("list", runs)
   for (t in 1:eobs)
   { 
     tau0 <- grid - ez[t]
@@ -327,7 +336,7 @@ confint.tvplm <- function(object, parm, level = 0.95,
     xtemp <- x[k.index, ]
     if (est == "ll")
       xtemp <- cbind(xtemp, xtemp * tau0[k.index])
-    for (k in 1:nboot)
+    for (k in 1:runs)
     {
       result <- stats::lm.wfit(x = as.matrix(xtemp), y = yboot[k.index, k], w = kernel.bw[k.index])
       BOOT[[k]] <-rbind(BOOT[[k]], result$coefficients[1:nvar])
@@ -342,7 +351,7 @@ confint.tvplm <- function(object, parm, level = 0.95,
 .tvSURE.ci <- function(x, yboot)
 {
   obs <- NROW(yboot)
-  nboot <- length(yboot)
+  runs <- length(yboot)
   method <- x$method
   tkernel <- x$tkernel
   obs <- x$obs
@@ -365,7 +374,7 @@ confint.tvplm <- function(object, parm, level = 0.95,
   eobs <- NROW(ez)
   theta <- matrix(0, eobs, sum(nvar))
   x <- x$x
-  BOOT = resid <- vector("list", nboot)
+  BOOT = resid <- vector("list", runs)
   if (length(bw) == 1)
     bw <- rep(bw, neq)
   if(!is.null(R))
@@ -404,7 +413,7 @@ confint.tvplm <- function(object, parm, level = 0.95,
       Sinv <- qr.solve(s0)
       mat <- Sinv %*% t(R) %*% qr.solve(R %*% Sinv %*% t(R))
     }
-    for(k in 1:nboot)
+    for(k in 1:runs)
     {
       y.kernel <- NULL
       for(i in 1:neq)
@@ -439,8 +448,8 @@ confint.tvplm <- function(object, parm, level = 0.95,
   }
   if(method == "tvFGLS")
   {
-    BOOT = Cov <- vector("list", nboot)
-    for (k in 1:nboot)
+    BOOT = Cov <- vector("list", runs)
+    for (k in 1:runs)
     {
       Cov[[k]] <- tvCov(x = resid[[k]], bw = bw.cov, tkernel = tkernel)
     }
@@ -457,7 +466,7 @@ confint.tvplm <- function(object, parm, level = 0.95,
           xtemp <- cbind(xtemp, xtemp * tau0)
         x.kernel[[i]] <- xtemp
       }
-      for(k in 1:nboot)
+      for(k in 1:runs)
       {
         eSigma <- eigen(Cov[[k]][,,t], TRUE)
         if (any(eSigma$value <= 0))
@@ -508,7 +517,7 @@ confint.tvplm <- function(object, parm, level = 0.95,
 .tvPLM.ci<-function(x, yboot)
 {
   obs <- x$obs
-  nboot <- NCOL(yboot)
+  runs <- NCOL(yboot)
   bw <- x$bw
   z <- x$z
   ez <- x$ez
@@ -528,7 +537,7 @@ confint.tvplm <- function(object, parm, level = 0.95,
   if(x$est == "ll")
     xnew <- matrix(NA, neq*eobs, 2*nvar)
   ynew <- yboot[, 1]
-  BOOT <- vector("list", nboot)
+  BOOT <- vector("list", runs)
   D <- t(cbind(rep(-1, neq-1), diag(1, neq-1)))%x%rep(1, obs)
   for (t in 1:eobs)
   { 
@@ -565,13 +574,13 @@ confint.tvplm <- function(object, parm, level = 0.95,
         stop("Bandwidth is too small for values in 'ez'.\n")
       WH <- diag(neq)%x%diag(kernel.bw)
       x.tilde <- crossprod(xtemp, WH)
-      temp <- crossprod(D, WH)
-      MH <- diag(neq*obs) - D %*% solve(temp%*%D)%*%temp
-      SH <- crossprod(MH, WH)%*%MH
-      x.tilde <- crossprod(xtemp, SH)
+      temp <- Matrix::crossprod(D, WH)
+      MH <- diag(neq*obs) - D %*% qr.solve(temp%*%D)%*%temp
+      SH <- Matrix::crossprod(MH, WH)%*%MH
+      x.tilde <- Matrix::crossprod(xtemp, SH)
       s0 <- x.tilde %*% xtemp
     }
-    for (k in 1:nboot)
+    for (k in 1:runs)
     {
       if(method != "within")
       {

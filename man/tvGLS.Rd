@@ -19,7 +19,7 @@ tvGLS(x, ...)
   R = NULL,
   r = NULL,
   est = c("lc", "ll"),
-  tkernel = c("Epa", "Gaussian"),
+  tkernel = c("Triweight", "Epa", "Gaussian"),
   ...
 )
 
@@ -33,7 +33,7 @@ tvGLS(x, ...)
   R = NULL,
   r = NULL,
   est = c("lc", "ll"),
-  tkernel = c("Epa", "Gaussian"),
+  tkernel = c("Triweight", "Epa", "Gaussian"),
   ...
 )
 
@@ -62,8 +62,7 @@ values are included then the vector z is used.}
 \item{est}{The nonparametric estimation method, one of "lc" (default) for linear constant
 or "ll" for local linear.}
 
-\item{tkernel}{The type of kernel used in the coefficients estimation method,
-one of Epanesnikov ("Epa") or "Gaussian".}
+\item{tkernel}{A character, either "Triweight" (default), "Epa" or "Gaussian" kernel function.}
 }
 \value{
 \code{tvGLS} returns a list containing:
@@ -83,9 +82,9 @@ The classical GLS estimator must be modified to generate a set of coefficients c
 The \code{tvGLS} finds a GLS estimate at a given point in time \emph{t} using the data near by.
 The size of the data window used is given by the bandwidth. The closest a point is to \emph{t},
 the larger is its effect on the estimation which is given by the kernel. In this programme,
-the two possible kernels are the Epanechnikov and Gaussian. As in the classical GLS, the covariance
+the three possible kernels are the Triweight, Epanechnikov and Gaussian. As in the classical GLS, the covariance
 matrix is involved in the estimation formula. If this matrix is NULL or the identity, then the
-programme returns the OLS estimates for time-varying coefficients.
+program returns the OLS estimates for time-varying coefficients.
 
 Note, that unless with the tvSURE, the tvGLS may run with one common bandwidth for all
 equations or with a different bandwidths for each equation.
@@ -104,6 +103,6 @@ FF5F$EU.SMALL.LoBM)
 ##Excess returns
 y <- y - cbind(FF5F$NA.RF, FF5F$JP.RF, FF5F$AP.RF, FF5F$EU.RF)
 ##I fit the data with one bandwidth for each equation
-ff5f.fit <- tvGLS(x = x, y = y, bw = c(1.03, 0.44, 0.69, 0.31))
+FF5F.fit <- tvGLS(x = x, y = y, bw = c(1.03, 0.44, 0.69, 0.31))
 
 }

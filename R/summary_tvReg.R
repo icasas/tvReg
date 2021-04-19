@@ -75,7 +75,7 @@ summary.tvsure <- function (object,  digits = max(3, getOption("digits") - 3), .
   names <- names(object$x)
   for (i in 1:neq)
   {
-    text1 <- paste("\nSummary of tvSURE for equation \"", 
+    text1 <- paste("\nSummary of TVSURE for equation \"", 
                      names[i], "\"", sep ="")
     cat(text1, "\n")
     row <- paste(rep("=", nchar(text1)), collapse = "")
@@ -117,7 +117,7 @@ summary.tvvar <- function (object,  digits = max(3, getOption("digits") - 3), ..
   names <- colnames(object$y.orig)
   for (i in 1:neq)
   {
-    text1 <- paste("\nSummary of tvVAR for equation ", 
+    text1 <- paste("\nSummary of TVVAR for equation ", 
                    names[i], ":", sep = "")
     cat(text1, "\n")
     row <- paste(rep("=", nchar(text1)), collapse = "")
@@ -150,7 +150,7 @@ summary.tvirf <-function(object, digits = max(3, getOption("digits") - 3), ...)
       text1 <- paste (text1, "Cumulative ", sep ="")
     if (object$ortho)
       text1 <- text1 <- paste(text1, "Orthogonal ", sep ="")
-    text1 <- paste (text1, "tvIRF Estimation Results:", sep ="")
+    text1 <- paste (text1, "TVIRF Estimation Results:", sep ="")
     cat(paste("\n", text1, "\n", sep = ""))
     row <- paste(rep("=", nchar(text1)), collapse = "")
     cat(row, "\n")
@@ -159,7 +159,7 @@ summary.tvirf <-function(object, digits = max(3, getOption("digits") - 3), ...)
     {
       for (j in 1:length(object$response))
       {
-        text1 <- paste("\nSummary of tvIRF for impulse \"", 
+        text1 <- paste("\nSummary of TVIRF for impulse \"", 
                        impulse[i], "\" and response \"", 
                        response[j], "\"", sep ="")
         cat(text1, "\n")

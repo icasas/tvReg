@@ -9,7 +9,7 @@ tvCov(
   bw = NULL,
   cv.block = 0,
   est = c("lc", "ll"),
-  tkernel = c("Epa", "Gaussian")
+  tkernel = c("Triweight", "Epa", "Gaussian")
 )
 }
 \arguments{
@@ -22,7 +22,7 @@ By default 'cv.block=0' meaning leave-one-out cross-validation.}
 
 \item{est}{A character, either "lc" or "ll" for local constant or local linear.}
 
-\item{tkernel}{A character, either "Gaussian" or "Epa" kernel types.}
+\item{tkernel}{A character, either "Triweight, "Epa" or "Gaussian" kernel functions.}
 }
 \value{
 A matrix of dimension obs x neq x neq.

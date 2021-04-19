@@ -17,7 +17,7 @@ tvFE(x, ...)
   neq,
   obs,
   est = c("lc", "ll"),
-  tkernel = c("Epa", "Gaussian"),
+  tkernel = c("Triweight", "Epa", "Gaussian"),
   ...
 )
 
@@ -44,8 +44,7 @@ values are included then the vector z is used.}
 \item{est}{The nonparametric estimation method, one of "lc" (default) for linear constant
 or "ll" for local linear.}
 
-\item{tkernel}{The type of kernel used in the coefficients estimation method,
-one of Epanesnikov ("Epa") or "Gaussian".}
+\item{tkernel}{A character, either "Triweight" (default), "Epa" or "Gaussian" kernel function.}
 }
 \value{
 \code{tvFE} returns a list containing:

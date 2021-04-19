@@ -4,7 +4,8 @@
 \name{FF5F}
 \alias{FF5F}
 \title{Fama and French portfolio daily returns and factors for international markets.}
-\format{A data frame with 314 rows and 41 variables.
+\format{
+A data frame with 314 rows and 41 variables.
 \describe{
   \item{Date}{Date, months from July 1990 until August 2016}
   \item{NA.SMALL.LoBM}{Monthly returns of portfolio SMALL/LoBM in North American market}
@@ -51,7 +52,8 @@
   \item{EU.RMW}{RMW (Robust Minus Weak) for the European market}
   \item{EU.CMA}{CMA (Conservative Minus Aggressive) for the European market}
   \item{EU.RF}{European risk free rate}
-}}
+}
+}
 \source{
 \url{http://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html}
 }

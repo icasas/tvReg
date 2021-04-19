@@ -17,8 +17,9 @@ forecast <- function(object, ...) UseMethod("forecast", object)
 
 #' @rdname forecast-tvReg
 #' @method forecast tvlm
-#' @param newx A vector, dataframe or matrix with new values of all variables in x. No need to 
-#' input the intercept.
+#' @param newdata A data.frame, matrix or vector with new values of all independent variables. No need to 
+#' input the intercept. Note that this does not refer to the variables in 'exogen' which might be part of 'tvar' 
+#' and 'tvvar' objects. Those must be included in 'newexogen'.
 #' @param n.ahead A scalar with the forecast horizon, value 1 by default.
 #' @param winsize A scalar. If 0 then an 'increase window' forecasting is performed.
 #'  Otherwise a 'rolling window' forecasting is performed with window size given by 
@@ -26,30 +27,30 @@ forecast <- function(object, ...) UseMethod("forecast", object)
 #' @examples 
 #' data("RV")
 #' RV2 <- head(RV, 2001)
-#' tvHAR <- tvLM (RV ~ RV_lag + RV_week + RV_month, data = RV2, bw = 20)
-#' newx <- cbind(RV$RV_lag[2002:2004], RV$RV_week[2002:2004],
+#' TVHAR <- tvLM (RV ~ RV_lag + RV_week + RV_month, data = RV2, bw = 20)
+#' newdata <- cbind(RV$RV_lag[2002:2004], RV$RV_week[2002:2004],
 #'               RV$RV_month[2002:2004])
-#' forecast(tvHAR, newx, n.ahead = 3)
+#' forecast(TVHAR, newdata, n.ahead = 3)
 #' 
 #' @export
-forecast.tvlm<-function (object, newx, n.ahead = 1, winsize = 0, ...) 
+forecast.tvlm<-function (object, newdata, n.ahead = 1, winsize = 0, ...) 
 {
   if(!inherits(object, c("tvlm")))
     stop("\nParameter 'object' should be entered and it should have class 'tvlm' or 'tvar'.\n")
   if(!is.null(object$z))
     stop("\nYour model coefficients are functions of a random variable 'z', use function 
          'predict' with parameter 'newz'.\n")
-  if(!inherits(newx, c("data.frame", "matrix", "numeric", "vector")))
-    stop("\nParameter 'newx' should be entered and it should be a numeric vector if there is only
+  if(!inherits(newdata, c("data.frame", "matrix", "numeric", "vector")))
+    stop("\nParameter 'newdata' should be entered and it should be a numeric vector if there is only
          one row or a 'matrix' or a 'data.frame' for more than one row.\n")
   if(n.ahead == 1) 
-    newx <- matrix(newx, ncol = length(newx))
-  if(NROW(newx) != n.ahead)
-    stop("\nDimensions of 'newx' are not compatible with 'n.ahead'.\n")
-  n.col <- NCOL(newx)
+    newdata <- matrix(newdata, ncol = length(newdata))
+  if(NROW(newdata) != n.ahead)
+    stop("\nDimensions of 'newdata' are not compatible with 'n.ahead'.\n")
+  n.col <- NCOL(newdata)
   is.intercept <- ("(Intercept)" %in% colnames(object$x))
   if(is.intercept & n.col ==(NCOL(object$x) - 1))
-    newx <- cbind(rep(1, n.ahead), newx)
+    newdata <- cbind(rep(1, n.ahead), newdata)
   obs <- object$obs
   is.rw <- !(winsize == 0)
   winsize <- abs (winsize)
@@ -73,8 +74,8 @@ forecast.tvlm<-function (object, newx, n.ahead = 1, winsize = 0, ...)
       object$bw <- bw (object)
       theta<- tvOLS(object)$coefficients
     }
-    prediction[t] <- theta%*%newx[t,]
-    X <- rbind(X, newx[t,])
+    prediction[t] <- theta%*%newdata[t,]
+    X <- rbind(X, newdata[t,])
     Y <- c (Y, prediction[t])
   }
   return(prediction)
@@ -87,9 +88,9 @@ forecast.tvlm<-function (object, newx, n.ahead = 1, winsize = 0, ...)
 #' Only for predictions of *tvar* and *tvvar* objects.
 #' @examples 
 #' exogen = RV2[, c("RV_week", "RV_month")]
-#' tvHAR2 <- tvAR(RV2$RV_lag, p = 1, exogen = exogen, bw = 20)
-#' newexogen <- newx[, -1]
-#' forecast(tvHAR2, n.ahead = 3, newexogen = newexogen)
+#' TVHAR2 <- tvAR(RV2$RV_lag, p = 1, exogen = exogen, bw = 20)
+#' newexogen <- newdata[, -1]
+#' forecast(TVHAR2, n.ahead = 3, newexogen = newexogen)
 #' 
 #' @export
 forecast.tvar <- function(object, n.ahead = 1, newz = NULL, newexogen = NULL, winsize = 0, ...) 
@@ -98,13 +99,12 @@ forecast.tvar <- function(object, n.ahead = 1, newz = NULL, newexogen = NULL, wi
     stop("\nParameter 'object' should be entered and it should have class 'tvar'.\n")
   if(!inherits(newz, c( "numeric", "vector")) & !is.null(object$z))
     stop("\nArgument 'newz' should be entered and it should be a numeric vector.\n")
-  if (!identical(NCOL(newexogen), NCOL(object$exogen))) 
-    stop("\nWrong dimension in 'newexogen'.\n")
   is.exogen <- !is.null(newexogen)
   if(is.exogen)
   {
-    if(NCOL(newexogen) == 1)
-      newexogen <- matrix (newexogen, ncol = length(newexogen))
+    if (!identical(NCOL(newexogen), NCOL(object$exogen))) 
+      stop("\nWrong dimension in 'newexogen'.\n")
+    newexogen <- as.matrix(newexogen)
     if(NROW(newexogen) != n.ahead)
       stop("\nDimensions of 'newxexogen' and 'n.ahead' are not compatible.\n")
     newexogen <- as.matrix(newexogen)
@@ -156,8 +156,8 @@ forecast.tvar <- function(object, n.ahead = 1, newz = NULL, newexogen = NULL, wi
 #' @method forecast tvvar
 #' @examples 
 #' data(usmacro, package = "bvarsv")
-#' tvVAR <- tvVAR(usmacro, p = 6, type = "const", bw = c(1.8, 20, 20))
-#' forecast(tvVAR, n.ahead = 10)
+#' model.tvVAR <- tvVAR(usmacro, p = 6, type = "const", bw = c(1.8, 20, 20))
+#' forecast(model.tvVAR, n.ahead = 10)
 #' 
 #' @export
 forecast.tvvar<-function (object, n.ahead = 1, newz = NULL, newexogen = NULL, winsize = 0, ...) 
@@ -169,17 +169,18 @@ forecast.tvvar<-function (object, n.ahead = 1, newz = NULL, newexogen = NULL, wi
   if (!identical(NCOL(newexogen), NCOL(object$exogen))) 
     stop("\nWrong dimension in 'newexogen'.\n")
   is.intercept <- (object$type == "const")
-  if (!identical(NCOL(newexogen), NCOL(object$exogen))) 
-    stop("\nWrong dimension in 'newexogen'.\n")
   is.exogen <- FALSE
   if(!is.null(newexogen))
   {
     is.exogen <- TRUE
-    if(NCOL(newexogen) == 1)
-      newexogen <- matrix (newexogen, ncol = length(newexogen))
+    if (!identical(NCOL(newexogen), NCOL(object$exogen))) 
+      stop("\nWrong dimension in 'newexogen'.\n")
+    if(!inherits(newexogen, c("numeric", "vector", "matrix", "data.frame")))
+      stop("\nWrong class in 'newexogen'.\n")
+    if(is.null(dim(newexogen)))
+      newexogen <- matrix (newexogen, nrow = length(newexogen), ncol = 1)
     if(NROW(newexogen) != n.ahead)
       stop("\nDimensions of 'newxexogen' and 'n.ahead' are not compatible.\n")
-    newexogen <- as.matrix(newexogen)
   }
   neq <- object$neq
   obs <- object$obs
@@ -201,12 +202,11 @@ forecast.tvvar<-function (object, n.ahead = 1, newz = NULL, newexogen = NULL, wi
   nlags <- p*neq
   for (t in 1:n.ahead)
   {
-
     object$x <- X[i:(obs + t -1), ]
     object$y <- Y[i:(obs + t -1), ]
     object$z <- grid[i:(obs + t -1)]
     object$ez <- grid[obs + t]
-    theta <- try(tvOLS(object)$coefficients)
+    theta <- try(tvOLS(object)$coefficients, silent = TRUE)
     if (inherits(theta, "try-error"))
     {
       object$bw <- bw (object)
@@ -236,10 +236,9 @@ forecast.tvvar<-function (object, n.ahead = 1, newz = NULL, newexogen = NULL, wi
 #' eqSupply <- consump ~ price + farmPrice 
 #' system <- list(demand = eqDemand, supply = eqSupply)
 #' tvOLS.fit <- tvSURE(system, data = Kmenta, est = "ll", bw = c(1.5, 1.5))
-#' newdata <- data.frame(consump = c(95, 100, 102), price = c(90, 100, 103), 
-#' farmPrice = c(70, 95, 103), income = c(82, 94, 115))
+#' newdata <- data.frame(price = c(90, 100, 103), farmPrice = c(70, 95, 103), 
+#' income = c(82, 94, 115))
 #' forecast(tvOLS.fit, newdata = newdata, n.ahead = 3)
-#' 
 #' @export
 forecast.tvsure<-function (object, newdata, n.ahead = 1, winsize = 0, ...) 
 {
@@ -249,8 +248,9 @@ forecast.tvsure<-function (object, newdata, n.ahead = 1, winsize = 0, ...)
     stop("\nYour model coefficients are functions of a random variable 'z', use function 
          'predict' with parameter 'newz'.\n")
   if(!inherits(newdata, c("matrix", "data.frame")))
-    stop("\nParameter 'newdata' should be entered and it should be a 'matrix' or a 'data.frame'.\n")
-  newdata <- as.matrix(newdata)
+    stop("\nParameter 'newdata' should be a 'matrix' or a 'data.frame'.\n")
+  if(is.null(colnames(newdata)))
+    stop("\nParameter 'newdata' needs variable names.\n")
   if(NROW(newdata) != n.ahead)
     stop("\nDimensions of 'newdata' are not compatible with 'n.ahead'.\n")
   obs <- object$obs
@@ -263,8 +263,6 @@ forecast.tvsure<-function (object, newdata, n.ahead = 1, winsize = 0, ...)
     winsize <- obs - 1
   totobs <- obs + n.ahead
   grid <- (1:totobs)/totobs
-  X <- object$x
-  Y <- object$y
   object$z <- head(grid, obs)
   object$ez <- tail(grid, n.ahead)
   prediction <- matrix(NA, nrow = n.ahead, ncol = neq)
@@ -298,7 +296,7 @@ forecast.tvsure<-function (object, newdata, n.ahead = 1, winsize = 0, ...)
       if(is.intercept)
         newx <- c(1L, newx) 
       columns <- (1 + ifelse(eq == 1, 0, sum(nvar[1:(eq-1)]))):sum(nvar[1:eq])
-      prediction[t, eq] <- theta[, columns]%*%newx
+      prediction[t, eq] <- crossprod(theta[, columns], newx)
       X[[eq]] <- rbind(X[[eq]], newx)
     }
     Y <- rbind(Y, prediction[t, ])
@@ -313,8 +311,7 @@ forecast.tvsure<-function (object, newdata, n.ahead = 1, winsize = 0, ...)
 #' data(OECD)
 #' tvpols <- tvPLM(lhe~lgdp+pop65+pop14+public, index = c("country", "year"), 
 #' data = OECD, method = "pooling", bw =  8.9)
-#' newdata <- cbind(lgdp = c(10, 13), pop65 = c(9, 12), 
-#' pop14 = c(17, 30), public = c(13, 20))  
+#' newdata <- OECD[c(7, 9), 4:7]
 #' forecast(tvpols, newdata = newdata, n.ahead = 2)
 #' @export
 forecast.tvplm<-function (object, newdata, n.ahead = 1, winsize = 0, ...) 
@@ -329,10 +326,10 @@ forecast.tvplm<-function (object, newdata, n.ahead = 1, winsize = 0, ...)
          'matrix' or 'data.frame'.\n")
   obs <- object$obs
   neq <- object$neq
-  if(n.ahead == 1) 
-    newdata <- matrix(newdata, ncol = neq)
   if(NROW(newdata) != n.ahead)
     stop("\nDimensions of 'newdata' are not compatible with 'n.ahead'.\n")
+  if(NCOL(newdata) != object$nvar)
+    stop("\nDimensions of 'newdata' are not compatible with number of variables in the model.\n")
   is.rw <- 1
   if(winsize != 0)
   {
@@ -350,15 +347,10 @@ forecast.tvplm<-function (object, newdata, n.ahead = 1, winsize = 0, ...)
   prediction <- numeric(n.ahead)
   totobs <- obs + n.ahead
   grid <- (1:totobs)/totobs
-  X.temp <- object$x
-  Y.temp <- object$y
   i <- obs - winsize + 1
-  X = Y <- NULL
-  for (k in 1:neq)
-  {
-    X <- rbind(X, object$x[(k-1)*obs + i:obs,])
-    Y <- c(Y, object$y[(k-1)*obs + i:obs])
-  }
+  ind <- c(t(outer((0:(neq-1))*obs, i:obs, FUN = "+")))
+  X <- object$x[ind,]
+  Y <- object$y[ind]
   if(is.rw == 2)
     i <- obs - winsize 
   for (t in 1:n.ahead)
@@ -387,14 +379,15 @@ forecast.tvplm<-function (object, newdata, n.ahead = 1, winsize = 0, ...)
         theta <- update(object)$coefficients
       }
     }
-    prediction[t] <- theta%*%newdata[t,]
+    regressor <- as.numeric(newdata[t,])
+    prediction[t] <- theta%*%regressor
     X = Y <- NULL
     for (k in 1:neq)
     {
-      X <- rbind(X, object$x[(k-1)*object$obs + is.rw:object$obs,], newdata[t,])
-      Y <- c(Y, object$y[(k-1)*object$obs + is.rw:object$obs], prediction[t])
+      ind <- (k-1)*object$obs + is.rw:object$obs
+      X <- rbind(X, object$x[ind,], regressor)
+      Y <- c(Y, object$y[ind], prediction[t])
     }
-  
   }
   return(prediction)
 }

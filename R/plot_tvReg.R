@@ -223,6 +223,8 @@ plot.tvplm <- plot.tvlm
        (vars) > 1)
       graphics::par(ask = TRUE)
   }
+  graphics::par(ask=FALSE)
+  graphics::par(mfrow=c(1, 1))
 }
 
 #' @rdname plot.tvReg
@@ -259,6 +261,8 @@ plot.tvvar <- function(x, ...)
     if(neq > 1)
       graphics::par(ask = TRUE)
   }
+  graphics::par(ask=FALSE)
+  graphics::par(mfrow=c(1, 1))
 }
 
 #' @rdname plot.tvReg
@@ -308,7 +312,7 @@ plot.tvirf <- function (x, obs.index = NULL, impulse = NULL, response = NULL,
   for (i in 1:length(impulse))
   {
     iname <- inames[i]
-    main <- paste("Impulse variable: ", iname, sep="")
+    main <- paste0("Impulse variable: ", iname)
     if (x$cumulative)
       main <- paste(main, "(cumulative)", sep = " ")
     sub <- "horizon"
@@ -388,4 +392,6 @@ plot.tvirf <- function (x, obs.index = NULL, impulse = NULL, response = NULL,
       }
     }
   }
+  graphics::par(ask=FALSE)
+  graphics::par(mfrow=c(1, 1))
 }

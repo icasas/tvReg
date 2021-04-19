@@ -4,9 +4,12 @@
 \name{CEES}
 \alias{CEES}
 \title{Standarised rates from a currency portfolio.}
-\format{A data frame with 2856 rows and 7 variables. Below the standarised rates of daily US dollar
+\format{
+A data frame with 2855 rows and 8 variables. Below the standarised rates of daily US dollar
 exchange rates of
 \describe{
+ \item{Date}{Daily data from Jan 6, 1999 until May 7, 2010 - without
+  weekends and days off}
   \item{AUS}{Australian dollar}
   \item{CHF}{Swiss franc}
   \item{EUR}{Euro}
@@ -14,7 +17,8 @@ exchange rates of
   \item{RAND}{South African rand}
   \item{REALB}{Brazilian real}
   \item{YEN}{Japanese yen}
-}}
+}
+}
 \description{
 Aslanidis and Casas (2013) consider a portfolio of daily US dollar exchange rates of the Australian
 dollar (AUS), Swiss franc (CHF), euro (EUR), British pound (GBP), South African rand (RAND),

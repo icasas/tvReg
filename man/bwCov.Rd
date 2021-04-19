@@ -6,7 +6,12 @@
 \emph{bwCov} calculates a single bandwidth to estimate the time-varying variance-
 covariance matrix.}
 \usage{
-bwCov(x, cv.block = 0, est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"))
+bwCov(
+  x,
+  cv.block = 0,
+  est = c("lc", "ll"),
+  tkernel = c("Triweight", "Epa", "Gaussian")
+)
 }
 \arguments{
 \item{x}{A matrix or a data frame.}
@@ -17,8 +22,7 @@ By default 'cv.block=0' meaning leave-one-out cross-validation.}
 \item{est}{The nonparametric estimation method, one of "lc" (default) for linear constant
 or "ll" for local linear.}
 
-\item{tkernel}{The type of kernel used in the coefficients estimation method,
-one of Epanesnikov ("Epa") or "Gaussian".}
+\item{tkernel}{A character, either "Triweight" (default), "Epa" or "Gaussian" kernel function.}
 }
 \value{
 A scalar.
@@ -31,8 +35,8 @@ covariance matrix.
 \examples{
 
 data(CEES)
-## Using a shorter set for a quick example
-mydata <- tail (CEES, 50)
+## Using a shorter set for a quick example. Variable "Date" is removed.
+mydata <- tail (CEES[, -1], 50)
 bw.cov <- bwCov(mydata)
 Sigma.hat <- tvCov(mydata, bw = bw.cov)
 

@@ -25,9 +25,9 @@ tvGLS<- function(x, ...) UseMethod("tvGLS", x)
 #' The \code{tvGLS} finds a GLS estimate at a given point in time \emph{t} using the data near by.
 #' The size of the data window used is given by the bandwidth. The closest a point is to \emph{t},
 #' the larger is its effect on the estimation which is given by the kernel. In this programme,
-#' the two possible kernels are the Epanechnikov and Gaussian. As in the classical GLS, the covariance
+#' the three possible kernels are the Triweight, Epanechnikov and Gaussian. As in the classical GLS, the covariance
 #' matrix is involved in the estimation formula. If this matrix is NULL or the identity, then the
-#' programme returns the OLS estimates for time-varying coefficients.
+#' program returns the OLS estimates for time-varying coefficients.
 #'
 #' Note, that unless with the tvSURE, the tvGLS may run with one common bandwidth for all
 #' equations or with a different bandwidths for each equation.
@@ -56,13 +56,13 @@ tvGLS<- function(x, ...) UseMethod("tvGLS", x)
 #' ##Excess returns
 #' y <- y - cbind(FF5F$NA.RF, FF5F$JP.RF, FF5F$AP.RF, FF5F$EU.RF)
 #' ##I fit the data with one bandwidth for each equation
-#' ff5f.fit <- tvGLS(x = x, y = y, bw = c(1.03, 0.44, 0.69, 0.31))
+#' FF5F.fit <- tvGLS(x = x, y = y, bw = c(1.03, 0.44, 0.69, 0.31))
 #'
 #' @method tvGLS list
 #' @export
 
 tvGLS.list <- function(x, y, z = NULL, ez = NULL, bw, Sigma = NULL, R = NULL, r = NULL,
-                       est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"), ...)
+                       est = c("lc", "ll"), tkernel = c("Triweight", "Epa", "Gaussian"), ...)
 {
   if(!inherits(x, "list"))
     stop("\n'x' should be a list of matrices. \n")
@@ -112,8 +112,7 @@ tvGLS.list <- function(x, y, z = NULL, ez = NULL, bw, Sigma = NULL, R = NULL, r 
       stop("\nWrong dimension of 'r', it should be as long as the number of 
            rows in 'R'. \n")
   }
-  fitted <- matrix(0, eobs, neq)
-  resid <- matrix(0, eobs, neq)
+  fitted=resid<- matrix(0, obs, neq)
   theta <- matrix(0, eobs, sum(nvar))
   for (t in 1:eobs)
   {
@@ -163,6 +162,8 @@ tvGLS.list <- function(x, y, z = NULL, ez = NULL, bw, Sigma = NULL, R = NULL, r 
   }
   if(!is.predict)
     resid <- as.matrix(y - fitted)
+  else
+    fitted = resid <- NULL
   return(list( coefficients = theta, fitted = fitted, residuals = resid))
 }
 
@@ -170,7 +171,7 @@ tvGLS.list <- function(x, y, z = NULL, ez = NULL, bw, Sigma = NULL, R = NULL, r 
 #' @method tvGLS matrix
 #' @export
 tvGLS.matrix <- function(x, y, z = NULL, ez = NULL, bw, Sigma = NULL, R = NULL, r = NULL,
-                       est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"), ...)
+                       est = c("lc", "ll"), tkernel = c("Triweight", "Epa", "Gaussian"), ...)
 {
   if(!inherits (x, "matrix"))
     stop("\n'x' should be a 'matrix'. \n")
@@ -220,8 +221,7 @@ tvGLS.matrix <- function(x, y, z = NULL, ez = NULL, bw, Sigma = NULL, R = NULL, 
       stop("\nWrong dimension of 'r', it should be as long as the number of 
            rows in 'R'. \n")
   }
-  fitted <- matrix(0, eobs, neq)
-  resid <- matrix(0, eobs, neq)
+  fitted=resid <- matrix(0, eobs, neq)
   theta <- matrix(0, eobs, sum(nvar))
   for (t in 1:eobs)
   {
@@ -271,6 +271,8 @@ tvGLS.matrix <- function(x, y, z = NULL, ez = NULL, bw, Sigma = NULL, R = NULL, 
   }
   if(!is.predict)
     resid <- as.matrix(y - fitted)
+  else
+    resid = fitted <- NULL
   return(list( coefficients = theta, fitted = fitted, residuals = resid))
 }
 

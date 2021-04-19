@@ -28,8 +28,7 @@
 #' By default 'cv.block=0' meaning leave one out cross-validation.
 #' @param est The nonparametric estimation method, one of "lc" (default) for linear constant
 #'  or "ll" for local linear.
-#' @param tkernel The type of kernel used in the coefficients estimation method,
-#' one of Epanesnikov ("Epa") or "Gaussian".
+#' @param tkernel A character, either "Triweight" (default), "Epa" or "Gaussian" kernel function.
 #' @param singular.ok	Logical. If FALSE, a singular model is an error.
 #'
 #' @return An object of class \code{tvlm}
@@ -74,9 +73,9 @@
 #' HARQ <- with(RV2, lm(RV ~ RV_lag + I(RV_lag * RQ_lag_sqrt) + RV_week + RV_month))
 #' 
 #' #Casas et al. (2018) TVHARQ model
-#' tvHARQ <- with(RV2, tvLM (RV ~ RV_lag + RV_week + RV_month, z = RQ_lag_sqrt, 
+#' TVHARQ <- with(RV2, tvLM (RV ~ RV_lag + RV_week + RV_month, z = RQ_lag_sqrt, 
 #'                          bw = 0.0061))
-#' boxplot(data.frame(tvHARQ = tvHARQ$coefficients[,2] * RV2$RV_lag,
+#' boxplot(data.frame(TVHARQ = TVHARQ$coefficients[,2] * RV2$RV_lag,
 #'                    HARQ = (HARQ$coef[2] + HARQ$coef[3] * RV2$RQ_lag_sqrt)*RV2$RV_lag),
 #'                    main = expression (RV[t-1]), outline = FALSE)
 #'                  
@@ -93,7 +92,7 @@
 #' @export
 
 tvLM<-function (formula, z = NULL, ez = NULL, data, bw = NULL, cv.block = 0, est = c("lc", "ll"), 
-                tkernel = c("Epa", "Gaussian"), singular.ok = TRUE)
+                tkernel = c("Triweight", "Epa", "Gaussian"), singular.ok = TRUE)
 {
   tkernel <- match.arg(tkernel)
   est <- match.arg(est)
@@ -121,9 +120,10 @@ tvLM<-function (formula, z = NULL, ez = NULL, data, bw = NULL, cv.block = 0, est
                       singular.ok = singular.ok)
   }
   nvar <- ncol(x)
-  xnames<-colnames(x)
+  xnames <- colnames(x)
+  yname <- attr(mt, "variables")[[2]]
   if(is.null(xnames))
-    xnames <- paste("X", 1:nvar, collate="&", sep="")
+    xnames <- paste0("X", 1:nvar, collate="&")
   coefficients <-results$coefficients
   colnames(coefficients) <- xnames
   result <- list(coefficients = coefficients, Lower = NULL, Upper = NULL, fitted = results$fitted,

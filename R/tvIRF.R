@@ -51,13 +51,13 @@
 #' ##Inflation rate, unemployment rate and treasury bill 
 #' ##interest rate for the US as in Primiceri (2005). 
 #' data(usmacro, package = "bvarsv")
-#' model.tvVAR <- tvVAR(usmacro, p = 4, type = "const")
+#' TVVAR <- tvVAR(usmacro, p = 4, type = "const")
 #' 
 #' ##Estimate a the tvIRF with time-varying covariance function
-#' model.tvIRF <- tvIRF(model.tvVAR)
+#' TVIRF <- tvIRF(TVVAR)
 #' 
 #' ##Cumulative impulse response function
-#' model.tvIRF2 <- tvIRF(model.tvVAR, cumulative = TRUE)
+#' TVIRF2 <- tvIRF(TVVAR, cumulative = TRUE)
 #' }
 #' 
 #' @rdname tvIRF

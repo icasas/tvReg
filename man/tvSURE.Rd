@@ -16,7 +16,7 @@ tvSURE(
   method = c("tvOLS", "tvFGLS", "tvGLS"),
   Sigma = NULL,
   est = c("lc", "ll"),
-  tkernel = c("Epa", "Gaussian"),
+  tkernel = c("Triweight", "Epa", "Gaussian"),
   bw.cov = NULL,
   singular.ok = TRUE,
   R = NULL,
@@ -54,7 +54,7 @@ the covariance matrix of the error term. Only necessary for method \code{tvGLS}.
 
 \item{est}{The nonparametric estimation method, one of "lc" (default) for linear constant or "ll" for local linear.}
 
-\item{tkernel}{The type of kernel used in the coefficients estimation method, one of Epanesnikov ("Epa") or "Gaussian".}
+\item{tkernel}{A character, either "Triweight" (default), "Epa" or "Gaussian" kernel function.}
 
 \item{bw.cov}{An optional scalar. It represents the bandwidth in the "lc" nonparametric estimation of the
 time-varying covariance matrix. If NULL, it is selected by cross validation.}
@@ -144,15 +144,15 @@ eqSupply2 <- consump ~  price + farmPrice
 system2 <- list(demand = eqDemand, supply = eqSupply2)
 
 ##OLS estimation of a system
-ols.fit <- systemfit::systemfit(system, method = "OLS", data = Kmenta)
+OLS <- systemfit::systemfit(system, method = "OLS", data = Kmenta)
 ##tvOLS estimation of a system with the local linear estimator
 ##removing trend because it is included in the intercept changing over time
-tvols.fit <- tvSURE(system2, data = Kmenta,  est = "ll")
+TVOLS <- tvSURE(system2, data = Kmenta,  est = "ll")
 
-##SUR estimation
-fgls1.fit <- systemfit::systemfit(system, data = Kmenta, method = "SUR")
+##SUR/FGLS estimation
+FGLS <- systemfit::systemfit(system, data = Kmenta, method = "SUR")
 ##tvSURE estimation
-tvfgls1.fit <- tvSURE(system, data = Kmenta, method = "tvFGLS")
+TVFGLS <- tvSURE(system, data = Kmenta, method = "tvFGLS")
 }
 
 }

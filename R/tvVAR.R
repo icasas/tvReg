@@ -52,7 +52,8 @@
 #' @export
 
 tvVAR <- function (y, p = 1, z = NULL, ez = NULL, bw = NULL, cv.block = 0, type = c("const", "none"), 
-                   exogen = NULL, est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"), singular.ok = TRUE)
+                   exogen = NULL, est = c("lc", "ll"), tkernel = c("Triweight", "Epa", "Gaussian"), 
+                   singular.ok = TRUE)
 {
   y <- as.matrix(y)
   if (any(is.na(y)))
@@ -71,7 +72,7 @@ tvVAR <- function (y, p = 1, z = NULL, ez = NULL, bw = NULL, cv.block = 0, type 
   type <- match.arg(type)
   if (is.null(colnames(y)))
   {
-    colnames(y) <- paste("y", 1:NCOL(y), sep = "")
+    colnames(y) <- paste0("y", 1:NCOL(y))
     warning(paste("No column names supplied in y, using:",
                   paste(colnames(y), collapse = ", "), ", instead.\n"))
   }
@@ -83,33 +84,27 @@ tvVAR <- function (y, p = 1, z = NULL, ez = NULL, bw = NULL, cv.block = 0, type 
   neq <- dim(y)[2]
   sample <- obs - p
   rhs <- stats::embed(y, dimension = p + 1)[, -(1:neq)]
-  temp1 <- NULL
-  for (i in 1:p)
-  {
-    temp <- paste(colnames(y), ".l", i, sep = "")
-    temp1 <- c(temp1, temp)
-  }
-  colnames(rhs) <- temp1
+  colnames(rhs) <- paste0(colnames(y), paste0(".l", rep(1:p, each=length(var.names))))
   yend <- y[-c(1:p), ]
-  
   if (type == "const")
   {
-    rhs <- cbind( rhs, rep(1, sample))
-    colnames(rhs) <- c(temp1, "(Intercept)")
+    tmp <- colnames(rhs)
+    rhs <- cbind(rhs, rep(1, sample))
+    colnames(rhs) <- c(tmp, "(Intercept)")
   }
   if (!(is.null(exogen)))
   {
     exogen <- as.matrix(exogen)
-    if (!identical(NROW(exogen), NROW(y))) {
+    if(is.null(dim(exogen)))
+      exogen <-matrix(exogen, nrow = length(exogen))
+    if (!identical(NROW(exogen), NROW(y)))
       stop("\nDifferent row size of 'y' and exogen.\n")
-    }
-    if (is.null(colnames(exogen))) {
-      colnames(exogen) <- paste("exo", 1:NCOL(exogen),
-                                sep = "")
-    }
+    if (is.null(colnames(exogen)))
+      colnames(exogen) <- paste("exo", 1:NCOL(exogen))
     colnames(exogen) <- make.names(colnames(exogen))
     tmp <- colnames(rhs)
-    rhs <- cbind(rhs, exogen[-c(1:p), ])
+    exogen <- exogen[-c(1:p),]
+    rhs <- cbind(rhs, exogen)
     colnames(rhs) <- c(tmp, colnames(exogen))
   }
   equation <- list()
@@ -137,7 +132,7 @@ tvVAR <- function (y, p = 1, z = NULL, ez = NULL, bw = NULL, cv.block = 0, type 
   if(length(bw) == 1)
     names(bw) <- "bw.mean"
   else
-    names(bw) <- paste("bw.", names(equation), sep = "")
+    names(bw) <- paste0("bw.", names(equation))
   result <- list(coefficients = equation, Lower = NULL, Upper = NULL,  fitted = fitted,
                  residuals = resid, y = yend, x = rhs, z = z, y.orig = y.orig,
                  bw = bw, cv.block = cv.block, exogen = exogen, p = p, type = type, obs = sample, 

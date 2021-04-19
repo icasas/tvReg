@@ -16,7 +16,7 @@ tvVAR(
   type = c("const", "none"),
   exogen = NULL,
   est = c("lc", "ll"),
-  tkernel = c("Epa", "Gaussian"),
+  tkernel = c("Triweight", "Epa", "Gaussian"),
   singular.ok = TRUE
 )
 }
@@ -43,7 +43,7 @@ By default 'cv.block = 0' meaning leave one out cross-validation.}
 
 \item{est}{The nonparametric estimation method, one of "lc" (default) for linear constant or "ll" for local linear.}
 
-\item{tkernel}{The type of kernel used in the coefficients estimation method, one of Epanesnikov ("Epa") or "Gaussian".}
+\item{tkernel}{A character, either "Triweight" (default), "Epa" or "Gaussian" kernel function.}
 
 \item{singular.ok}{Logical. If FALSE, a singular model is an error.}
 }

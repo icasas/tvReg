@@ -17,7 +17,7 @@ tvAR(
   exogen = NULL,
   fixed = NULL,
   est = c("lc", "ll"),
-  tkernel = c("Epa", "Gaussian"),
+  tkernel = c("Triweight", "Epa", "Gaussian"),
   singular.ok = TRUE
 )
 }
@@ -42,14 +42,14 @@ By default 'cv.block=0' meaning leave one out cross-validation.}
 
 \item{exogen}{A matrix or data.frame with the exogenous variables (optional)}
 
-\item{fixed}{(optional) numeric vector of the same length as the total number of parameters.
-If supplied, only NA entries in fixed will be varied.}
+\item{fixed}{(optional) numeric vector of the same length as the total number of parameters. 
+The order of the parameters is intercept (if type = "const"), lags in ascending order and 
+exogenous variables. If supplied, only NA entries in fixed will be estimated.}
 
 \item{est}{The nonparametric estimation method, one of "lc" (default) for linear constant
 or "ll" for local linear.}
 
-\item{tkernel}{The type of kernel used in the coefficients estimation method,
-one of Epanesnikov ("Epa") or "Gaussian".}
+\item{tkernel}{A character, either "Triweight" (default), "Epa" or "Gaussian" kernel function.}
 
 \item{singular.ok}{Logical. If FALSE, a singular model is an error.}
 }
@@ -102,9 +102,9 @@ TVCHAR <- tvAR (RV, p = 1, exogen = cbind (RV_week, RV_month), bw = 20)
 print(TVCHAR)
 
 ##Casas et al (2018) TVHARQ model
-tvHARQ <- tvAR (RV, p = 1, exogen = cbind (RV_week, RV_month), 
+TVHARQ <- tvAR (RV, p = 1, exogen = cbind (RV_week, RV_month), 
 z=RQ, bw = 0.0062)
-print(tvHARQ)
+print(TVHARQ)
 
 }
 \references{

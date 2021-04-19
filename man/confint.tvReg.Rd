@@ -4,6 +4,7 @@
 \alias{confint.tvlm}
 \alias{confint.tvar}
 \alias{confint.tvsure}
+\alias{confint.tvvar}
 \alias{confint.tvirf}
 \alias{confint.tvplm}
 \title{Confidence Intervals for Objects in tvReg}
@@ -27,6 +28,15 @@
 )
 
 \method{confint}{tvsure}(
+  object,
+  parm,
+  level = 0.95,
+  runs = 100,
+  tboot = c("wild", "wild2"),
+  ...
+)
+
+\method{confint}{tvvar}(
   object,
   parm,
   level = 0.95,
@@ -96,7 +106,6 @@ tvci <- confint(model.tvlm, level = 0.95, runs = 20)
 
 ##If a second confidence interval on the "same" object is calculated, 
 ##for example with a different level, the calculation is faster
-
 tvci.80 <- confint(tvci, level = 0.8)
 }
 }

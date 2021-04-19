@@ -1,20 +1,20 @@
 Package: tvReg
 Type: Package
-Title: Time-Varying Coefficient Linear Regression for Single and
-        Multi-Equations
-Version: 0.5.2
-Date: 2020-04-21
+Title: Time-Varying Coefficient for Single and
+        Multi-Equation Regressions
+Version: 0.5.5
+Date: 2021-03-21
 Authors@R: c(person("Isabel", "Casas", email = "casasis@gmail.com", role = c("aut", "cre")),
         person("Ruben", "Fernandez-Casal", email = "rubenfcasal@gmail.com", role = "aut"))
-Description: Fitting time-varying coefficient models both for single and multi-equation regressions, using kernel smoothing techniques.
+Description: Fitting time-varying coefficient models for single and multi-equation regressions, using kernel smoothing techniques.
 License: GPL (>= 3)
 LazyData: yes
-Depends: R (>= 3.6), Matrix, graphics, stats (>= 2.14.0), methods, plm
-Imports: systemfit (>= 1.1-20), MASS, vars, bvarsv
+Depends: R (>= 3.6), Matrix, graphics, stats (>= 2.14.0), methods
+Imports: systemfit (>= 1.1-20), MASS, vars, bvarsv, plm
 Suggests: knitr, rmarkdown
-URL: http://github.com/icasas/tvReg
-BugReports: http://github.com/icasas/tvReg/issues
+URL: https://github.com/icasas/tvReg
+BugReports: https://github.com/icasas/tvReg/issues
 Encoding: UTF-8
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.1
 VignetteBuilder: knitr
 NeedsCompilation: no

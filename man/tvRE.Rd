@@ -18,7 +18,7 @@ tvRE(x, ...)
   neq,
   obs,
   est = c("lc", "ll"),
-  tkernel = c("Epa", "Gaussian"),
+  tkernel = c("Triweight", "Epa", "Gaussian"),
   ...
 )
 
@@ -40,15 +40,14 @@ values are included then the vector z is used.}
 
 \item{Sigma}{NULL (default) or a matrix of size obs x obs..}
 
-\item{neq}{A sclar with the number of equations}
+\item{neq}{A scalar with the number of equations}
 
 \item{obs}{A scalar with the number of time observations}
 
 \item{est}{The nonparametric estimation method, one of "lc" (default) for linear constant
 or "ll" for local linear.}
 
-\item{tkernel}{The type of kernel used in the coefficients estimation method,
-one of Epanesnikov ("Epa") or "Gaussian".}
+\item{tkernel}{A character, either "Triweight" (default), "Epa" or "Gaussian" kernel function.}
 }
 \value{
 \code{tvRE} returns a list containing:

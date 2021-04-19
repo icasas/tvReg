@@ -531,8 +531,8 @@ The *forecast* method main arguments are *object* and *n.ahead*. The latter is a
 ###Type of forecast
 It is possible to run either an increase window forecast (default), when argument *winsize = 0* or a rolling window forecast with a window size as long as it is defined in argument *winsize*.
 
-###newx, newdata
-These are arguments in the *forecast* method for class attributes *tvlm* and *tvsure*, respectively. They should contain new values of the regressors and have class attributes *vector*, *data.frame* or *matrix*. It is not necessary to enter the intercept.
+###newdata
+These are arguments in the *forecast* method containing the new values of the regressors and have class attributes *vector*, *data.frame* or *matrix*. It is not necessary to enter the intercept.
 
 ###newexogen
 This argument appears in the *forecast* method for the class attributes *tvar* and *tvvar* and it must be entered when the initial model contains *exogen* variables. It is a *vector*, *data.frame* or *matrix*.
@@ -543,9 +543,9 @@ The *predict* method is implemented for the same four class attribues than the *
 ```{r Predict, eval = TRUE}
 tvHARQ <- with(RV2, tvLM (RV ~ RV_lag + RV_week + RV_month, z = RQ_lag_sqrt, 
                 bw = 0.003))
-newx <- cbind(RV$RV_lag[2002:2004], RV$RV_week[2002:2004], RV$RV_month[2002:2004])
+newdata <- cbind(RV$RV_lag[2002:2004], RV$RV_week[2002:2004], RV$RV_month[2002:2004])
 newz <- RV$RQ_lag_sqrt[2002:2004]
-predict(tvHARQ, newx, newz)
+predict(tvHARQ, newdata, newz)
 ```
  
 The *predict* method for the rest of the class attributes in the package follow similar patterns and further examples can be found in the documentation of the package.

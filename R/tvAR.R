@@ -18,8 +18,9 @@
 #' the bandwidth in the estimation of coefficients. If NULL, it is selected
 #' by cross validation.
 #' @inheritParams tvLM
-#' @param fixed (optional) numeric vector of the same length as the total number of parameters.
-#' If supplied, only NA entries in fixed will be varied.
+#' @param fixed (optional) numeric vector of the same length as the total number of parameters. 
+#' The order of the parameters is intercept (if type = "const"), lags in ascending order and 
+#' exogenous variables. If supplied, only NA entries in fixed will be estimated.
 #' 
 #' @return An object of class \code{tvar} with the following components:
 #' \item{coefficients}{A vector of dimension obs (obs = number of observations - number lags),
@@ -64,9 +65,9 @@
 #' print(TVCHAR)
 #' 
 #' ##Casas et al (2018) TVHARQ model
-#' tvHARQ <- tvAR (RV, p = 1, exogen = cbind (RV_week, RV_month), 
+#' TVHARQ <- tvAR (RV, p = 1, exogen = cbind (RV_week, RV_month), 
 #' z=RQ, bw = 0.0062)
-#' print(tvHARQ)
+#' print(TVHARQ)
 #' 
 #' @aliases tvar-class tvar
 #' @references
@@ -86,20 +87,23 @@
 #' @inheritParams tvVAR
 #' @export
 tvAR <- function (y, p = 1, z = NULL, ez = NULL, bw = NULL, cv.block = 0, type = c("const", "none"), exogen = NULL,
-                  fixed = NULL, est = c("lc", "ll"), tkernel = c("Epa", "Gaussian"), singular.ok = TRUE)
+                  fixed = NULL, est = c("lc", "ll"), tkernel = c("Triweight", "Epa", "Gaussian"), singular.ok = TRUE)
 {
+  if(!is.null(dim(y)))
+    stop("\nWrong dimension of 'y', it should be a vector.")
   if (any(is.na(y)))
-    stop("\nNAs in y.\n")
-  if (p < 1)
-    stop("p should be a positive number. \n")
+    stop("\nNAs in 'y'.\n")
+  if (p < 1 | p >= length(y))
+    stop("\nWrong value in 'p'. \n")
   tkernel <- match.arg(tkernel)
   est <- match.arg(est)
   type <- match.arg(type)
   y.orig <- y
+  y <- as.vector(y)
   obs <- length(y)
   sample <- obs - p
   ylags <- as.matrix(stats::embed(y, dimension = p + 1))
-  colnames(ylags) <- c("y", paste("y.l", 1:p, sep=""))
+  colnames(ylags) <- c("y", paste0("y.l", 1:p))
   yend <- ylags[, 1]
   ylags <- ylags[, -1, drop = FALSE]
   rhs <- ylags
@@ -118,7 +122,8 @@ tvAR <- function (y, p = 1, z = NULL, ez = NULL, bw = NULL, cv.block = 0, type =
                                 sep = "")
     colnames(exogen) <- make.names(colnames(exogen))
     tmp <- colnames(rhs)
-    rhs <- cbind(rhs, exogen[-c(1:p), ])
+    exogen <- exogen[-c(1:p),]
+    rhs <- cbind(rhs, exogen)
     colnames(rhs) <- c(tmp, colnames(exogen))
   }
   if (!is.null(z))
@@ -147,8 +152,8 @@ tvAR <- function (y, p = 1, z = NULL, ez = NULL, bw = NULL, cv.block = 0, type =
   result <- list(coefficients = coefficients, Lower = NULL, Upper = NULL,  fitted = results$fitted,
                  residuals = results$resid, x = datamat, y = yend, z = z, ez = ez, y.orig = y.orig, 
                  bw = bw, cv.block = cv.block, mask = mask, exogen = exogen, p = p, type = type, obs = sample, 
-                 totobs = sample + p, est = est, tkernel = tkernel, level = 0, runs = 0, tboot = NULL, 
-                 BOOT = NULL, call = match.call())
+                 totobs = sample + p, est = est, tkernel = tkernel, singular.ok = singular.ok, level = 0, 
+                 runs = 0, tboot = NULL, BOOT = NULL, call = match.call())
   class(result) <- "tvar"
   return(result)
 }

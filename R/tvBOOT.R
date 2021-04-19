@@ -17,21 +17,17 @@
   nvar <- NCOL (x$x)
   resorig <- scale(x$residuals, scale = FALSE)
   fitted <- x$fitted
-  residup <- resorig * -0.6180339887498949025257 # (1-sqrt(5))*0.5
-  residdown <- resorig * 1.618033988749894902526 # (1+sqrt(5))*0.5
+  prob <- c(0.7236067977499789360962267892318777740001678466796875,
+            0.2763932022500210639037732107681222259998321533203125)
+  binar <- c((1-sqrt(5))*0.5, (1+sqrt(5))*0.5)
   yboot <- matrix(NA, nrow = obs, ncol = runs)
   for (i in 1:runs) 
   {
-    if (tboot == "wild"){
-      index <- ifelse(apply(resorig, 2, stats::rbinom, size = 1, prob = 0.7236067977499789360962) == 1, TRUE, FALSE)
-      resid <- residup
-      resid [!index] <- residdown[!index]
-      ystar <- fitted + resid
-    }else if (tboot == "wild2"){
+    if (tboot == "wild")
+      resid <- resorig*sample(binar, obs, replace = TRUE, prob = prob)
+    else if (tboot == "wild2")
       resid <- resorig*stats::rnorm(obs)
-      ystar <- fitted + resid
-    }
-    yboot[, i] <- ystar
+    yboot[, i] <- fitted + resid
   }
   return(.tvLM.ci(x, yboot))
 }
@@ -42,30 +38,22 @@
 #'
 .tvboot.tvplm <- function (x , runs = 100, tboot = "wild")
 {
-  B <- x$coefficients
-  BOOT <- vector("list", runs)
   obs <- x$obs
   neq <- x$neq
   resorig <- matrix(x$residuals, nrow = obs, ncol = neq)
   resorig <- apply(resorig, 2, scale, scale = FALSE)
-  residup <- resorig * -0.6180339887498949025257 # (1-sqrt(5))*0.5
-  residdown <- resorig * 1.618033988749894902526 # (1+sqrt(5))*0.5
+  prob <- c(0.7236067977499789360962267892318777740001678466796875,
+            0.2763932022500210639037732107681222259998321533203125)
+  binar <- c((1-sqrt(5))*0.5, (1+sqrt(5))*0.5)
   fitted <- x$fitted
-  X.tilde <- x$x
-  bw <- x$bw
   yboot <- matrix(NA, nrow = obs*neq, ncol = runs)
   for (i in 1:runs)
   {
-    if (tboot=="wild"){
-      index <- ifelse(apply(resorig, 2, stats::rbinom, size=1, prob=0.7236067977499789360962)==1, TRUE, FALSE)
-      resid <- residup
-      resid [!index] <- residdown[!index]
-      ystar <- fitted + as.numeric(resid)
-    }else if (tboot=="wild2"){
+    if (tboot == "wild")
+      resid <- resorig*sample(binar, obs, replace = TRUE, prob = prob)
+    else if (tboot == "wild2")
       resid <- resorig*stats::rnorm(obs*neq)
-      ystar <- fitted + resid
-    }
-    yboot[, i] <- ystar
+    yboot[, i] <- fitted + as.numeric(resid)
   }
   return(.tvPLM.ci(x, yboot))
 }
@@ -81,20 +69,16 @@
   neq <- x$neq
   resorig <- scale(x$residuals, scale = FALSE)
   fitted <- x$fitted
-  residup <- resorig * -0.6180339887498949025257 # (1-sqrt(5))*0.5
-  residdown <- resorig * 1.618033988749894902526 # (1+sqrt(5))*0.5
+  prob <- c(0.7236067977499789360962267892318777740001678466796875,
+            0.2763932022500210639037732107681222259998321533203125)
+  binar <- c((1-sqrt(5))*0.5, (1+sqrt(5))*0.5)
   yboot <- vector("list", runs)
   for (i in 1:runs) {
-    if (tboot == "wild"){
-      index <- ifelse(apply(resorig, 2, stats::rbinom, size = 1, prob = 0.7236067977499789360962) == 1, TRUE, FALSE)
-      resid <- residup
-      resid [!index] <- residdown[!index]
-      ystar <- fitted + resid
-    }else if (tboot == "wild2"){
+    if (tboot == "wild")
+      resid <- resorig*sample(binar, obs, replace = TRUE, prob = prob)
+    else if (tboot == "wild2")
       resid <- resorig*stats::rnorm(obs*neq)
-      ystar <- fitted + resid
-    }
-    yboot[[i]] <- ystar
+    yboot[[i]] <- fitted + resid
   }
   return(.tvSURE.ci(x, yboot))
 }
@@ -124,12 +108,10 @@
   neq <- VAR$neq
   X <- VAR$x
   obs <- VAR$obs
-  total <- VAR$totobs
   type <- VAR$type
-  params <- NCOL(x$x)
   B <- tvBcoef(VAR)
   BOOT <- vector("list", runs)
-  ystar <- matrix(0, nrow = total, ncol = neq)
+  ystar <- matrix(0, nrow = VAR$totobs, ncol = neq)
   y.names <- colnames(VAR$y)
   colnames(ystar) <- y.names
   Zdet <- NULL
@@ -138,21 +120,16 @@
     Zdet <- as.matrix(X[, (neq * (p + 1) + 1):NCOL(X)])
   }
   resorig <- scale(VAR$residuals, scale = FALSE)
-  Sigmaorig <- crossprod(resorig)/(obs - params)
-  eSigma <- eigen(Sigmaorig, TRUE)
-  Sigma <- diag(eSigma$values^0.5)%*%eSigma$vector
-  resid <-resorig
   fitted <- VAR$fitted
   yorig <- VAR$y.orig
-  residup <- resorig * -0.6180339887498949025257 # (1-sqrt(5))*0.5
-  residdown <- resorig * 1.618033988749894902526 # (1+sqrt(5))*0.5
+  prob <- c(0.7236067977499789360962267892318777740001678466796875,
+            0.2763932022500210639037732107681222259998321533203125)
+  binar <- c((1-sqrt(5))*0.5, (1+sqrt(5))*0.5)
   for (i in 1:runs)
   {
     if (tboot == "wild")
     {
-      index <- ifelse(apply(resorig, 2, stats::rbinom, size=1, prob=0.7236067977499789360962) == 1, TRUE, FALSE)
-      resid <- residup
-      resid [!index] <- residdown[!index]
+      resid <- resorig*sample(binar, obs, replace = TRUE, prob = prob)
       lasty <- c(t(yorig[p:1, ]))
       ystar[c(1:p), ] <- yorig[c(1:p), ]
     }
@@ -166,7 +143,7 @@
     {
       lasty <- lasty[1:(neq * p)]
       Z <- c(lasty, Zdet[j, ])
-      if (VAR$type == "const")
+      if (type == "const")
         Z <- c(Z, 1)
       ystar[j + p, ] <- B[j,,]%*%Z + resid[j, ]
       lasty <- c(ystar[j + p, ], lasty)
@@ -175,7 +152,7 @@
     VAR$y <- ystar[-c(1:p),]
     VAR$residuals <- resid
     temp <- stats::embed(ystar, dimension = p + 1)[, -c(1:neq)]
-    if(VAR$type == "const")
+    if(type == "const")
       temp <- cbind(temp, rep(1, obs))
     VAR$x[, 1:NCOL(temp)] <- temp
     varboot <- update(VAR)

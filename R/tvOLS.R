@@ -40,7 +40,7 @@ tvOLS <- function(x, ...) UseMethod("tvOLS", x)
 #' \code{\link{tvAR}}.
 #' @export
 tvOLS.matrix <- function(x, y, z = NULL, ez = NULL, bw, est = c("lc", "ll"), 
-                  tkernel = c("Epa", "Gaussian"), singular.ok = TRUE, ...)
+                  tkernel = c("Triweight", "Epa", "Gaussian"), singular.ok = TRUE, ...)
 {
   x <- as.matrix(x)
   y <- as.numeric(y)
@@ -76,12 +76,15 @@ tvOLS.matrix <- function(x, y, z = NULL, ez = NULL, bw, est = c("lc", "ll"),
     xtemp <- x[k.index, ]
     if (est=="ll")
       xtemp <- cbind(xtemp, xtemp * tau0[k.index])
-    result <- stats::lm.wfit(x = as.matrix(xtemp), y = y[k.index], w = kernel.bw[k.index])
+    result <- stats::lm.wfit(x = as.matrix(xtemp), y = y[k.index], 
+                             w = kernel.bw[k.index], singular.ok = singular.ok)
     theta[t,] <- result$coefficients[1:nvar]
     fitted[t] <- crossprod(x[t, !is.na(theta[t,])], theta[t, !is.na(theta[t,])])
   }
   if(!is.predict)
     resid <- y - fitted
+  else
+    fitted = resid <- NULL
   return(list(coefficients = theta, fitted = fitted, residuals = resid))
 }
 
@@ -107,19 +110,24 @@ tvOLS.tvvar <- function(x, ...)
     stop ("Function for object of class 'tvvar'. \n")
   equation <- list()
   neq <- x$neq
-  resid = fitted <- matrix(0, nrow = x$obs, ncol = neq)
   rhs <- x$x
   eqnames <- colnames(x$y)
+  is.predict <- ifelse (is.null(x$ez), FALSE, TRUE)
+  resid = fitted <- NULL
+  if(!is.predict)
+    resid = fitted <- matrix(0, nrow = x$obs, ncol = neq)
   for (i in 1:neq)
   {
     results <- tvOLS(x = rhs, y = x$y[, i], z = x$z, ez = x$ez, bw = x$bw[i], est = x$est, tkernel = x$tkernel, 
                      singular.ok = x$singular.ok)
     equation[[eqnames[i]]] <- results$coefficients
     colnames(equation[[eqnames[i]]]) <- colnames(rhs)
-    resid[, i] <- results$residuals
-    fitted[, i] <- results$fitted
+    if(!is.predict)
+    {
+      resid[, i] <- results$residuals
+      fitted[, i] <- results$fitted
+    }
   }
-  
   return(list(coefficients = equation, fitted = fitted, residuals = resid))
 }
 
@@ -127,7 +135,7 @@ tvOLS.tvvar <- function(x, ...)
 #' @rdname tvReg-internals
 #' @keywords internal
 .tvOLS.cv <- function(bw, x, y, z = NULL,  cv.block = 0, est = c("lc", "ll"), 
-                      tkernel = c("Epa", "Gaussian"), singular.ok = TRUE)
+                      tkernel = c("Triweight", "Epa", "Gaussian"), singular.ok = TRUE)
 {
   x <- as.matrix(x)
   obs <- NROW(x)
@@ -159,8 +167,7 @@ tvOLS.tvvar <- function(x, ...)
     xtemp <- x[k.index, ]
     if (est == "ll")
       xtemp <- cbind(xtemp, xtemp * tau0[k.index])
-    ytemp <- y[k.index]
-    result <- stats::lm.wfit(x = as.matrix(xtemp), y = ytemp, w = kernel.bw[k.index],
+    result <- stats::lm.wfit(x = as.matrix(xtemp), y = y[k.index], w = kernel.bw[k.index],
                              singular.ok = singular.ok)
     theta[t,] <- result$coefficients[1:nvar]
     fitted[t] <- crossprod(x[t, !is.na(theta[t,])], theta[t, !is.na(theta[t,])])
