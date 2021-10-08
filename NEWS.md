@@ -1,49 +1,59 @@
+# tvReg 0.5.6
+
+* Added package documentation (in "tvReg-package.R", which now also includes data documentation). 
+
+* Changed imports in NAMESPACE. Now only the necessary functions of `plm` are imported (to avoid new compatibility issues between packages `Matrix` and `plm`).
 
 
+# tvReg 0.5.5
 
-#tvReg 0.5.4
+* Updated `RV` dataset and its variables description.
+* Fixed bug in `tvAR`and `tvVAR` when `exogen` is only one column.
 
-* Add par(ask=FALSE) at the end of plots.
-* Fix bug in `confint` for objects obtained with `tvFE`
-* Fix bug in `predict` for objects obtained with `tvFE`
-* Fix bug in `tvSURE` for datasets with different name than data
-* Add kernel function `Triweight` and make it the default
-* Remove package `plm` from dependencies and only import the necessary functions to avoid new compatibility issues between packages `Matrix` and `plm`.
 
-#tvReg 0.5.3
+# tvReg 0.5.4
 
-* Add dates in data `CEES`
-* Change argument 'newx' for argument 'newdata' in forecast.tvlm, forecast.tvar, predict.tvlm and predict.tvar.
+* Added par(ask=FALSE) at the end of plots.
+* Fixed bug in `confint` for objects obtained with `tvFE`
+* Fixed bug in `predict` for objects obtained with `tvFE`
+* Fixed bug in `tvSURE` for datasets with different name than data
+* Added kernel function `Triweight` and make it the default
 
-#tvReg 0.5.2
 
-* Fix bug in `tvPLM` and change the limits of the Epanechnikov kernel.
-* Control for variables size in `tvPLM` when there are NAs
-* Control for class in `tvAR` main argument
+# tvReg 0.5.3
 
-#tvReg 0.5.1
+* Added dates in data `CEES`
+* Changed argument `newx` for argument `newdata` in `forecast.tvlm`, `forecast.tvar`, `predict.tvlm` and `predict.tvar`.
 
-* Fix bug in method `tvSURE` when using constraints. Method `confint` works.
+# tvReg 0.5.2
 
-#tvReg 0.5.0
+* Fixed bug in `tvPLM` and changed the limits of the Epanechnikov kernel.
+* Added check for variables size in `tvPLM` when there are NAs.
+* Added check for class in `tvAR` main argument.
 
-* Added methods `tvPLM`, `tvRE` and `tvFE` and methods to fit time-varying coefficients panel data models. Also added their corresponding `confint`, `predict`, `forecast`, `plot`, `summary` and `print` methods.
+# tvReg 0.5.1
 
-* Added dataset OECD.
+* Fixed bug in method `tvSURE` when using constraints. Method `confint` works.
 
-* Change all return argument `tvcoef` to `coefficients` to fit the standards of other packages in R.
+# tvReg 0.5.0
 
-* Allow the user to choose individual plots for each variable in models of class tvlm, tvar or tvplm.
+* Added methods `tvPLM`, `tvRE` and `tvFE` and methods to fit time-varying coefficients panel data models. Also added their corresponding`confint`, `predict`, `forecast`, `plot`, `summary` and `print` methods.
 
-* Fix of the bug in R-devel caused by matrix objects now also inheriting from class `array` which caused some problems in some "`if`" statements.
+* Added dataset OECD
 
-#tvReg 0.4.2
+* Change all return argument `tvcoef` to `coefficients` to fit the standards of other packages in R
 
-* Added  modified or leave-(2l+1)-out cross-validation for bandwidth selection.
+* Allow the user to choose individual plots for each variable in models of class tvlm, tvar or tvplm
 
-* Faster algorithm for the calculation of confidence intervals.
+* Fix of the bug in R-devel caused by matrix objects now also inheriting from class `array` which caused some problems in some "if" statements
 
-* Fix bug in `.tvCov.cv`.
+# tvReg 0.4.2
+
+* Added  modified or leave-(2l+1)-out cross-validation for bandwidth selection
+
+* Faster algorithm for the calculation of confidence intervals
+
+* Fix bug in `.tvCov.cv
 
 # tvReg 0.4.1
 

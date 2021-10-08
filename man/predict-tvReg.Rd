@@ -57,7 +57,8 @@ predict(TVHARQ, newdata, newz)
 
 ## Example of TVAR prediction with coefficients as 
 ## functions of the realized quarticity
-
+data("RV")
+RV2 <- head(RV, 2001)
 exogen = RV2[, c("RV_week", "RV_month")]
 TVHARQ2 <- tvAR (RV2$RV, p = 1, exogen = exogen,  
                       z = RV2[, "RQ_lag_sqrt"], bw = 0.0062)

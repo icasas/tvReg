@@ -58,9 +58,11 @@ newdata <- cbind(RV$RV_lag[2002:2004], RV$RV_week[2002:2004],
               RV$RV_month[2002:2004])
 forecast(TVHAR, newdata, n.ahead = 3)
 
-exogen = RV2[, c("RV_week", "RV_month")]
-TVHAR2 <- tvAR(RV2$RV_lag, p = 1, exogen = exogen, bw = 20)
-newexogen <- newdata[, -1]
+
+data("RV")
+exogen = RV[1:2001, c("RV_week", "RV_month")]
+TVHAR2 <- tvAR(RV$RV_lag[1:2001], p = 1, exogen = exogen, bw = 20)
+newexogen <- RV[2002:2004, c("RV_week", "RV_month")]
 forecast(TVHAR2, n.ahead = 3, newexogen = newexogen)
 
 data(usmacro, package = "bvarsv")
