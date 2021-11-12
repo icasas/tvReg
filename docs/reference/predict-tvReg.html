@@ -8,21 +8,29 @@
 
 <title>Predict Methods for Objects in tvReg. — predict.tvlm • tvReg</title>
 
+
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
-<!-- sticky kit -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+<!-- headroom.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -30,13 +38,13 @@
 
 
 
-<meta property="og:title" content="Predict Methods for Objects in tvReg. — predict.tvlm" />
 
+<meta property="og:title" content="Predict Methods for Objects in tvReg. — predict.tvlm" />
 <meta property="og:description" content="Predict methods for objects with class attribute tvlm, tvar, 
-tvvar, tvirf and tvsure. This function needs new values of 
+tvvar, tvirf, tvsure and tvplm. This function needs new values of 
 variables y (response), x (regressors), exogen (exogenous variables, when used),
 and  z (smoothing variable)." />
-<meta name="twitter:card" content="summary" />
+
 
 
 
@@ -50,9 +58,10 @@ and  z (smoothing variable)." />
 <![endif]-->
 
 
+
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -66,7 +75,7 @@ and  z (smoothing variable)." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">tvReg</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.5.6</span>
       </span>
     </div>
 
@@ -74,7 +83,7 @@ and  z (smoothing variable)." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -88,11 +97,10 @@ and  z (smoothing variable)." />
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
-      
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/icasas/tvReg">
-    <span class="fa fa-github fa-lg"></span>
+  <a href="https://github.com/icasas/tvReg/">
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -103,6 +111,7 @@ and  z (smoothing variable)." />
 </div><!--/.navbar -->
 
       
+
       </header>
 
 <div class="row">
@@ -114,37 +123,39 @@ and  z (smoothing variable)." />
     </div>
 
     <div class="ref-description">
-    
     <p>Predict methods for objects with class attribute <code>tvlm</code>, <code>tvar</code>, 
-<code>tvvar</code>, <code>tvirf</code> and <code>tvsure</code>. This function needs new values of 
+<code>tvvar</code>, <code>tvirf</code>, <code>tvsure</code> and <code>tvplm</code>. This function needs new values of 
 variables y (response), x (regressors), exogen (exogenous variables, when used),
 and  z (smoothing variable).</p>
-    
     </div>
 
     <pre class="usage"><span class='co'># S3 method for tvlm</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/predict'>predict</a></span>(<span class='no'>object</span>, <span class='no'>newx</span>, <span class='no'>newz</span>, <span class='no'>...</span>)
+<span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>newdata</span>, <span class='va'>newz</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for tvar</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/predict'>predict</a></span>(<span class='no'>object</span>, <span class='no'>newy</span>, <span class='no'>newz</span>, <span class='kw'>newexogen</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
+<span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>newdata</span>, <span class='va'>newz</span>, newexogen <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for tvvar</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/predict'>predict</a></span>(<span class='no'>object</span>, <span class='no'>newy</span>, <span class='no'>newz</span>, <span class='kw'>newexogen</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
+<span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>newdata</span>, <span class='va'>newz</span>, newexogen <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for tvsure</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/predict'>predict</a></span>(<span class='no'>object</span>, <span class='no'>newdata</span>, <span class='no'>newz</span>, <span class='no'>...</span>)</pre>
-    
+<span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>newdata</span>, <span class='va'>newz</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S3 method for tvplm</span>
+<span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>newdata</span>, <span class='va'>newz</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>object</th>
-      <td><p>Object of class <code>tvlm</code>, <code>tvar</code>, <code>tvvar</code> or <code>tvsure</code>.</p></td>
+      <td><p>An object used to select a method.</p></td>
     </tr>
     <tr>
-      <th>newx</th>
-      <td><p>A dataframe with new values of all variables in x. No need to 
-input the intercept.</p></td>
+      <th>newdata</th>
+      <td><p>A pdata.frame with new values of all regressors, with the
+same name and order as they appear in argument 'data' from the 'tvplm'
+object</p></td>
     </tr>
     <tr>
       <th>newz</th>
@@ -155,106 +166,105 @@ input the intercept.</p></td>
       <td><p>Other arguments passed to specific methods.</p></td>
     </tr>
     <tr>
-      <th>newy</th>
-      <td><p>A vector with new values of the response variable</p></td>
-    </tr>
-    <tr>
       <th>newexogen</th>
       <td><p>A matrix or vector with the new value of the exogenous variables.
-Only for predictions of *tvar* and *tvvar* objects.</p></td>
-    </tr>
-    <tr>
-      <th>newdata</th>
-      <td><p>A dataframe with new values of all regressors, with the
-same name and order as they appear in argument *data* from the *tvsure* 
-object</p></td>
+Only for predictions of 'tvar' and 'tvvar' objects.</p></td>
     </tr>
     </table>
-    
+
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>An object of class matrix or vector with the prediction.</p>
-    
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='forecast.html'>forecast</a></code>.</p></div>
-    
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'>## Example of TV-LM prediction with coefficients as </span>
-<span class='co'>## functions of the realized quarticity</span>
-
-<span class='fu'><a href='https://www.rdocumentation.org/packages/utils/topics/data'>data</a></span>(<span class='st'>"RV"</span>)
-<span class='no'>RV2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/utils/topics/head'>head</a></span>(<span class='no'>RV</span>, <span class='fl'>2001</span>)
-<span class='no'>z</span> <span class='kw'>&lt;-</span> <span class='no'>RV2</span>$<span class='no'>RQ_lag_sqrt</span>
-<span class='no'>tvHARQ</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='tvLM.html'>tvLM</a></span> (<span class='no'>RV</span> ~ <span class='no'>RV_lag</span> + <span class='no'>RV_week</span> + <span class='no'>RV_month</span>,
-                 <span class='kw'>z</span> <span class='kw'>=</span> <span class='no'>z</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>RV2</span>, <span class='kw'>bw</span> <span class='kw'>=</span> <span class='fl'>0.0062</span>)
-<span class='no'>newx</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/cbind'>cbind</a></span>(<span class='no'>RV</span>$<span class='no'>RV_lag</span>[<span class='fl'>2002</span>:<span class='fl'>2004</span>], <span class='no'>RV</span>$<span class='no'>RV_week</span>[<span class='fl'>2002</span>:<span class='fl'>2004</span>],
-              <span class='no'>RV</span>$<span class='no'>RV_month</span>[<span class='fl'>2002</span>:<span class='fl'>2004</span>])
-<span class='no'>newz</span> <span class='kw'>&lt;-</span> <span class='no'>RV</span>$<span class='no'>RQ_lag_sqrt</span>[<span class='fl'>2002</span>:<span class='fl'>2004</span>]
-<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/predict'>predict</a></span>(<span class='no'>tvHARQ</span>, <span class='no'>newx</span>, <span class='no'>newz</span>)</div><div class='output co'>#&gt; [1] 2.512716e-05 2.206062e-05 2.276241e-05</div><div class='input'>
-<span class='co'>## Example of TV-AR prediction with coefficients as </span>
-<span class='co'>## functions of the realized quarticity</span>
-
-<span class='no'>exogen</span> <span class='kw'>=</span> <span class='no'>RV2</span>[, <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"RV_week"</span>, <span class='st'>"RV_month"</span>)]
-<span class='no'>tvHARQ2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='tvAR.html'>tvAR</a></span> (<span class='no'>RV2</span>$<span class='no'>RV</span>, <span class='kw'>p</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>exogen</span> <span class='kw'>=</span> <span class='no'>exogen</span>,
-                      <span class='kw'>z</span> <span class='kw'>=</span> <span class='no'>RV2</span>[, <span class='st'>"RQ_lag_sqrt"</span>], <span class='kw'>bw</span> <span class='kw'>=</span> <span class='fl'>0.0062</span>)
-<span class='no'>newylag</span> <span class='kw'>&lt;-</span> <span class='no'>RV</span>$<span class='no'>RV</span>[<span class='fl'>2002</span>:<span class='fl'>2004</span>]
-<span class='no'>newz</span> <span class='kw'>&lt;-</span> <span class='no'>RV</span>$<span class='no'>RQ_lag_sqrt</span>[<span class='fl'>2002</span>:<span class='fl'>2004</span>]
-<span class='no'>newexogen</span> <span class='kw'>&lt;-</span> <span class='no'>RV</span>[<span class='fl'>2002</span>:<span class='fl'>2004</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"RV_week"</span>, <span class='st'>"RV_month"</span>)]
-<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/predict'>predict</a></span>(<span class='no'>tvHARQ2</span>, <span class='no'>newylag</span>,  <span class='no'>newz</span>, <span class='kw'>newexogen</span> <span class='kw'>=</span> <span class='no'>newexogen</span>)</div><div class='output co'>#&gt; [1] 2.417587e-05 2.420358e-05 2.237831e-05</div><div class='input'><span class='co'>## Example of TV-VAR prediction with coefficients as </span>
-<span class='co'>## functions of a random ARMA (2,2) process</span>
-
-<span class='fu'><a href='https://www.rdocumentation.org/packages/utils/topics/data'>data</a></span>(<span class='no'>usmacro</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"bvarsv"</span>)
-<span class='no'>smoothing</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/arima.sim'>arima.sim</a></span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>nrow</a></span>(<span class='no'>usmacro</span>) + <span class='fl'>3</span>,
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>ar</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>0.8897</span>, -<span class='fl'>0.4858</span>), <span class='kw'>ma</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(-<span class='fl'>0.2279</span>, <span class='fl'>0.2488</span>)),
-<span class='kw'>sd</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/MathFun'>sqrt</a></span>(<span class='fl'>0.1796</span>))
-<span class='no'>smoothing</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/numeric'>as.numeric</a></span>(<span class='no'>smoothing</span>)
-<span class='no'>tvVAR.z</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='tvVAR.html'>tvVAR</a></span>(<span class='no'>usmacro</span>, <span class='kw'>p</span> <span class='kw'>=</span> <span class='fl'>6</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"const"</span>,
-               <span class='kw'>z</span> <span class='kw'>=</span> <span class='no'>smoothing</span>[<span class='fl'>1</span>:<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>nrow</a></span>(<span class='no'>usmacro</span>)], <span class='kw'>bw</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>16.3</span>, <span class='fl'>16.3</span>, <span class='fl'>16.3</span>))
-<span class='no'>newy</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/data.frame'>data.frame</a></span>(<span class='kw'>inf</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>2</span>, <span class='fl'>1</span>, <span class='fl'>6</span>), <span class='kw'>une</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>5</span>, <span class='fl'>4</span>, <span class='fl'>9</span>), <span class='kw'>tbi</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>1</span>, <span class='fl'>2.5</span>, <span class='fl'>3</span>))
-<span class='no'>newz</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>0</span>, <span class='fl'>1.2</span>, -<span class='fl'>0.2</span>)
-<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/predict'>predict</a></span>(<span class='no'>tvVAR.z</span>, <span class='kw'>newy</span> <span class='kw'>=</span> <span class='no'>newy</span>, <span class='kw'>newz</span> <span class='kw'>=</span> <span class='no'>newz</span>)</div><div class='output co'>#&gt;             inf        une        tbi
-#&gt; [1,]  0.3541093  0.3541093  0.3541093
-#&gt; [2,]  4.5138322  4.5138322  4.5138322
-#&gt; [3,] -2.1817609 -2.1817609 -2.1817609</div><div class='input'>
-<span class='co'>## Example of TV-SURE prediction with coefficients as </span>
-<span class='co'>## functions of an ARMA(2,2) process</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/utils/topics/data'>data</a></span>(<span class='st'>"Kmenta"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"systemfit"</span>)
-<span class='no'>nobs</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>nrow</a></span> (<span class='no'>Kmenta</span>)
-<span class='no'>eqDemand</span> <span class='kw'>&lt;-</span> <span class='no'>consump</span> ~ <span class='no'>price</span> + <span class='no'>income</span>
-<span class='no'>eqSupply</span> <span class='kw'>&lt;-</span> <span class='no'>consump</span> ~ <span class='no'>price</span> + <span class='no'>farmPrice</span>
-<span class='no'>system</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>demand</span> <span class='kw'>=</span> <span class='no'>eqDemand</span>, <span class='kw'>supply</span> <span class='kw'>=</span> <span class='no'>eqSupply</span>)
-<span class='no'>smoothing</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/arima.sim'>arima.sim</a></span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='no'>nobs</span> + <span class='fl'>3</span>,
-                       <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>ar</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>0.8897</span>, -<span class='fl'>0.4858</span>), <span class='kw'>ma</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(-<span class='fl'>0.2279</span>, <span class='fl'>0.2488</span>)),
-                       <span class='kw'>sd</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/MathFun'>sqrt</a></span>(<span class='fl'>0.1796</span>))
-<span class='no'>smoothing</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/numeric'>as.numeric</a></span>(<span class='no'>smoothing</span>)
-<span class='no'>tvOLS.z.fit</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='tvSURE.html'>tvSURE</a></span>(<span class='no'>system</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>Kmenta</span>,
-                      <span class='kw'>z</span> <span class='kw'>=</span> <span class='no'>smoothing</span>[<span class='fl'>1</span>:<span class='no'>nobs</span>],  <span class='kw'>bw</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>7</span>, <span class='fl'>1.8</span>),
-                      <span class='kw'>est</span> <span class='kw'>=</span> <span class='st'>"ll"</span>)
-<span class='no'>newdata</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/data.frame'>data.frame</a></span>(<span class='kw'>consump</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>95</span>, <span class='fl'>100</span>, <span class='fl'>102</span>), <span class='kw'>price</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>90</span>, <span class='fl'>100</span>, <span class='fl'>103</span>),
-                      <span class='kw'>farmPrice</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>70</span>, <span class='fl'>95</span>, <span class='fl'>103</span>), <span class='kw'>income</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>82</span>, <span class='fl'>94</span>, <span class='fl'>115</span>))
-<span class='no'>newz</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/utils/topics/head'>tail</a></span>(<span class='no'>smoothing</span>, <span class='fl'>3</span>)
-<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/predict'>predict</a></span>(<span class='no'>tvOLS.z.fit</span>, <span class='kw'>newdata</span> <span class='kw'>=</span> <span class='no'>newdata</span>, <span class='kw'>newz</span> <span class='kw'>=</span> <span class='no'>newz</span>)</div><div class='output co'>#&gt;         demand    supply
-#&gt; [1,]  99.10429 -2.414486
-#&gt; [2,]  99.16073  1.426034
-#&gt; [3,] 103.59942  2.659291</div><div class='input'>
-</div></pre>
+    <pre class="examples"><span class='r-in'><span class='co'>## Example of TVLM prediction with coefficients as </span></span>
+<span class='r-in'><span class='co'>## functions of the realized quarticity</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='st'>"RV"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>RV2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>RV</span>, <span class='fl'>2001</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>z</span> <span class='op'>&lt;-</span> <span class='va'>RV2</span><span class='op'>$</span><span class='va'>RQ_lag_sqrt</span></span>
+<span class='r-in'><span class='va'>TVHARQ</span> <span class='op'>&lt;-</span> <span class='fu'><a href='tvLM.html'>tvLM</a></span> <span class='op'>(</span><span class='va'>RV</span> <span class='op'>~</span> <span class='va'>RV_lag</span> <span class='op'>+</span> <span class='va'>RV_week</span> <span class='op'>+</span> <span class='va'>RV_month</span>, </span>
+<span class='r-in'>                 z <span class='op'>=</span> <span class='va'>z</span>, data <span class='op'>=</span> <span class='va'>RV2</span>, bw <span class='op'>=</span> <span class='fl'>0.0062</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>newdata</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span><span class='op'>(</span><span class='va'>RV</span><span class='op'>$</span><span class='va'>RV_lag</span><span class='op'>[</span><span class='fl'>2002</span><span class='op'>:</span><span class='fl'>2004</span><span class='op'>]</span>, <span class='va'>RV</span><span class='op'>$</span><span class='va'>RV_week</span><span class='op'>[</span><span class='fl'>2002</span><span class='op'>:</span><span class='fl'>2004</span><span class='op'>]</span>,</span>
+<span class='r-in'>              <span class='va'>RV</span><span class='op'>$</span><span class='va'>RV_month</span><span class='op'>[</span><span class='fl'>2002</span><span class='op'>:</span><span class='fl'>2004</span><span class='op'>]</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>newz</span> <span class='op'>&lt;-</span> <span class='va'>RV</span><span class='op'>$</span><span class='va'>RQ_lag_sqrt</span><span class='op'>[</span><span class='fl'>2002</span><span class='op'>:</span><span class='fl'>2004</span><span class='op'>]</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span><span class='va'>TVHARQ</span>, <span class='va'>newdata</span>, <span class='va'>newz</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] 1.781073e-05 1.926774e-05 2.705291e-05</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## Example of TVAR prediction with coefficients as </span></span>
+<span class='r-in'><span class='co'>## functions of the realized quarticity</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='st'>"RV"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>RV2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>RV</span>, <span class='fl'>2001</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>exogen</span> <span class='op'>=</span> <span class='va'>RV2</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"RV_week"</span>, <span class='st'>"RV_month"</span><span class='op'>)</span><span class='op'>]</span></span>
+<span class='r-in'><span class='va'>TVHARQ2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='tvAR.html'>tvAR</a></span> <span class='op'>(</span><span class='va'>RV2</span><span class='op'>$</span><span class='va'>RV</span>, p <span class='op'>=</span> <span class='fl'>1</span>, exogen <span class='op'>=</span> <span class='va'>exogen</span>,  </span>
+<span class='r-in'>                      z <span class='op'>=</span> <span class='va'>RV2</span><span class='op'>[</span>, <span class='st'>"RQ_lag_sqrt"</span><span class='op'>]</span>, bw <span class='op'>=</span> <span class='fl'>0.0062</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>newylag</span> <span class='op'>&lt;-</span> <span class='va'>RV</span><span class='op'>$</span><span class='va'>RV</span><span class='op'>[</span><span class='fl'>2002</span><span class='op'>:</span><span class='fl'>2004</span><span class='op'>]</span></span>
+<span class='r-in'><span class='va'>newz</span> <span class='op'>&lt;-</span> <span class='va'>RV</span><span class='op'>$</span><span class='va'>RQ_lag_sqrt</span><span class='op'>[</span><span class='fl'>2002</span><span class='op'>:</span><span class='fl'>2004</span><span class='op'>]</span></span>
+<span class='r-in'><span class='va'>newexogen</span> <span class='op'>&lt;-</span> <span class='va'>RV</span><span class='op'>[</span><span class='fl'>2002</span><span class='op'>:</span><span class='fl'>2004</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"RV_week"</span>, <span class='st'>"RV_month"</span><span class='op'>)</span><span class='op'>]</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span><span class='va'>TVHARQ2</span>, <span class='va'>newylag</span>,  <span class='va'>newz</span>, newexogen <span class='op'>=</span> <span class='va'>newexogen</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] 1.930648e-05 2.597139e-05 2.642790e-05</span>
+<span class='r-in'><span class='co'>## Example of TVVAR prediction with coefficients as </span></span>
+<span class='r-in'><span class='co'>## functions of a random ARMA (2,2) process</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>usmacro</span>, package <span class='op'>=</span> <span class='st'>"bvarsv"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>smoothing</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/arima.sim.html'>arima.sim</a></span><span class='op'>(</span>n <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span><span class='op'>(</span><span class='va'>usmacro</span><span class='op'>)</span> <span class='op'>+</span> <span class='fl'>3</span>, </span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>ar <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.8897</span>, <span class='op'>-</span><span class='fl'>0.4858</span><span class='op'>)</span>, ma <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='op'>-</span><span class='fl'>0.2279</span>, <span class='fl'>0.2488</span><span class='op'>)</span><span class='op'>)</span>, </span>
+<span class='r-in'>sd <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>sqrt</a></span><span class='op'>(</span><span class='fl'>0.1796</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>smoothing</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/numeric.html'>as.numeric</a></span><span class='op'>(</span><span class='va'>smoothing</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>TVVAR.z</span> <span class='op'>&lt;-</span> <span class='fu'><a href='tvVAR.html'>tvVAR</a></span><span class='op'>(</span><span class='va'>usmacro</span>, p <span class='op'>=</span> <span class='fl'>6</span>, type <span class='op'>=</span> <span class='st'>"const"</span>, </span>
+<span class='r-in'>               z <span class='op'>=</span> <span class='va'>smoothing</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span><span class='op'>(</span><span class='va'>usmacro</span><span class='op'>)</span><span class='op'>]</span>, bw <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>16.3</span>, <span class='fl'>16.3</span>, <span class='fl'>16.3</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>newdata</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>inf <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>2</span>, <span class='fl'>1</span>, <span class='fl'>6</span><span class='op'>)</span>, une <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>5</span>, <span class='fl'>4</span>, <span class='fl'>9</span><span class='op'>)</span>, tbi <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>2.5</span>, <span class='fl'>3</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>newz</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>1.2</span>, <span class='op'>-</span><span class='fl'>0.2</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span><span class='va'>TVVAR.z</span>, newdata <span class='op'>=</span> <span class='va'>newdata</span>, newz <span class='op'>=</span> <span class='va'>newz</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>             inf        une        tbi</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1,]  0.3544131  0.3544131  0.3544131</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [2,]  4.5063953  4.5063953  4.5063953</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [3,] -2.1858620 -2.1858620 -2.1858620</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## Example of TVSURE prediction with coefficients as </span></span>
+<span class='r-in'><span class='co'>## functions of an ARMA(2,2) process</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='st'>"Kmenta"</span>, package <span class='op'>=</span> <span class='st'>"systemfit"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>nobs</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>NROW</a></span> <span class='op'>(</span><span class='va'>Kmenta</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>eqDemand</span> <span class='op'>&lt;-</span> <span class='va'>consump</span> <span class='op'>~</span> <span class='va'>price</span> <span class='op'>+</span> <span class='va'>income</span></span>
+<span class='r-in'><span class='va'>eqSupply</span> <span class='op'>&lt;-</span> <span class='va'>consump</span> <span class='op'>~</span> <span class='va'>price</span> <span class='op'>+</span> <span class='va'>farmPrice</span> </span>
+<span class='r-in'><span class='va'>system</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>demand <span class='op'>=</span> <span class='va'>eqDemand</span>, supply <span class='op'>=</span> <span class='va'>eqSupply</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>smoothing</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/arima.sim.html'>arima.sim</a></span><span class='op'>(</span>n <span class='op'>=</span> <span class='va'>nobs</span> <span class='op'>+</span> <span class='fl'>3</span>, </span>
+<span class='r-in'>                       <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>ar <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.8897</span>, <span class='op'>-</span><span class='fl'>0.4858</span><span class='op'>)</span>, ma <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='op'>-</span><span class='fl'>0.2279</span>, <span class='fl'>0.2488</span><span class='op'>)</span><span class='op'>)</span>, </span>
+<span class='r-in'>                       sd <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>sqrt</a></span><span class='op'>(</span><span class='fl'>0.1796</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>smoothing</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/numeric.html'>as.numeric</a></span><span class='op'>(</span><span class='va'>smoothing</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>TVOLS.z</span> <span class='op'>&lt;-</span> <span class='fu'><a href='tvSURE.html'>tvSURE</a></span><span class='op'>(</span><span class='va'>system</span>, data <span class='op'>=</span> <span class='va'>Kmenta</span>,  </span>
+<span class='r-in'>                      z <span class='op'>=</span> <span class='va'>smoothing</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='va'>nobs</span><span class='op'>]</span>,  bw <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>7</span>, <span class='fl'>1.8</span><span class='op'>)</span>,</span>
+<span class='r-in'>                      est <span class='op'>=</span> <span class='st'>"ll"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>newdata</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>consump <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>95</span>, <span class='fl'>100</span>, <span class='fl'>102</span><span class='op'>)</span>, price <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>90</span>, <span class='fl'>100</span>, <span class='fl'>103</span><span class='op'>)</span>, </span>
+<span class='r-in'>                      farmPrice <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>70</span>, <span class='fl'>95</span>, <span class='fl'>103</span><span class='op'>)</span>, income <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>82</span>, <span class='fl'>94</span>, <span class='fl'>115</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>newz</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span><span class='op'>(</span><span class='va'>smoothing</span>, <span class='fl'>3</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span><span class='va'>TVOLS.z</span>, newdata <span class='op'>=</span> <span class='va'>newdata</span>, newz <span class='op'>=</span> <span class='va'>newz</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>         demand    supply</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1,]  99.11459  94.20937</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [2,]  99.16312  99.40177</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [3,] 103.60595 100.81371</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>OECD</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>z</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/levels.html'>levels</a></span><span class='op'>(</span><span class='va'>OECD</span><span class='op'>$</span><span class='va'>year</span><span class='op'>)</span><span class='op'>)</span>, <span class='fl'>10</span>, <span class='fl'>15</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>TVPOLS</span> <span class='op'>&lt;-</span> <span class='fu'><a href='tvPLM.html'>tvPLM</a></span><span class='op'>(</span><span class='va'>lhe</span><span class='op'>~</span><span class='va'>lgdp</span><span class='op'>+</span><span class='va'>pop65</span><span class='op'>+</span><span class='va'>pop14</span><span class='op'>+</span><span class='va'>public</span>, z <span class='op'>=</span> <span class='va'>z</span>,</span>
+<span class='r-in'>index <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"country"</span>, <span class='st'>"year"</span><span class='op'>)</span>, data <span class='op'>=</span> <span class='va'>OECD</span>,  method <span class='op'>=</span><span class='st'>"pooling"</span>, bw <span class='op'>=</span>  <span class='fl'>2</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>newdata</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span><span class='op'>(</span>lgdp <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>10</span>, <span class='fl'>13</span><span class='op'>)</span>, pop65 <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>9</span>, <span class='fl'>12</span><span class='op'>)</span>, </span>
+<span class='r-in'>pop14 <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>17</span>, <span class='fl'>30</span><span class='op'>)</span>, public <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>13</span>, <span class='fl'>20</span><span class='op'>)</span><span class='op'>)</span>  </span>
+<span class='r-in'><span class='va'>newz</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span><span class='fl'>2</span>, <span class='fl'>10</span>, <span class='fl'>15</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span><span class='va'>TVPOLS</span>, newdata <span class='op'>=</span> <span class='va'>newdata</span>, newz <span class='op'>=</span> <span class='va'>newz</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] 7.447127 9.582447</span>
+</pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      
-      <li><a href="#value">Value</a></li>
-
-      <li><a href="#see-also">See also</a></li>
-      
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
+
 
       <footer>
       <div class="copyright">
@@ -262,13 +272,16 @@ object</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
+
       </footer>
    </div>
 
   
 
+
   </body>
 </html>
+
 

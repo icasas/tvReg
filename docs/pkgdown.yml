@@ -1,8 +1,9 @@
-pandoc: 1.19.2.1
-pkgdown: 1.3.0
+pandoc: 2.11.4
+pkgdown: 1.6.1
 pkgdown_sha: ~
 articles:
   tvReg: tvReg.html
+last_built: 2021-11-12T10:50Z
 urls:
   reference: http://github.com/icasas/tvReg/reference
   article: http://github.com/icasas/tvReg/articles

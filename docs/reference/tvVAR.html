@@ -8,21 +8,29 @@
 
 <title>Time-varying Vector Autoregressive Models — tvVAR • tvReg</title>
 
+
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
-<!-- sticky kit -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+<!-- headroom.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -30,10 +38,10 @@
 
 
 
-<meta property="og:title" content="Time-varying Vector Autoregressive Models — tvVAR" />
 
+<meta property="og:title" content="Time-varying Vector Autoregressive Models — tvVAR" />
 <meta property="og:description" content="Fits a time-varying coefficients vector autorregressive model with p lags." />
-<meta name="twitter:card" content="summary" />
+
 
 
 
@@ -47,9 +55,10 @@
 <![endif]-->
 
 
+
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -63,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">tvReg</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.5.6</span>
       </span>
     </div>
 
@@ -71,7 +80,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -85,11 +94,10 @@
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
-      
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/icasas/tvReg">
-    <span class="fa fa-github fa-lg"></span>
+  <a href="https://github.com/icasas/tvReg/">
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -100,6 +108,7 @@
 </div><!--/.navbar -->
 
       
+
       </header>
 
 <div class="row">
@@ -111,15 +120,23 @@
     </div>
 
     <div class="ref-description">
-    
     <p>Fits a time-varying coefficients vector autorregressive model with p lags.</p>
-    
     </div>
 
-    <pre class="usage"><span class='fu'>tvVAR</span>(<span class='no'>y</span>, <span class='kw'>p</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>z</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>ez</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>bw</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"const"</span>,
-  <span class='st'>"none"</span>), <span class='kw'>exogen</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>est</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"lc"</span>, <span class='st'>"ll"</span>), <span class='kw'>tkernel</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"Epa"</span>,
-  <span class='st'>"Gaussian"</span>), <span class='kw'>singular.ok</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
-    
+    <pre class="usage"><span class='fu'>tvVAR</span><span class='op'>(</span>
+  <span class='va'>y</span>,
+  p <span class='op'>=</span> <span class='fl'>1</span>,
+  z <span class='op'>=</span> <span class='cn'>NULL</span>,
+  ez <span class='op'>=</span> <span class='cn'>NULL</span>,
+  bw <span class='op'>=</span> <span class='cn'>NULL</span>,
+  cv.block <span class='op'>=</span> <span class='fl'>0</span>,
+  type <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"const"</span>, <span class='st'>"none"</span><span class='op'>)</span>,
+  exogen <span class='op'>=</span> <span class='cn'>NULL</span>,
+  est <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"lc"</span>, <span class='st'>"ll"</span><span class='op'>)</span>,
+  tkernel <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Triweight"</span>, <span class='st'>"Epa"</span>, <span class='st'>"Gaussian"</span><span class='op'>)</span>,
+  singular.ok <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span></pre>
+
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
@@ -143,8 +160,13 @@ values are included then the vector <code>z</code> is used.</p></td>
     </tr>
     <tr>
       <th>bw</th>
-      <td><p>An opcional scalar or vector of length the number of equations. It represents the bandwidth in
+      <td><p>An optional scalar or vector of length the number of equations. It represents the bandwidth in
 the estimation of trend coefficients. If NULL, it is selected by cross validation.</p></td>
+    </tr>
+    <tr>
+      <th>cv.block</th>
+      <td><p>A positive scalar with the size of the block in leave one block out cross-validation.
+By default 'cv.block = 0' meaning leave one out cross-validation.</p></td>
     </tr>
     <tr>
       <th>type</th>
@@ -160,19 +182,19 @@ the estimation of trend coefficients. If NULL, it is selected by cross validatio
     </tr>
     <tr>
       <th>tkernel</th>
-      <td><p>The type of kernel used in the coefficients estimation method, one of Epanesnikov ("Epa") or "Gaussian".</p></td>
+      <td><p>A character, either "Triweight" (default), "Epa" or "Gaussian" kernel function.</p></td>
     </tr>
     <tr>
       <th>singular.ok</th>
       <td><p>Logical. If FALSE, a singular model is an error.</p></td>
     </tr>
     </table>
-    
+
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>An object of class 'tvvar'
 The object of class <code>tvvar</code> have the following components:</p>
-<dt>tvcoef</dt><dd><p>An array of dimension obs x neq (obs = number of observations,
+<dt>coefficients</dt><dd><p>An array of dimension obs x neq (obs = number of observations,
 neq = number of equations in the system) with the time-varying coefficients estimates.</p></dd>
 <dt>fitted</dt><dd><p>The fitted values.</p></dd>
 <dt>residuals</dt><dd><p>Estimation residuals.</p></dd>
@@ -189,7 +211,6 @@ neq = number of equations in the system) with the time-varying coefficients esti
 <dt>totobs</dt><dd><p>Number of observations in the original set.</p></dd>
 <dt>call</dt><dd><p>Matched call.</p></dd>
 
-    
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Casas, I., Ferreira, E., and Orbe, S. (2017) Time-Varying Coefficient Estimation 
@@ -197,38 +218,31 @@ in SURE Models: Application to Portfolio Management. Available at SSRN:
 https://ssrn.com/abstract=3043137</p>
 <p>Primiceri, G.E. (2005) Time varying structural vector autoregressions 
 and monetary policy. <em>Review of Economic Studies</em>, 72, 821-852.</p>
-    
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='bw.html'>bw</a></code>, <code><a href='tvIRF.html'>tvIRF</a></code>, <code><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></code>, 
-<code><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></code> and <code><a href='summary.tvReg.html'>summary</a></code></p></div>
-    
+    <div class='dont-index'><p><code><a href='bw.html'>bw</a></code>, <code><a href='tvIRF.html'>tvIRF</a></code>, <code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></code>, 
+<code><a href='https://rdrr.io/r/base/print.html'>print</a></code> and <code><a href='summary.tvlm.html'>summary</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'>##Inflation rate, unemployment rate and treasury bill interest rate for </span>
-<span class='co'>##the US, as used in Primiceri (2005).</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/utils/topics/data'>data</a></span>(<span class='no'>usmacro</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"bvarsv"</span>)
-<span class='no'>VAR.fit</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>vars</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/vars/topics/VAR'>VAR</a></span>(<span class='no'>usmacro</span>, <span class='kw'>p</span> <span class='kw'>=</span> <span class='fl'>6</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"const"</span>)
-<span class='no'>tvVAR.fit</span> <span class='kw'>&lt;-</span> <span class='fu'>tvVAR</span>(<span class='no'>usmacro</span>, <span class='kw'>p</span> <span class='kw'>=</span> <span class='fl'>6</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"const"</span>, <span class='kw'>bw</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>1.8</span>, <span class='fl'>20</span>, <span class='fl'>20</span>))
-<span class='fu'><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></span>(<span class='no'>tvVAR.fit</span>)</div><div class='img'><img src='tvVAR-1.png' alt='' width='700' height='433' /></div><div class='img'><img src='tvVAR-2.png' alt='' width='700' height='433' /></div><div class='img'><img src='tvVAR-3.png' alt='' width='700' height='433' /></div><div class='input'>
-</div></pre>
+    <pre class="examples"><span class='r-in'><span class='co'>##Inflation rate, unemployment rate and treasury bill interest rate for </span></span>
+<span class='r-in'><span class='co'>##the US, as used in Primiceri (2005).</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>usmacro</span>, package <span class='op'>=</span> <span class='st'>"bvarsv"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>VAR.fit</span> <span class='op'>&lt;-</span> <span class='fu'>vars</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/vars/man/VAR.html'>VAR</a></span><span class='op'>(</span><span class='va'>usmacro</span>, p <span class='op'>=</span> <span class='fl'>6</span>, type <span class='op'>=</span> <span class='st'>"const"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>tvVAR.fit</span> <span class='op'>&lt;-</span> <span class='fu'>tvVAR</span><span class='op'>(</span><span class='va'>usmacro</span>, p <span class='op'>=</span> <span class='fl'>6</span>, type <span class='op'>=</span> <span class='st'>"const"</span>, bw <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1.8</span>, <span class='fl'>20</span>, <span class='fl'>20</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>tvVAR.fit</span><span class='op'>)</span></span>
+<span class='r-plt img'><img src='tvVAR-1.png' alt='' width='700' height='433' /></span>
+<span class='r-plt img'><img src='tvVAR-2.png' alt='' width='700' height='433' /></span>
+<span class='r-plt img'><img src='tvVAR-3.png' alt='' width='700' height='433' /></span>
+<span class='r-in'></span>
+</pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      
-      <li><a href="#value">Value</a></li>
-
-      <li><a href="#references">References</a></li>
-
-      <li><a href="#see-also">See also</a></li>
-      
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
+
 
       <footer>
       <div class="copyright">
@@ -236,13 +250,16 @@ and monetary policy. <em>Review of Economic Studies</em>, 72, 821-852.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
+
       </footer>
    </div>
 
   
 
+
   </body>
 </html>
+
 

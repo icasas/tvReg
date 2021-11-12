@@ -8,21 +8,29 @@
 
 <title>Confidence Intervals for Objects in tvReg — confint.tvlm • tvReg</title>
 
+
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
-<!-- sticky kit -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+<!-- headroom.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -30,11 +38,11 @@
 
 
 
-<meta property="og:title" content="Confidence Intervals for Objects in tvReg — confint.tvlm" />
 
+<meta property="og:title" content="Confidence Intervals for Objects in tvReg — confint.tvlm" />
 <meta property="og:description" content="confint is used to estimate the bootstrap confidence intervals for objects with class
-attribute tvlm, tvar, tvirf, tvsure." />
-<meta name="twitter:card" content="summary" />
+attribute tvlm, tvar, tvirf, tvsure and tvplm." />
+
 
 
 
@@ -48,9 +56,10 @@ attribute tvlm, tvar, tvirf, tvsure." />
 <![endif]-->
 
 
+
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -64,7 +73,7 @@ attribute tvlm, tvar, tvirf, tvsure." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">tvReg</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.5.6</span>
       </span>
     </div>
 
@@ -72,7 +81,7 @@ attribute tvlm, tvar, tvirf, tvsure." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -86,11 +95,10 @@ attribute tvlm, tvar, tvirf, tvsure." />
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
-      
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/icasas/tvReg">
-    <span class="fa fa-github fa-lg"></span>
+  <a href="https://github.com/icasas/tvReg/">
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -101,6 +109,7 @@ attribute tvlm, tvar, tvirf, tvsure." />
 </div><!--/.navbar -->
 
       
+
       </header>
 
 <div class="row">
@@ -112,34 +121,76 @@ attribute tvlm, tvar, tvirf, tvsure." />
     </div>
 
     <div class="ref-description">
-    
     <p>confint is used to estimate the bootstrap confidence intervals for objects with class
-attribute <code>tvlm</code>, <code>tvar</code>, <code>tvirf</code>, <code>tvsure</code>.</p>
-    
+attribute <code>tvlm</code>, <code>tvar</code>, <code>tvirf</code>, <code>tvsure</code> and <code>tvplm</code>.</p>
     </div>
 
     <pre class="usage"><span class='co'># S3 method for tvlm</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/confint'>confint</a></span>(<span class='no'>object</span>, <span class='no'>parm</span>, <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>0.95</span>, <span class='kw'>runs</span> <span class='kw'>=</span> <span class='fl'>100</span>,
-  <span class='kw'>tboot</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
+<span class='fu'><a href='https://rdrr.io/r/stats/confint.html'>confint</a></span><span class='op'>(</span>
+  <span class='va'>object</span>,
+  <span class='va'>parm</span>,
+  level <span class='op'>=</span> <span class='fl'>0.95</span>,
+  runs <span class='op'>=</span> <span class='fl'>100</span>,
+  tboot <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"wild"</span>, <span class='st'>"wild2"</span><span class='op'>)</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span>
 
 <span class='co'># S3 method for tvar</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/confint'>confint</a></span>(<span class='no'>object</span>, <span class='no'>parm</span>, <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>0.95</span>, <span class='kw'>runs</span> <span class='kw'>=</span> <span class='fl'>100</span>,
-  <span class='kw'>tboot</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
+<span class='fu'><a href='https://rdrr.io/r/stats/confint.html'>confint</a></span><span class='op'>(</span>
+  <span class='va'>object</span>,
+  <span class='va'>parm</span>,
+  level <span class='op'>=</span> <span class='fl'>0.95</span>,
+  runs <span class='op'>=</span> <span class='fl'>100</span>,
+  tboot <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"wild"</span>, <span class='st'>"wild2"</span><span class='op'>)</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span>
 
 <span class='co'># S3 method for tvsure</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/confint'>confint</a></span>(<span class='no'>object</span>, <span class='no'>parm</span>, <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>0.95</span>, <span class='kw'>runs</span> <span class='kw'>=</span> <span class='fl'>100</span>,
-  <span class='kw'>tboot</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
+<span class='fu'><a href='https://rdrr.io/r/stats/confint.html'>confint</a></span><span class='op'>(</span>
+  <span class='va'>object</span>,
+  <span class='va'>parm</span>,
+  level <span class='op'>=</span> <span class='fl'>0.95</span>,
+  runs <span class='op'>=</span> <span class='fl'>100</span>,
+  tboot <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"wild"</span>, <span class='st'>"wild2"</span><span class='op'>)</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span>
+
+<span class='co'># S3 method for tvvar</span>
+<span class='fu'><a href='https://rdrr.io/r/stats/confint.html'>confint</a></span><span class='op'>(</span>
+  <span class='va'>object</span>,
+  <span class='va'>parm</span>,
+  level <span class='op'>=</span> <span class='fl'>0.95</span>,
+  runs <span class='op'>=</span> <span class='fl'>100</span>,
+  tboot <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"wild"</span>, <span class='st'>"wild2"</span><span class='op'>)</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span>
 
 <span class='co'># S3 method for tvirf</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/confint'>confint</a></span>(<span class='no'>object</span>, <span class='no'>parm</span>, <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>0.95</span>, <span class='kw'>runs</span> <span class='kw'>=</span> <span class='fl'>100</span>,
-  <span class='kw'>tboot</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</pre>
-    
+<span class='fu'><a href='https://rdrr.io/r/stats/confint.html'>confint</a></span><span class='op'>(</span>
+  <span class='va'>object</span>,
+  <span class='va'>parm</span>,
+  level <span class='op'>=</span> <span class='fl'>0.95</span>,
+  runs <span class='op'>=</span> <span class='fl'>100</span>,
+  tboot <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"wild"</span>, <span class='st'>"wild2"</span><span class='op'>)</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span>
+
+<span class='co'># S3 method for tvplm</span>
+<span class='fu'><a href='https://rdrr.io/r/stats/confint.html'>confint</a></span><span class='op'>(</span>
+  <span class='va'>object</span>,
+  <span class='va'>parm</span>,
+  level <span class='op'>=</span> <span class='fl'>0.95</span>,
+  runs <span class='op'>=</span> <span class='fl'>100</span>,
+  tboot <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"wild"</span>, <span class='st'>"wild2"</span><span class='op'>)</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span></pre>
+
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>object</th>
-      <td><p>Object of class <code>tvsure</code>, class <code>tvvar</code> or class <code>tvirf</code>.</p></td>
+      <td><p>An object used to select a method.</p></td>
     </tr>
     <tr>
       <th>parm</th>
@@ -165,11 +216,10 @@ normal.</p></td>
       <td><p>Other parameters passed to specific methods.</p></td>
     </tr>
     </table>
-    
+
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>an object of class <code>tvsure</code> with BOOT, Lower and Upper different from NULL.</p>
-    
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Chen, X. B., Gao, J., Li, D., and Silvapulle, P (2017) Nonparametric estimation and 
@@ -177,53 +227,42 @@ forecasting for time-varying coefficient realized volatility models,
 <em>Journal of Business \&amp; Economic Statistics</em>, online, 1-13.</p>
 <p>Mammen, E (1993) Bootstrap and wild bootstrap for high dimensional linear models,
 <em> Annals of Statistics</em>, 21, 255-285.</p>
-    
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='tvLM.html'>tvLM</a></code>, <code><a href='tvAR.html'>tvAR</a></code>, <code><a href='tvVAR.html'>tvVAR</a></code>,
 <code><a href='tvSURE.html'>tvSURE</a></code></p></div>
-    
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='co'># NOT RUN {</span>
-<span class='co'>##Calculation of confidence intervals for a TV-LM model</span>
-
-<span class='co'>##Generation of time-varying coefficients linear model</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Random'>set.seed</a></span>(<span class='fl'>42</span>)
-<span class='no'>tau</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq</a></span>(<span class='fl'>1</span>:<span class='fl'>200</span>)/<span class='fl'>200</span>
-<span class='no'>beta</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/data.frame'>data.frame</a></span>(<span class='kw'>beta1</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Trig'>sin</a></span>(<span class='fl'>2</span>*<span class='no'>pi</span>*<span class='no'>tau</span>), <span class='kw'>beta2</span><span class='kw'>=</span> <span class='fl'>2</span>*<span class='no'>tau</span>)
-<span class='no'>X1</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Normal'>rnorm</a></span>(<span class='fl'>200</span>)
-<span class='no'>X2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Chisquare'>rchisq</a></span>(<span class='fl'>200</span>, <span class='kw'>df</span> <span class='kw'>=</span> <span class='fl'>4</span>)
-<span class='no'>error</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/TDist'>rt</a></span>(<span class='fl'>200</span>, <span class='kw'>df</span> <span class='kw'>=</span> <span class='fl'>10</span>)
-<span class='no'>y</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/apply'>apply</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/cbind'>cbind</a></span>(<span class='no'>X1</span>, <span class='no'>X2</span>)*<span class='no'>beta</span>, <span class='fl'>1</span>, <span class='no'>sum</span>) + <span class='no'>error</span>
-<span class='no'>data</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/data.frame'>data.frame</a></span>(<span class='kw'>y</span> <span class='kw'>=</span> <span class='no'>y</span>, <span class='kw'>X1</span> <span class='kw'>=</span> <span class='no'>X1</span>, <span class='kw'>X2</span> <span class='kw'>=</span> <span class='no'>X2</span>)
-
-<span class='co'>##Fitting the model and confidence interval calculation</span>
-<span class='no'>model.tvlm</span> <span class='kw'>&lt;-</span>  <span class='fu'><a href='tvLM.html'>tvLM</a></span>(<span class='no'>y</span> ~ <span class='fl'>0</span> + <span class='no'>X1</span> + <span class='no'>X2</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>data</span>, <span class='kw'>bw</span> <span class='kw'>=</span> <span class='fl'>0.29</span>)
-<span class='no'>tvci</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/confint'>confint</a></span>(<span class='no'>model.tvlm</span>, <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>0.95</span>, <span class='kw'>runs</span> <span class='kw'>=</span> <span class='fl'>20</span>)
-
-<span class='co'>##If a second confidence interval on the "same" object is calculated, </span>
-<span class='co'>##for example with a different level, the calculation is faster</span>
-
-<span class='no'>tvci.80</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/confint'>confint</a></span>(<span class='no'>tvci</span>, <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>0.8</span>)
-<span class='co'># }</span></pre>
+    <pre class="examples"><span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'><span class='co'>##Calculation of confidence intervals for a TVLM model</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>##Generation of time-varying coefficients linear model</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>42</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>tau</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>200</span><span class='op'>)</span><span class='op'>/</span><span class='fl'>200</span></span>
+<span class='r-in'><span class='va'>beta</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>beta1 <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>sin</a></span><span class='op'>(</span><span class='fl'>2</span><span class='op'>*</span><span class='va'>pi</span><span class='op'>*</span><span class='va'>tau</span><span class='op'>)</span>, beta2<span class='op'>=</span> <span class='fl'>2</span><span class='op'>*</span><span class='va'>tau</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>X1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>200</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>X2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Chisquare.html'>rchisq</a></span><span class='op'>(</span><span class='fl'>200</span>, df <span class='op'>=</span> <span class='fl'>4</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>error</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/TDist.html'>rt</a></span><span class='op'>(</span><span class='fl'>200</span>, df <span class='op'>=</span> <span class='fl'>10</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>y</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/apply.html'>apply</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span><span class='op'>(</span><span class='va'>X1</span>, <span class='va'>X2</span><span class='op'>)</span><span class='op'>*</span><span class='va'>beta</span>, <span class='fl'>1</span>, <span class='va'>sum</span><span class='op'>)</span> <span class='op'>+</span> <span class='va'>error</span></span>
+<span class='r-in'><span class='va'>data</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>y <span class='op'>=</span> <span class='va'>y</span>, X1 <span class='op'>=</span> <span class='va'>X1</span>, X2 <span class='op'>=</span> <span class='va'>X2</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>##Fitting the model and confidence interval calculation</span></span>
+<span class='r-in'><span class='va'>model.tvlm</span> <span class='op'>&lt;-</span>  <span class='fu'><a href='tvLM.html'>tvLM</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='fl'>0</span> <span class='op'>+</span> <span class='va'>X1</span> <span class='op'>+</span> <span class='va'>X2</span>, data <span class='op'>=</span> <span class='va'>data</span>, bw <span class='op'>=</span> <span class='fl'>0.29</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>tvci</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/confint.html'>confint</a></span><span class='op'>(</span><span class='va'>model.tvlm</span>, level <span class='op'>=</span> <span class='fl'>0.95</span>, runs <span class='op'>=</span> <span class='fl'>20</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>##If a second confidence interval on the "same" object is calculated, </span></span>
+<span class='r-in'><span class='co'>##for example with a different level, the calculation is faster</span></span>
+<span class='r-in'><span class='va'>tvci.80</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/confint.html'>confint</a></span><span class='op'>(</span><span class='va'>tvci</span>, level <span class='op'>=</span> <span class='fl'>0.8</span><span class='op'>)</span></span>
+<span class='r-in'><span class='op'>}</span></span>
+</pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      
-      <li><a href="#value">Value</a></li>
-
-      <li><a href="#references">References</a></li>
-
-      <li><a href="#see-also">See also</a></li>
-      
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
+
 
       <footer>
       <div class="copyright">
@@ -231,13 +270,16 @@ forecasting for time-varying coefficient realized volatility models,
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
+
       </footer>
    </div>
 
   
 
+
   </body>
 </html>
+
 

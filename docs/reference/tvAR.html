@@ -8,21 +8,29 @@
 
 <title>Time-Varying Autoregressive Model — tvAR • tvReg</title>
 
+
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
-<!-- sticky kit -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+<!-- headroom.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -30,10 +38,10 @@
 
 
 
-<meta property="og:title" content="Time-Varying Autoregressive Model — tvAR" />
 
+<meta property="og:title" content="Time-Varying Autoregressive Model — tvAR" />
 <meta property="og:description" content="tvAR is used to fit an autorregressive model with time varying coefficients." />
-<meta name="twitter:card" content="summary" />
+
 
 
 
@@ -47,9 +55,10 @@
 <![endif]-->
 
 
+
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -63,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">tvReg</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.5.6</span>
       </span>
     </div>
 
@@ -71,7 +80,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -85,11 +94,10 @@
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
-      
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/icasas/tvReg">
-    <span class="fa fa-github fa-lg"></span>
+  <a href="https://github.com/icasas/tvReg/">
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -100,6 +108,7 @@
 </div><!--/.navbar -->
 
       
+
       </header>
 
 <div class="row">
@@ -111,15 +120,24 @@
     </div>
 
     <div class="ref-description">
-    
     <p><code>tvAR</code> is used to fit an autorregressive model with time varying coefficients.</p>
-    
     </div>
 
-    <pre class="usage"><span class='fu'>tvAR</span>(<span class='no'>y</span>, <span class='kw'>p</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>z</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>ez</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>bw</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"const"</span>,
-  <span class='st'>"none"</span>), <span class='kw'>exogen</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>fixed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>est</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"lc"</span>, <span class='st'>"ll"</span>),
-  <span class='kw'>tkernel</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"Epa"</span>, <span class='st'>"Gaussian"</span>), <span class='kw'>singular.ok</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
-    
+    <pre class="usage"><span class='fu'>tvAR</span><span class='op'>(</span>
+  <span class='va'>y</span>,
+  p <span class='op'>=</span> <span class='fl'>1</span>,
+  z <span class='op'>=</span> <span class='cn'>NULL</span>,
+  ez <span class='op'>=</span> <span class='cn'>NULL</span>,
+  bw <span class='op'>=</span> <span class='cn'>NULL</span>,
+  cv.block <span class='op'>=</span> <span class='fl'>0</span>,
+  type <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"const"</span>, <span class='st'>"none"</span><span class='op'>)</span>,
+  exogen <span class='op'>=</span> <span class='cn'>NULL</span>,
+  fixed <span class='op'>=</span> <span class='cn'>NULL</span>,
+  est <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"lc"</span>, <span class='st'>"ll"</span><span class='op'>)</span>,
+  tkernel <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Triweight"</span>, <span class='st'>"Epa"</span>, <span class='st'>"Gaussian"</span><span class='op'>)</span>,
+  singular.ok <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span></pre>
+
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
@@ -147,6 +165,11 @@ the bandwidth in the estimation of coefficients. If NULL, it is selected
 by cross validation.</p></td>
     </tr>
     <tr>
+      <th>cv.block</th>
+      <td><p>A positive scalar with the size of the block in leave one block out cross-validation.
+By default 'cv.block=0' meaning leave one out cross-validation.</p></td>
+    </tr>
+    <tr>
       <th>type</th>
       <td><p>A character 'const' if the model contains an intercept and 'none' otherwise.</p></td>
     </tr>
@@ -156,8 +179,9 @@ by cross validation.</p></td>
     </tr>
     <tr>
       <th>fixed</th>
-      <td><p>(optional) numeric vector of the same length as the total number of parameters.
-If supplied, only NA entries in fixed will be varied.</p></td>
+      <td><p>(optional) numeric vector of the same length as the total number of parameters. 
+The order of the parameters is intercept (if type = "const"), lags in ascending order and 
+exogenous variables. If supplied, only NA entries in fixed will be estimated.</p></td>
     </tr>
     <tr>
       <th>est</th>
@@ -166,19 +190,18 @@ or "ll" for local linear.</p></td>
     </tr>
     <tr>
       <th>tkernel</th>
-      <td><p>The type of kernel used in the coefficients estimation method,
-one of Epanesnikov ("Epa") or "Gaussian".</p></td>
+      <td><p>A character, either "Triweight" (default), "Epa" or "Gaussian" kernel function.</p></td>
     </tr>
     <tr>
       <th>singular.ok</th>
       <td><p>Logical. If FALSE, a singular model is an error.</p></td>
     </tr>
     </table>
-    
+
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>An object of class <code>tvar</code> with the following components:</p>
-<dt>tvcoef</dt><dd><p>A vector of dimension obs (obs = number of observations - number lags),
+<dt>coefficients</dt><dd><p>A vector of dimension obs (obs = number of observations - number lags),
  with the time-varying coefficients estimates.</p></dd>
 <dt>fitted</dt><dd><p>The fitted values.</p></dd>
 <dt>residuals</dt><dd><p>Estimation residuals.</p></dd>
@@ -196,16 +219,14 @@ one of Epanesnikov ("Epa") or "Gaussian".</p></td>
 <dt>level</dt><dd><p>Confidence interval range.</p></dd>
 <dt>runs</dt><dd><p>Number of bootstrap replications.</p></dd>
 <dt>tboot</dt><dd><p>Type of bootstrap.</p></dd>
-<dt>BOOT</dt><dd><p>List with all bootstrap replications of <code>tvcoef</code>, if done.</p></dd>
+<dt>BOOT</dt><dd><p>List with all bootstrap replications of <code>coefficients</code>, if done.</p></dd>
 
-    
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>It is a special case of linear model in which the regressors are lags of the
 dependent variable. If any variable is included in the <code>xreg</code> term, these are added 
 to the regressors matrix. A time-varying coefficients linear regression (with an
 intercept if type = "const") is fitted.</p>
-    
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Cai, Z. (2007) Trending time-varying coefficient time series with serially
@@ -218,79 +239,72 @@ forecasting for time-varying coefficient realized volatility models,
 <em>Journal of Business \&amp; Economic Statistics</em>, online, 1-13.</p>
 <p>Corsi, F. (2009) A simple approximate long-memory model of realized 
 volatility. <em>Journal of Financial Econometrics</em>, 7, 174-196.</p>
-    
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='bw.html'>bw</a></code>, <code><a href='tvLM.html'>tvLM</a></code>, <code><a href='https://www.rdocumentation.org/packages/stats/topics/confint'>confint</a></code>, 
-<code><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></code>, <code><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></code> and <code><a href='summary.tvReg.html'>summary</a></code></p></div>
-    
+    <div class='dont-index'><p><code><a href='bw.html'>bw</a></code>, <code><a href='tvLM.html'>tvLM</a></code>, <code><a href='https://rdrr.io/r/stats/confint.html'>confint</a></code>, 
+<code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></code>, <code><a href='https://rdrr.io/r/base/print.html'>print</a></code> and <code><a href='summary.tvlm.html'>summary</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-<span class='co'>## Estimate coefficients of different realized variance models</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/utils/topics/data'>data</a></span>(<span class='st'>"RV"</span>)
-<span class='no'>RV2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/utils/topics/head'>head</a></span>(<span class='no'>RV</span>, <span class='fl'>2000</span>)
-<span class='no'>RV</span> <span class='kw'>&lt;-</span> <span class='no'>RV2</span>$<span class='no'>RV</span>
-<span class='no'>RV_week</span> <span class='kw'>&lt;-</span> <span class='no'>RV2</span>$<span class='no'>RV_week</span>
-<span class='no'>RV_month</span> <span class='kw'>&lt;-</span> <span class='no'>RV2</span>$<span class='no'>RV_month</span>
-<span class='no'>RQ</span> <span class='kw'>&lt;-</span> <span class='no'>RV2</span>$<span class='no'>RQ_lag_sqrt</span>
-<span class='co'>##Corsi (2009) HAR model</span>
-<span class='no'>HAR</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/arima'>arima</a></span>(<span class='no'>RV</span>, <span class='kw'>order</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>1</span>, <span class='fl'>0</span>, <span class='fl'>0</span>), <span class='kw'>xreg</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/cbind'>cbind</a></span> (<span class='no'>RV_week</span>, <span class='no'>RV_month</span>))
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>HAR</span>)</div><div class='output co'>#&gt; 
-#&gt; Call:
-#&gt; arima(x = RV, order = c(1, 0, 0), xreg = cbind(RV_week, RV_month))
-#&gt; 
-#&gt; Coefficients:
-#&gt;          ar1  intercept  RV_week  RV_month
-#&gt;       0.2486          0   0.2648    0.4319
-#&gt; s.e.  0.0255          0   0.0590    0.0734
-#&gt; 
-#&gt; sigma^2 estimated as 2.631e-10:  log likelihood = 19220.71,  aic = -38431.41</div><div class='input'>
-<span class='co'>##Chen et al (2017) TVC-HAR model </span>
-<span class='no'>TVCHAR</span> <span class='kw'>&lt;-</span> <span class='fu'>tvAR</span> (<span class='no'>RV</span>, <span class='kw'>p</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>exogen</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/cbind'>cbind</a></span> (<span class='no'>RV_week</span>, <span class='no'>RV_month</span>), <span class='kw'>bw</span> <span class='kw'>=</span> <span class='fl'>20</span>)
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>TVCHAR</span>)</div><div class='output co'>#&gt; 
-#&gt; Class:  tvar 
-#&gt; 
-#&gt; Mean of coefficient estimates: 
-#&gt; =============================== 
-#&gt; (Intercept)        y.l1     RV_week    RV_month 
-#&gt;   3.437e-06   2.698e-01   1.996e-01   3.038e-01 
-#&gt; 
-#&gt; Bandwidth:  20 
-#&gt; </div><div class='input'>
-<span class='co'>##Casas et al (2018) TV-HARQ model</span>
-<span class='no'>tvHARQ</span> <span class='kw'>&lt;-</span> <span class='fu'>tvAR</span> (<span class='no'>RV</span>, <span class='kw'>p</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>exogen</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/cbind'>cbind</a></span> (<span class='no'>RV_week</span>, <span class='no'>RV_month</span>),
-<span class='kw'>z</span><span class='kw'>=</span><span class='no'>RQ</span>, <span class='kw'>bw</span> <span class='kw'>=</span> <span class='fl'>0.0062</span>)
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>tvHARQ</span>)</div><div class='output co'>#&gt; 
-#&gt; Class:  tvar 
-#&gt; 
-#&gt; Mean of coefficient estimates: 
-#&gt; =============================== 
-#&gt; (Intercept)        y.l1     RV_week    RV_month 
-#&gt;   3.320e-06   2.973e-01   1.908e-01   2.939e-01 
-#&gt; 
-#&gt; Bandwidth:  0.0062 
-#&gt; </div><div class='input'>
-</div></pre>
+    <pre class="examples"><span class='r-in'></span>
+<span class='r-in'><span class='co'>## Estimate coefficients of different realized variance models</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='st'>"RV"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>RV2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>RV</span>, <span class='fl'>2000</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>RV</span> <span class='op'>&lt;-</span> <span class='va'>RV2</span><span class='op'>$</span><span class='va'>RV</span></span>
+<span class='r-in'><span class='va'>RV_week</span> <span class='op'>&lt;-</span> <span class='va'>RV2</span><span class='op'>$</span><span class='va'>RV_week</span></span>
+<span class='r-in'><span class='va'>RV_month</span> <span class='op'>&lt;-</span> <span class='va'>RV2</span><span class='op'>$</span><span class='va'>RV_month</span></span>
+<span class='r-in'><span class='va'>RQ</span> <span class='op'>&lt;-</span> <span class='va'>RV2</span><span class='op'>$</span><span class='va'>RQ_lag_sqrt</span></span>
+<span class='r-in'><span class='co'>##Corsi (2009) HAR model</span></span>
+<span class='r-in'><span class='va'>HAR</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/arima.html'>arima</a></span><span class='op'>(</span><span class='va'>RV</span>, order <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>0</span>, <span class='fl'>0</span><span class='op'>)</span>, xreg <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span> <span class='op'>(</span><span class='va'>RV_week</span>, <span class='va'>RV_month</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>HAR</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Call:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> arima(x = RV, order = c(1, 0, 0), xreg = cbind(RV_week, RV_month))</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Coefficients:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>          ar1  intercept  RV_week  RV_month</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       0.2510          0   0.2495    0.4407</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> s.e.  0.0255          0   0.0592    0.0728</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> sigma^2 estimated as 2.623e-10:  log likelihood = 19223.64,  aic = -38437.27</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>##Chen et al (2017) TVCHAR model </span></span>
+<span class='r-in'><span class='va'>TVCHAR</span> <span class='op'>&lt;-</span> <span class='fu'>tvAR</span> <span class='op'>(</span><span class='va'>RV</span>, p <span class='op'>=</span> <span class='fl'>1</span>, exogen <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span> <span class='op'>(</span><span class='va'>RV_week</span>, <span class='va'>RV_month</span><span class='op'>)</span>, bw <span class='op'>=</span> <span class='fl'>20</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>TVCHAR</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Class:  tvar </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Mean of coefficient estimates: </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> =============================== </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> (Intercept)        y.l1     RV_week    RV_month </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   3.388e-06   2.708e-01   1.894e-01   3.121e-01 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Bandwidth:  20 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>##Casas et al (2018) TVHARQ model</span></span>
+<span class='r-in'><span class='va'>TVHARQ</span> <span class='op'>&lt;-</span> <span class='fu'>tvAR</span> <span class='op'>(</span><span class='va'>RV</span>, p <span class='op'>=</span> <span class='fl'>1</span>, exogen <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span> <span class='op'>(</span><span class='va'>RV_week</span>, <span class='va'>RV_month</span><span class='op'>)</span>, </span>
+<span class='r-in'>z<span class='op'>=</span><span class='va'>RQ</span>, bw <span class='op'>=</span> <span class='fl'>0.0062</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>TVHARQ</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Class:  tvar </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Mean of coefficient estimates: </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> =============================== </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> (Intercept)        y.l1     RV_week    RV_month </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   3.042e-06   3.520e-01   1.645e-01   2.821e-01 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Bandwidth:  0.0062 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'></span>
+</pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      
-      <li><a href="#value">Value</a></li>
-
-      <li><a href="#details">Details</a></li>
-
-      <li><a href="#references">References</a></li>
-
-      <li><a href="#see-also">See also</a></li>
-      
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
+
 
       <footer>
       <div class="copyright">
@@ -298,13 +312,16 @@ volatility. <em>Journal of Financial Econometrics</em>, 7, 174-196.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
+
       </footer>
    </div>
 
   
 
+
   </body>
 </html>
+
 

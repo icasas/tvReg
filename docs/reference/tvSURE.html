@@ -8,21 +8,29 @@
 
 <title>Time-Varying Seemingly Unrelated Regression Equations Model — tvSURE • tvReg</title>
 
+
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
-<!-- sticky kit -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+<!-- headroom.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -30,13 +38,13 @@
 
 
 
-<meta property="og:title" content="Time-Varying Seemingly Unrelated Regression Equations Model — tvSURE" />
 
+<meta property="og:title" content="Time-Varying Seemingly Unrelated Regression Equations Model — tvSURE" />
 <meta property="og:description" content="Fits a set of balanced linear structural equations using Time-varying Ordinary Least 
 Squares (tvOLS), Time-varying Seemingly Unrelated Regression (tvGLS), when the error 
 variance-covariance matrix is known, or Time-varying Feasible Seemingly Unrelated 
 Regression (tvFGLS), when the error variance-covariance matrix is unknown." />
-<meta name="twitter:card" content="summary" />
+
 
 
 
@@ -50,9 +58,10 @@ Regression (tvFGLS), when the error variance-covariance matrix is unknown." />
 <![endif]-->
 
 
+
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -66,7 +75,7 @@ Regression (tvFGLS), when the error variance-covariance matrix is unknown." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">tvReg</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.5.6</span>
       </span>
     </div>
 
@@ -74,7 +83,7 @@ Regression (tvFGLS), when the error variance-covariance matrix is unknown." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -88,11 +97,10 @@ Regression (tvFGLS), when the error variance-covariance matrix is unknown." />
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
-      
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/icasas/tvReg">
-    <span class="fa fa-github fa-lg"></span>
+  <a href="https://github.com/icasas/tvReg/">
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -103,6 +111,7 @@ Regression (tvFGLS), when the error variance-covariance matrix is unknown." />
 </div><!--/.navbar -->
 
       
+
       </header>
 
 <div class="row">
@@ -114,20 +123,31 @@ Regression (tvFGLS), when the error variance-covariance matrix is unknown." />
     </div>
 
     <div class="ref-description">
-    
     <p>Fits a set of balanced linear structural equations using Time-varying Ordinary Least 
 Squares (tvOLS), Time-varying Seemingly Unrelated Regression (tvGLS), when the error 
 variance-covariance matrix is known, or Time-varying Feasible Seemingly Unrelated 
 Regression (tvFGLS), when the error variance-covariance matrix is unknown.</p>
-    
     </div>
 
-    <pre class="usage"><span class='fu'>tvSURE</span>(<span class='no'>formula</span>, <span class='kw'>z</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>ez</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>bw</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>data</span>,
-  <span class='kw'>method</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"tvOLS"</span>, <span class='st'>"tvFGLS"</span>, <span class='st'>"tvGLS"</span>), <span class='kw'>Sigma</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>est</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"lc"</span>,
-  <span class='st'>"ll"</span>), <span class='kw'>tkernel</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"Epa"</span>, <span class='st'>"Gaussian"</span>), <span class='kw'>bw.cov</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>singular.ok</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>R</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>r</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>control</span> <span class='kw'>=</span> <span class='fu'><a href='tvReg-internals.html'>tvsure.control</a></span>(<span class='no'>...</span>), <span class='no'>...</span>)</pre>
-    
+    <pre class="usage"><span class='fu'>tvSURE</span><span class='op'>(</span>
+  <span class='va'>formula</span>,
+  z <span class='op'>=</span> <span class='cn'>NULL</span>,
+  ez <span class='op'>=</span> <span class='cn'>NULL</span>,
+  bw <span class='op'>=</span> <span class='cn'>NULL</span>,
+  cv.block <span class='op'>=</span> <span class='fl'>0</span>,
+  <span class='va'>data</span>,
+  method <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"tvOLS"</span>, <span class='st'>"tvFGLS"</span>, <span class='st'>"tvGLS"</span><span class='op'>)</span>,
+  Sigma <span class='op'>=</span> <span class='cn'>NULL</span>,
+  est <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"lc"</span>, <span class='st'>"ll"</span><span class='op'>)</span>,
+  tkernel <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Triweight"</span>, <span class='st'>"Epa"</span>, <span class='st'>"Gaussian"</span><span class='op'>)</span>,
+  bw.cov <span class='op'>=</span> <span class='cn'>NULL</span>,
+  singular.ok <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  R <span class='op'>=</span> <span class='cn'>NULL</span>,
+  r <span class='op'>=</span> <span class='cn'>NULL</span>,
+  control <span class='op'>=</span> <span class='fu'><a href='.tvLM.ci.html'>tvreg.control</a></span><span class='op'>(</span><span class='va'>...</span><span class='op'>)</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span></pre>
+
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
@@ -146,8 +166,13 @@ values are included then the vector <code>z</code> is used.</p></td>
     </tr>
     <tr>
       <th>bw</th>
-      <td><p>An opcional scalar or vector of length the number of equations. It represents the bandwidth in
+      <td><p>An optional scalar or vector of length the number of equations. It represents the bandwidth in
 the estimation of trend coefficients. If NULL, it is selected by cross validation.</p></td>
+    </tr>
+    <tr>
+      <th>cv.block</th>
+      <td><p>A positive scalar with the size of the block in leave one block out cross-validation.
+By default 'cv.block = 0' meaning leave one out cross-validation.</p></td>
     </tr>
     <tr>
       <th>data</th>
@@ -174,7 +199,7 @@ the covariance matrix of the error term. Only necessary for method <code>tvGLS</
     </tr>
     <tr>
       <th>tkernel</th>
-      <td><p>The type of kernel used in the coefficients estimation method, one of Epanesnikov ("Epa") or "Gaussian".</p></td>
+      <td><p>A character, either "Triweight" (default), "Epa" or "Gaussian" kernel function.</p></td>
     </tr>
     <tr>
       <th>bw.cov</th>
@@ -197,21 +222,21 @@ neq = number of equations).</p></td>
     <tr>
       <th>control</th>
       <td><p>list of control parameters.  The default is constructed by
-the function <code><a href='tvReg-internals.html'>tvsure.control</a></code>.  See the documentation of
-<code><a href='tvReg-internals.html'>tvsure.control</a></code> for details.</p></td>
+the function <code><a href='.tvLM.ci.html'>tvreg.control</a></code>.  See the documentation of
+<code><a href='.tvLM.ci.html'>tvreg.control</a></code> for details.</p></td>
     </tr>
     <tr>
       <th>...</th>
       <td><p>Other parameters passed to specific methods.</p></td>
     </tr>
     </table>
-    
+
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p><code>tvSURE</code> returns a list of the class <code>tvsure</code> containing the results of the whole system, results of the estimation
 and confidence instervals if chosen.
 The object of class <code>tvsure</code> have the following components:</p>
-<dt>tvcoef</dt><dd><p>An array of dimension obs x nvar x neq (obs = number of observations, nvar = number of variables
+<dt>coefficients</dt><dd><p>An array of dimension obs x nvar x neq (obs = number of observations, nvar = number of variables
 in each equation, neq = number of equations in the system) with the time-varying coefficients estimates.</p></dd>
 <dt>Lower</dt><dd><p>If <code>level</code> non equal zero, an array of dimension obs x nvar x neq containing the confidence 
 interval lower band.</p></dd>
@@ -235,12 +260,11 @@ interval upper band.</p></dd>
 <dt>level</dt><dd><p>Confidence interval range.</p></dd>
 <dt>runs</dt><dd><p>Number of bootstrap replications.</p></dd>
 <dt>tboot</dt><dd><p>Type of bootstrap.</p></dd>
-<dt>BOOT</dt><dd><p>List with all bootstrap replications of <code>tvcoef</code>, if done.</p></dd>
+<dt>BOOT</dt><dd><p>List with all bootstrap replications of <code>coefficients</code>, if done.</p></dd>
 <dt>R</dt><dd><p>Restrictions matrix.</p></dd>
 <dt>r</dt><dd><p>Restrictions vector.</p></dd>
 <dt>formula</dt><dd><p>Initial formula.</p></dd>
 
-    
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>This function wraps up the kernel smoothing "tvOLS" and "tvGLS" estimators. The former is used when
@@ -262,7 +286,6 @@ where \(Y_t  = (y_{1t}, y_{2t}, \ldots, y_{neq t})'\), \(X_t = diag (x_{1t}, x_{
 and \(\beta_{t} = \left(\beta _{1t}', \ldots, \beta _{neq t}'\right)'\) is a vector of order the
 total number of variables in the system. The error vector \(u_{t} = (u_{1t}, u_{2t}, \ldots, u_{neq t})'\)
 has zero mean and  covariance matrix \(E(u_t u_t') = \Sigma_t\).</p>
-    
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Casas, I., Ferreira, E., and Orbe, S. (2017) Time-Varying Coefficient Estimation 
@@ -277,53 +300,41 @@ Parameter Models? <em>Studies in Nonlinear Dynamics \&amp; Econometrics</em>, 12
 <em>Econometrics Journal</em>, 15, pp. 420-461.</p>
 <p>Orbe, S., Ferreira, E., and Rodriguez-Poo, J (2004) On the estimation and testing of
 time varying constraints in econometric models, <em>Statistica Sinica</em>.</p>
-    
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='bw.html'>bw</a></code>, <code><a href='tvCov.html'>tvCov</a></code>,  <code><a href='tvVAR.html'>tvVAR</a></code>, 
-<code><a href='https://www.rdocumentation.org/packages/stats/topics/confint'>confint</a></code>, <code><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></code>, <code><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></code> and <code><a href='summary.tvReg.html'>summary</a></code></p></div>
-    
+<code><a href='https://rdrr.io/r/stats/confint.html'>confint</a></code>, <code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></code>, <code><a href='https://rdrr.io/r/base/print.html'>print</a></code> and <code><a href='summary.tvlm.html'>summary</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='co'># NOT RUN {</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/utils/topics/data'>data</a></span>(<span class='st'>"Kmenta"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"systemfit"</span>)
-<span class='no'>eqDemand</span> <span class='kw'>&lt;-</span> <span class='no'>consump</span> ~ <span class='no'>price</span> + <span class='no'>income</span>
-<span class='no'>eqSupply</span> <span class='kw'>&lt;-</span> <span class='no'>consump</span> ~ <span class='no'>price</span> + <span class='no'>farmPrice</span> + <span class='no'>trend</span>
-<span class='no'>system</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>demand</span> <span class='kw'>=</span> <span class='no'>eqDemand</span>, <span class='kw'>supply</span> <span class='kw'>=</span> <span class='no'>eqSupply</span>)
-<span class='no'>eqSupply2</span> <span class='kw'>&lt;-</span> <span class='no'>consump</span> ~  <span class='no'>price</span> + <span class='no'>farmPrice</span>
-<span class='no'>system2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>demand</span> <span class='kw'>=</span> <span class='no'>eqDemand</span>, <span class='kw'>supply</span> <span class='kw'>=</span> <span class='no'>eqSupply2</span>)
-
-<span class='co'>##OLS estimation of a system</span>
-<span class='no'>ols.fit</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>systemfit</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/systemfit/topics/systemfit'>systemfit</a></span>(<span class='no'>system</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"OLS"</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>Kmenta</span>)
-<span class='co'>##tvOLS estimation of a system with the local linear estimator</span>
-<span class='co'>##removing trend because it is included in the intercept changing over time</span>
-<span class='no'>tvols.fit</span> <span class='kw'>&lt;-</span> <span class='fu'>tvSURE</span>(<span class='no'>system2</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>Kmenta</span>,  <span class='kw'>est</span> <span class='kw'>=</span> <span class='st'>"ll"</span>)
-
-<span class='co'>##SUR estimation</span>
-<span class='no'>fgls1.fit</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>systemfit</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/systemfit/topics/systemfit'>systemfit</a></span>(<span class='no'>system</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>Kmenta</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"SUR"</span>)
-<span class='co'>##tvSURE estimation</span>
-<span class='no'>tvfgls1.fit</span> <span class='kw'>&lt;-</span> <span class='fu'>tvSURE</span>(<span class='no'>system</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>Kmenta</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"tvFGLS"</span>)
-<span class='co'># }</span><div class='input'>
-</div></pre>
+    <pre class="examples"><span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='st'>"Kmenta"</span>, package <span class='op'>=</span> <span class='st'>"systemfit"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>eqDemand</span> <span class='op'>&lt;-</span> <span class='va'>consump</span> <span class='op'>~</span> <span class='va'>price</span> <span class='op'>+</span> <span class='va'>income</span></span>
+<span class='r-in'><span class='va'>eqSupply</span> <span class='op'>&lt;-</span> <span class='va'>consump</span> <span class='op'>~</span> <span class='va'>price</span> <span class='op'>+</span> <span class='va'>farmPrice</span> <span class='op'>+</span> <span class='va'>trend</span></span>
+<span class='r-in'><span class='va'>system</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>demand <span class='op'>=</span> <span class='va'>eqDemand</span>, supply <span class='op'>=</span> <span class='va'>eqSupply</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>eqSupply2</span> <span class='op'>&lt;-</span> <span class='va'>consump</span> <span class='op'>~</span>  <span class='va'>price</span> <span class='op'>+</span> <span class='va'>farmPrice</span> </span>
+<span class='r-in'><span class='va'>system2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>demand <span class='op'>=</span> <span class='va'>eqDemand</span>, supply <span class='op'>=</span> <span class='va'>eqSupply2</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>##OLS estimation of a system</span></span>
+<span class='r-in'><span class='va'>OLS</span> <span class='op'>&lt;-</span> <span class='fu'>systemfit</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/systemfit/man/systemfit.html'>systemfit</a></span><span class='op'>(</span><span class='va'>system</span>, method <span class='op'>=</span> <span class='st'>"OLS"</span>, data <span class='op'>=</span> <span class='va'>Kmenta</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'>##tvOLS estimation of a system with the local linear estimator</span></span>
+<span class='r-in'><span class='co'>##removing trend because it is included in the intercept changing over time</span></span>
+<span class='r-in'><span class='va'>TVOLS</span> <span class='op'>&lt;-</span> <span class='fu'>tvSURE</span><span class='op'>(</span><span class='va'>system2</span>, data <span class='op'>=</span> <span class='va'>Kmenta</span>,  est <span class='op'>=</span> <span class='st'>"ll"</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>##SUR/FGLS estimation</span></span>
+<span class='r-in'><span class='va'>FGLS</span> <span class='op'>&lt;-</span> <span class='fu'>systemfit</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/systemfit/man/systemfit.html'>systemfit</a></span><span class='op'>(</span><span class='va'>system</span>, data <span class='op'>=</span> <span class='va'>Kmenta</span>, method <span class='op'>=</span> <span class='st'>"SUR"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'>##tvSURE estimation</span></span>
+<span class='r-in'><span class='va'>TVFGLS</span> <span class='op'>&lt;-</span> <span class='fu'>tvSURE</span><span class='op'>(</span><span class='va'>system</span>, data <span class='op'>=</span> <span class='va'>Kmenta</span>, method <span class='op'>=</span> <span class='st'>"tvFGLS"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='op'>}</span></span>
+<span class='r-in'></span>
+</pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      
-      <li><a href="#value">Value</a></li>
-
-      <li><a href="#details">Details</a></li>
-
-      <li><a href="#references">References</a></li>
-
-      <li><a href="#see-also">See also</a></li>
-      
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
+
 
       <footer>
       <div class="copyright">
@@ -331,13 +342,16 @@ time varying constraints in econometric models, <em>Statistica Sinica</em>.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
+
       </footer>
    </div>
 
   
 
+
   </body>
 </html>
+
 
