@@ -1,24 +1,32 @@
 ---
-title: 'tvReg: Time-Varying Coefficient Linear Regression for Single and Multi-Equations in R'
+title: 'Introduction to the tvReg package'
 author:
 - name: Isabel Casas
-  affiliation: The University of Southern Denmark.
+  affiliation: University of Deusto
 - name: Ruben Fernandez-Casal
   affiliation: University of A Coruna
-date: '`r Sys.Date()`'
-output: rmarkdown::html_vignette
+date: '`r paste("tvReg", packageVersion("tvReg"))`'
+output: 
+  rmarkdown::html_vignette:
+    toc: yes
+    toc_depth: 2
+  html_document:
+    toc: yes
+    toc_depth: 2
 vignette: >
-  %\VignetteIndexEntry{Introduction to the tvReg R package} 
+  %\VignetteIndexEntry{Introduction to the tvReg package} 
   %\VignetteEngine{knitr::rmarkdown} 
   %\usepackage[UTF-8]{inputenc}
-  
-abstract: "The source code of the *tvReg* package is publicly available
-for download from the Comprehensive *R* Archive Network (CRAN,
-https://CRAN.R-project.org/). The five basic functions in this package are *tvLM*, *tvAR*, *tvSURE*, *tvVAR* and *tvIRF*. Moreover, this package provides the *confint*, *fitted*, *forecast*, *plot*, *predict*, *print*, *resid* and *summary* methods adapted to the class attributes of the *tvReg*. In addition, it includes a bandwidth selection method, a time-varying variance-covariance estimator and two estimation procedures: the time-varying ordinary least squares, which is implemented in the *tvOLS* method and the time-varying generalised least squares, which is implemented in the *tvGLS* method."
-
 ---
 
+<!-- 
+abstract: "The source code of the *tvReg* package is publicly available
+for download from the Comprehensive *R* Archive Network (CRAN,
+https://CRAN.R-project.org/). "
 
+Pendiente:
+- Actualizar funciones `tvLM()`
+-->
 
 
 ```{r setup, include = FALSE}
@@ -27,6 +35,7 @@ knitr::opts_chunk$set(echo = TRUE, fig.width = 6,
 library(tvReg)
 ```
 
+The five basic functions in this package are *tvLM*, *tvAR*, *tvSURE*, *tvPLM*, *tvVAR*  and *tvIRF*. Moreover, this package provides the *confint*, *fitted*, *forecast*, *plot*, *predict*, *print*, *resid* and *summary* methods adapted to the class attributes of the *tvReg*. In addition, it includes a bandwidth selection method, a time-varying variance-covariance estimator and two estimation procedures: the time-varying ordinary least squares, which is implemented in the *tvOLS* method and the time-varying generalised least squares, which is implemented in the *tvGLS* method.
 
 # Single equation models: the TVLM and TVAR 
 
