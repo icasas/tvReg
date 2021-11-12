@@ -147,14 +147,13 @@ set of arrays</p>
     <p>A list object with coefficient arrays for the lagged endogenous variables.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>Canada</span>, package<span class='op'>=</span><span class='st'>"vars"</span><span class='op'>)</span></span>
-<span class='r-in'><span class='va'>var.2p</span> <span class='op'>&lt;-</span> <span class='fu'>vars</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/vars/man/VAR.html'>VAR</a></span><span class='op'>(</span><span class='va'>Canada</span>, p <span class='op'>=</span> <span class='fl'>2</span>, type <span class='op'>=</span> <span class='st'>"const"</span><span class='op'>)</span></span>
-<span class='r-in'><span class='va'>tvvar.2p</span> <span class='op'>&lt;-</span> <span class='fu'><a href='tvVAR.html'>tvVAR</a></span><span class='op'>(</span><span class='va'>Canada</span>, p <span class='op'>=</span> <span class='fl'>2</span>, type <span class='op'>=</span> <span class='st'>"const"</span><span class='op'>)</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating regression bandwidths... bandwidth(s)  1.055559 4.118743 20 0.8864787 </span>
-<span class='r-in'><span class='va'>A</span> <span class='op'>&lt;-</span> <span class='fu'>vars</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/vars/man/A.html'>Acoef</a></span><span class='op'>(</span><span class='va'>var.2p</span><span class='op'>)</span></span>
-<span class='r-in'><span class='va'>tvA</span> <span class='op'>&lt;-</span> <span class='fu'>tvAcoef</span><span class='op'>(</span><span class='va'>tvvar.2p</span><span class='op'>)</span></span>
-<span class='r-in'></span>
-</pre>
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>Canada</span>, package<span class='op'>=</span><span class='st'>"vars"</span><span class='op'>)</span>
+<span class='va'>var.2p</span> <span class='op'>&lt;-</span> <span class='fu'>vars</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/vars/man/VAR.html'>VAR</a></span><span class='op'>(</span><span class='va'>Canada</span>, p <span class='op'>=</span> <span class='fl'>2</span>, type <span class='op'>=</span> <span class='st'>"const"</span><span class='op'>)</span>
+<span class='va'>tvvar.2p</span> <span class='op'>&lt;-</span> <span class='fu'><a href='tvVAR.html'>tvVAR</a></span><span class='op'>(</span><span class='va'>Canada</span>, p <span class='op'>=</span> <span class='fl'>2</span>, type <span class='op'>=</span> <span class='st'>"const"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; Calculating regression bandwidths... bandwidth(s)  1.055559 4.118743 20 0.8864787 </div><div class='input'><span class='va'>A</span> <span class='op'>&lt;-</span> <span class='fu'>vars</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/vars/man/A.html'>Acoef</a></span><span class='op'>(</span><span class='va'>var.2p</span><span class='op'>)</span>
+<span class='va'>tvA</span> <span class='op'>&lt;-</span> <span class='fu'>tvAcoef</span><span class='op'>(</span><span class='va'>tvvar.2p</span><span class='op'>)</span>
+
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

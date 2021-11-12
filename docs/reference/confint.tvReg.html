@@ -233,28 +233,28 @@ forecasting for time-varying coefficient realized volatility models,
 <code><a href='tvSURE.html'>tvSURE</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span></span>
-<span class='r-in'><span class='co'>##Calculation of confidence intervals for a TVLM model</span></span>
-<span class='r-in'></span>
-<span class='r-in'><span class='co'>##Generation of time-varying coefficients linear model</span></span>
-<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>42</span><span class='op'>)</span></span>
-<span class='r-in'><span class='va'>tau</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>200</span><span class='op'>)</span><span class='op'>/</span><span class='fl'>200</span></span>
-<span class='r-in'><span class='va'>beta</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>beta1 <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>sin</a></span><span class='op'>(</span><span class='fl'>2</span><span class='op'>*</span><span class='va'>pi</span><span class='op'>*</span><span class='va'>tau</span><span class='op'>)</span>, beta2<span class='op'>=</span> <span class='fl'>2</span><span class='op'>*</span><span class='va'>tau</span><span class='op'>)</span></span>
-<span class='r-in'><span class='va'>X1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>200</span><span class='op'>)</span></span>
-<span class='r-in'><span class='va'>X2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Chisquare.html'>rchisq</a></span><span class='op'>(</span><span class='fl'>200</span>, df <span class='op'>=</span> <span class='fl'>4</span><span class='op'>)</span></span>
-<span class='r-in'><span class='va'>error</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/TDist.html'>rt</a></span><span class='op'>(</span><span class='fl'>200</span>, df <span class='op'>=</span> <span class='fl'>10</span><span class='op'>)</span></span>
-<span class='r-in'><span class='va'>y</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/apply.html'>apply</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span><span class='op'>(</span><span class='va'>X1</span>, <span class='va'>X2</span><span class='op'>)</span><span class='op'>*</span><span class='va'>beta</span>, <span class='fl'>1</span>, <span class='va'>sum</span><span class='op'>)</span> <span class='op'>+</span> <span class='va'>error</span></span>
-<span class='r-in'><span class='va'>data</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>y <span class='op'>=</span> <span class='va'>y</span>, X1 <span class='op'>=</span> <span class='va'>X1</span>, X2 <span class='op'>=</span> <span class='va'>X2</span><span class='op'>)</span></span>
-<span class='r-in'></span>
-<span class='r-in'><span class='co'>##Fitting the model and confidence interval calculation</span></span>
-<span class='r-in'><span class='va'>model.tvlm</span> <span class='op'>&lt;-</span>  <span class='fu'><a href='tvLM.html'>tvLM</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='fl'>0</span> <span class='op'>+</span> <span class='va'>X1</span> <span class='op'>+</span> <span class='va'>X2</span>, data <span class='op'>=</span> <span class='va'>data</span>, bw <span class='op'>=</span> <span class='fl'>0.29</span><span class='op'>)</span></span>
-<span class='r-in'><span class='va'>tvci</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/confint.html'>confint</a></span><span class='op'>(</span><span class='va'>model.tvlm</span>, level <span class='op'>=</span> <span class='fl'>0.95</span>, runs <span class='op'>=</span> <span class='fl'>20</span><span class='op'>)</span></span>
-<span class='r-in'></span>
-<span class='r-in'><span class='co'>##If a second confidence interval on the "same" object is calculated, </span></span>
-<span class='r-in'><span class='co'>##for example with a different level, the calculation is faster</span></span>
-<span class='r-in'><span class='va'>tvci.80</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/confint.html'>confint</a></span><span class='op'>(</span><span class='va'>tvci</span>, level <span class='op'>=</span> <span class='fl'>0.8</span><span class='op'>)</span></span>
-<span class='r-in'><span class='op'>}</span></span>
-</pre>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'>##Calculation of confidence intervals for a TVLM model</span>
+
+<span class='co'>##Generation of time-varying coefficients linear model</span>
+<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>42</span><span class='op'>)</span>
+<span class='va'>tau</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>200</span><span class='op'>)</span><span class='op'>/</span><span class='fl'>200</span>
+<span class='va'>beta</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>beta1 <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>sin</a></span><span class='op'>(</span><span class='fl'>2</span><span class='op'>*</span><span class='va'>pi</span><span class='op'>*</span><span class='va'>tau</span><span class='op'>)</span>, beta2<span class='op'>=</span> <span class='fl'>2</span><span class='op'>*</span><span class='va'>tau</span><span class='op'>)</span>
+<span class='va'>X1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>200</span><span class='op'>)</span>
+<span class='va'>X2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/Chisquare.html'>rchisq</a></span><span class='op'>(</span><span class='fl'>200</span>, df <span class='op'>=</span> <span class='fl'>4</span><span class='op'>)</span>
+<span class='va'>error</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/TDist.html'>rt</a></span><span class='op'>(</span><span class='fl'>200</span>, df <span class='op'>=</span> <span class='fl'>10</span><span class='op'>)</span>
+<span class='va'>y</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/apply.html'>apply</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span><span class='op'>(</span><span class='va'>X1</span>, <span class='va'>X2</span><span class='op'>)</span><span class='op'>*</span><span class='va'>beta</span>, <span class='fl'>1</span>, <span class='va'>sum</span><span class='op'>)</span> <span class='op'>+</span> <span class='va'>error</span>
+<span class='va'>data</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>y <span class='op'>=</span> <span class='va'>y</span>, X1 <span class='op'>=</span> <span class='va'>X1</span>, X2 <span class='op'>=</span> <span class='va'>X2</span><span class='op'>)</span>
+
+<span class='co'>##Fitting the model and confidence interval calculation</span>
+<span class='va'>model.tvlm</span> <span class='op'>&lt;-</span>  <span class='fu'><a href='tvLM.html'>tvLM</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='fl'>0</span> <span class='op'>+</span> <span class='va'>X1</span> <span class='op'>+</span> <span class='va'>X2</span>, data <span class='op'>=</span> <span class='va'>data</span>, bw <span class='op'>=</span> <span class='fl'>0.29</span><span class='op'>)</span>
+<span class='va'>tvci</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/confint.html'>confint</a></span><span class='op'>(</span><span class='va'>model.tvlm</span>, level <span class='op'>=</span> <span class='fl'>0.95</span>, runs <span class='op'>=</span> <span class='fl'>20</span><span class='op'>)</span>
+
+<span class='co'>##If a second confidence interval on the "same" object is calculated, </span>
+<span class='co'>##for example with a different level, the calculation is faster</span>
+<span class='va'>tvci.80</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/confint.html'>confint</a></span><span class='op'>(</span><span class='va'>tvci</span>, level <span class='op'>=</span> <span class='fl'>0.8</span><span class='op'>)</span>
+<span class='op'>}</span>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

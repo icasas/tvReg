@@ -168,14 +168,14 @@ or "ll" for local linear.</p></td>
     <p>A scalar.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='r-in'></span>
-<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>CEES</span><span class='op'>)</span></span>
-<span class='r-in'><span class='co'>## Using a shorter set for a quick example. Variable "Date" is removed.</span></span>
-<span class='r-in'><span class='va'>mydata</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span> <span class='op'>(</span><span class='va'>CEES</span><span class='op'>[</span>, <span class='op'>-</span><span class='fl'>1</span><span class='op'>]</span>, <span class='fl'>50</span><span class='op'>)</span></span>
-<span class='r-in'><span class='va'>bw.cov</span> <span class='op'>&lt;-</span> <span class='fu'>bwCov</span><span class='op'>(</span><span class='va'>mydata</span><span class='op'>)</span></span>
-<span class='r-in'><span class='va'>Sigma.hat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='tvCov.html'>tvCov</a></span><span class='op'>(</span><span class='va'>mydata</span>, bw <span class='op'>=</span> <span class='va'>bw.cov</span><span class='op'>)</span></span>
-<span class='r-in'></span>
-</pre>
+    <pre class="examples"><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>CEES</span><span class='op'>)</span>
+<span class='co'>## Using a shorter set for a quick example. Variable "Date" is removed.</span>
+<span class='va'>mydata</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>tail</a></span> <span class='op'>(</span><span class='va'>CEES</span><span class='op'>[</span>, <span class='op'>-</span><span class='fl'>1</span><span class='op'>]</span>, <span class='fl'>50</span><span class='op'>)</span>
+<span class='va'>bw.cov</span> <span class='op'>&lt;-</span> <span class='fu'>bwCov</span><span class='op'>(</span><span class='va'>mydata</span><span class='op'>)</span>
+<span class='va'>Sigma.hat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='tvCov.html'>tvCov</a></span><span class='op'>(</span><span class='va'>mydata</span>, bw <span class='op'>=</span> <span class='va'>bw.cov</span><span class='op'>)</span>
+
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

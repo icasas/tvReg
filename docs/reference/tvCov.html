@@ -171,35 +171,32 @@ allocation. <em>Journal of Banking \&amp; Finance</em>, 37, 2268-2283</p>
     <div class='dont-index'><p><code><a href='bwCov.html'>bwCov</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='r-in'><span class='co'>##Generate two independent (uncorrelated series)</span></span>
-<span class='r-in'><span class='va'>y</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>100</span>, sd <span class='op'>=</span> <span class='fl'>4</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>100</span>, sd <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span></span>
-<span class='r-in'></span>
-<span class='r-in'><span class='co'>##Estimation variance-variance matrix. If the bandwidth is unknown, it can</span></span>
-<span class='r-in'><span class='co'>##calculated with function bwCov()</span></span>
-<span class='r-in'><span class='va'>Sigma.hat</span> <span class='op'>&lt;-</span>  <span class='fu'>tvCov</span><span class='op'>(</span><span class='va'>y</span>, bw <span class='op'>=</span> <span class='fl'>1.4</span><span class='op'>)</span></span>
-<span class='r-in'></span>
-<span class='r-in'><span class='co'>##The first time estimate</span></span>
-<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>Sigma.hat</span><span class='op'>[</span>,,<span class='fl'>1</span><span class='op'>]</span><span class='op'>)</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span>           [,1]      [,2]</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> [1,] 15.382965 -1.175845</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> [2,] -1.175845  1.033527</span>
-<span class='r-in'><span class='co'>##The mean over time of all estimates</span></span>
-<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/apply.html'>apply</a></span><span class='op'>(</span><span class='va'>Sigma.hat</span>, <span class='fl'>1</span><span class='op'>:</span><span class='fl'>2</span>, <span class='va'>mean</span><span class='op'>)</span><span class='op'>)</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span>            [,1]       [,2]</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> [1,] 13.0650645 -0.8566088</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> [2,] -0.8566088  0.9647204</span>
-<span class='r-in'><span class='co'>##Generate two dependent variables</span></span>
-<span class='r-in'><span class='va'>y</span> <span class='op'>&lt;-</span> <span class='fu'>MASS</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/MASS/man/mvrnorm.html'>mvrnorm</a></span><span class='op'>(</span>n <span class='op'>=</span> <span class='fl'>100</span>, mu <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>,<span class='fl'>0</span><span class='op'>)</span>, Sigma <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='op'>-</span><span class='fl'>0.5</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='op'>-</span><span class='fl'>0.5</span>, <span class='fl'>4</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span></span>
-<span class='r-in'></span>
-<span class='r-in'><span class='co'>##Estimation variance-variance matrix</span></span>
-<span class='r-in'><span class='va'>Sigma.hat</span> <span class='op'>&lt;-</span>  <span class='fu'>tvCov</span><span class='op'>(</span><span class='va'>y</span>, bw <span class='op'>=</span> <span class='fl'>3.2</span><span class='op'>)</span></span>
-<span class='r-in'><span class='co'>##The first time estimate</span></span>
-<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>Sigma.hat</span><span class='op'>[</span>,,<span class='fl'>1</span><span class='op'>]</span><span class='op'>)</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span>            [,1]       [,2]</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> [1,]  0.8223837 -0.2518741</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> [2,] -0.2518741  3.1337540</span>
-<span class='r-in'></span>
-</pre>
+    <pre class="examples"><div class='input'><span class='co'>##Generate two independent (uncorrelated series)</span>
+<span class='va'>y</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>100</span>, sd <span class='op'>=</span> <span class='fl'>4</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>100</span>, sd <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='co'>##Estimation variance-variance matrix. If the bandwidth is unknown, it can</span>
+<span class='co'>##calculated with function bwCov()</span>
+<span class='va'>Sigma.hat</span> <span class='op'>&lt;-</span>  <span class='fu'>tvCov</span><span class='op'>(</span><span class='va'>y</span>, bw <span class='op'>=</span> <span class='fl'>1.4</span><span class='op'>)</span>
+
+<span class='co'>##The first time estimate</span>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>Sigma.hat</span><span class='op'>[</span>,,<span class='fl'>1</span><span class='op'>]</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;           [,1]      [,2]
+#&gt; [1,] 15.382965 -1.175845
+#&gt; [2,] -1.175845  1.033527</div><div class='input'><span class='co'>##The mean over time of all estimates</span>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/apply.html'>apply</a></span><span class='op'>(</span><span class='va'>Sigma.hat</span>, <span class='fl'>1</span><span class='op'>:</span><span class='fl'>2</span>, <span class='va'>mean</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;            [,1]       [,2]
+#&gt; [1,] 13.0650645 -0.8566088
+#&gt; [2,] -0.8566088  0.9647204</div><div class='input'><span class='co'>##Generate two dependent variables</span>
+<span class='va'>y</span> <span class='op'>&lt;-</span> <span class='fu'>MASS</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/MASS/man/mvrnorm.html'>mvrnorm</a></span><span class='op'>(</span>n <span class='op'>=</span> <span class='fl'>100</span>, mu <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>,<span class='fl'>0</span><span class='op'>)</span>, Sigma <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='op'>-</span><span class='fl'>0.5</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='op'>-</span><span class='fl'>0.5</span>, <span class='fl'>4</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='co'>##Estimation variance-variance matrix</span>
+<span class='va'>Sigma.hat</span> <span class='op'>&lt;-</span>  <span class='fu'>tvCov</span><span class='op'>(</span><span class='va'>y</span>, bw <span class='op'>=</span> <span class='fl'>3.2</span><span class='op'>)</span>
+<span class='co'>##The first time estimate</span>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>Sigma.hat</span><span class='op'>[</span>,,<span class='fl'>1</span><span class='op'>]</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;            [,1]       [,2]
+#&gt; [1,]  0.8223837 -0.2518741
+#&gt; [2,] -0.2518741  3.1337540</div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

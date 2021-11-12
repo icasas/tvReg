@@ -214,20 +214,20 @@ coefficients are computed. Default is FALSE.</p></dd>
 <code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></code>, <code><a href='https://rdrr.io/r/base/print.html'>print</a></code> and <code><a href='summary.tvlm.html'>summary</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span></span>
-<span class='r-in'><span class='co'>##Inflation rate, unemployment rate and treasury bill </span></span>
-<span class='r-in'><span class='co'>##interest rate for the US as in Primiceri (2005). </span></span>
-<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>usmacro</span>, package <span class='op'>=</span> <span class='st'>"bvarsv"</span><span class='op'>)</span></span>
-<span class='r-in'><span class='va'>TVVAR</span> <span class='op'>&lt;-</span> <span class='fu'><a href='tvVAR.html'>tvVAR</a></span><span class='op'>(</span><span class='va'>usmacro</span>, p <span class='op'>=</span> <span class='fl'>4</span>, type <span class='op'>=</span> <span class='st'>"const"</span><span class='op'>)</span></span>
-<span class='r-in'></span>
-<span class='r-in'><span class='co'>##Estimate a the tvIRF with time-varying covariance function</span></span>
-<span class='r-in'><span class='va'>TVIRF</span> <span class='op'>&lt;-</span> <span class='fu'>tvIRF</span><span class='op'>(</span><span class='va'>TVVAR</span><span class='op'>)</span></span>
-<span class='r-in'></span>
-<span class='r-in'><span class='co'>##Cumulative impulse response function</span></span>
-<span class='r-in'><span class='va'>TVIRF2</span> <span class='op'>&lt;-</span> <span class='fu'>tvIRF</span><span class='op'>(</span><span class='va'>TVVAR</span>, cumulative <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></span>
-<span class='r-in'><span class='op'>}</span></span>
-<span class='r-in'></span>
-</pre>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'>##Inflation rate, unemployment rate and treasury bill </span>
+<span class='co'>##interest rate for the US as in Primiceri (2005). </span>
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>usmacro</span>, package <span class='op'>=</span> <span class='st'>"bvarsv"</span><span class='op'>)</span>
+<span class='va'>TVVAR</span> <span class='op'>&lt;-</span> <span class='fu'><a href='tvVAR.html'>tvVAR</a></span><span class='op'>(</span><span class='va'>usmacro</span>, p <span class='op'>=</span> <span class='fl'>4</span>, type <span class='op'>=</span> <span class='st'>"const"</span><span class='op'>)</span>
+
+<span class='co'>##Estimate a the tvIRF with time-varying covariance function</span>
+<span class='va'>TVIRF</span> <span class='op'>&lt;-</span> <span class='fu'>tvIRF</span><span class='op'>(</span><span class='va'>TVVAR</span><span class='op'>)</span>
+
+<span class='co'>##Cumulative impulse response function</span>
+<span class='va'>TVIRF2</span> <span class='op'>&lt;-</span> <span class='fu'>tvIRF</span><span class='op'>(</span><span class='va'>TVVAR</span>, cumulative <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+<span class='op'>}</span>
+
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

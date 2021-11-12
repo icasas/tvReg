@@ -245,58 +245,55 @@ volatility. <em>Journal of Financial Econometrics</em>, 7, 174-196.</p>
 <code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></code>, <code><a href='https://rdrr.io/r/base/print.html'>print</a></code> and <code><a href='summary.tvlm.html'>summary</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='r-in'></span>
-<span class='r-in'><span class='co'>## Estimate coefficients of different realized variance models</span></span>
-<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='st'>"RV"</span><span class='op'>)</span></span>
-<span class='r-in'><span class='va'>RV2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>RV</span>, <span class='fl'>2000</span><span class='op'>)</span></span>
-<span class='r-in'><span class='va'>RV</span> <span class='op'>&lt;-</span> <span class='va'>RV2</span><span class='op'>$</span><span class='va'>RV</span></span>
-<span class='r-in'><span class='va'>RV_week</span> <span class='op'>&lt;-</span> <span class='va'>RV2</span><span class='op'>$</span><span class='va'>RV_week</span></span>
-<span class='r-in'><span class='va'>RV_month</span> <span class='op'>&lt;-</span> <span class='va'>RV2</span><span class='op'>$</span><span class='va'>RV_month</span></span>
-<span class='r-in'><span class='va'>RQ</span> <span class='op'>&lt;-</span> <span class='va'>RV2</span><span class='op'>$</span><span class='va'>RQ_lag_sqrt</span></span>
-<span class='r-in'><span class='co'>##Corsi (2009) HAR model</span></span>
-<span class='r-in'><span class='va'>HAR</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/arima.html'>arima</a></span><span class='op'>(</span><span class='va'>RV</span>, order <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>0</span>, <span class='fl'>0</span><span class='op'>)</span>, xreg <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span> <span class='op'>(</span><span class='va'>RV_week</span>, <span class='va'>RV_month</span><span class='op'>)</span><span class='op'>)</span></span>
-<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>HAR</span><span class='op'>)</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> Call:</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> arima(x = RV, order = c(1, 0, 0), xreg = cbind(RV_week, RV_month))</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> Coefficients:</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span>          ar1  intercept  RV_week  RV_month</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span>       0.2510          0   0.2495    0.4407</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> s.e.  0.0255          0   0.0592    0.0728</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> sigma^2 estimated as 2.623e-10:  log likelihood = 19223.64,  aic = -38437.27</span>
-<span class='r-in'></span>
-<span class='r-in'><span class='co'>##Chen et al (2017) TVCHAR model </span></span>
-<span class='r-in'><span class='va'>TVCHAR</span> <span class='op'>&lt;-</span> <span class='fu'>tvAR</span> <span class='op'>(</span><span class='va'>RV</span>, p <span class='op'>=</span> <span class='fl'>1</span>, exogen <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span> <span class='op'>(</span><span class='va'>RV_week</span>, <span class='va'>RV_month</span><span class='op'>)</span>, bw <span class='op'>=</span> <span class='fl'>20</span><span class='op'>)</span></span>
-<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>TVCHAR</span><span class='op'>)</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> Class:  tvar </span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> Mean of coefficient estimates: </span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> =============================== </span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> (Intercept)        y.l1     RV_week    RV_month </span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span>   3.388e-06   2.708e-01   1.894e-01   3.121e-01 </span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> Bandwidth:  20 </span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
-<span class='r-in'></span>
-<span class='r-in'><span class='co'>##Casas et al (2018) TVHARQ model</span></span>
-<span class='r-in'><span class='va'>TVHARQ</span> <span class='op'>&lt;-</span> <span class='fu'>tvAR</span> <span class='op'>(</span><span class='va'>RV</span>, p <span class='op'>=</span> <span class='fl'>1</span>, exogen <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span> <span class='op'>(</span><span class='va'>RV_week</span>, <span class='va'>RV_month</span><span class='op'>)</span>, </span>
-<span class='r-in'>z<span class='op'>=</span><span class='va'>RQ</span>, bw <span class='op'>=</span> <span class='fl'>0.0062</span><span class='op'>)</span></span>
-<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>TVHARQ</span><span class='op'>)</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> Class:  tvar </span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> Mean of coefficient estimates: </span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> =============================== </span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> (Intercept)        y.l1     RV_week    RV_month </span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span>   3.042e-06   3.520e-01   1.645e-01   2.821e-01 </span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> Bandwidth:  0.0062 </span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
-<span class='r-in'></span>
-</pre>
+    <pre class="examples"><div class='input'>
+<span class='co'>## Estimate coefficients of different realized variance models</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='st'>"RV"</span><span class='op'>)</span>
+<span class='va'>RV2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>RV</span>, <span class='fl'>2000</span><span class='op'>)</span>
+<span class='va'>RV</span> <span class='op'>&lt;-</span> <span class='va'>RV2</span><span class='op'>$</span><span class='va'>RV</span>
+<span class='va'>RV_week</span> <span class='op'>&lt;-</span> <span class='va'>RV2</span><span class='op'>$</span><span class='va'>RV_week</span>
+<span class='va'>RV_month</span> <span class='op'>&lt;-</span> <span class='va'>RV2</span><span class='op'>$</span><span class='va'>RV_month</span>
+<span class='va'>RQ</span> <span class='op'>&lt;-</span> <span class='va'>RV2</span><span class='op'>$</span><span class='va'>RQ_lag_sqrt</span>
+<span class='co'>##Corsi (2009) HAR model</span>
+<span class='va'>HAR</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/arima.html'>arima</a></span><span class='op'>(</span><span class='va'>RV</span>, order <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>0</span>, <span class='fl'>0</span><span class='op'>)</span>, xreg <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span> <span class='op'>(</span><span class='va'>RV_week</span>, <span class='va'>RV_month</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>HAR</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; 
+#&gt; Call:
+#&gt; arima(x = RV, order = c(1, 0, 0), xreg = cbind(RV_week, RV_month))
+#&gt; 
+#&gt; Coefficients:
+#&gt;          ar1  intercept  RV_week  RV_month
+#&gt;       0.2510          0   0.2495    0.4407
+#&gt; s.e.  0.0255          0   0.0592    0.0728
+#&gt; 
+#&gt; sigma^2 estimated as 2.623e-10:  log likelihood = 19223.64,  aic = -38437.27</div><div class='input'>
+<span class='co'>##Chen et al (2017) TVCHAR model </span>
+<span class='va'>TVCHAR</span> <span class='op'>&lt;-</span> <span class='fu'>tvAR</span> <span class='op'>(</span><span class='va'>RV</span>, p <span class='op'>=</span> <span class='fl'>1</span>, exogen <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span> <span class='op'>(</span><span class='va'>RV_week</span>, <span class='va'>RV_month</span><span class='op'>)</span>, bw <span class='op'>=</span> <span class='fl'>20</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>TVCHAR</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; 
+#&gt; Class:  tvar 
+#&gt; 
+#&gt; Mean of coefficient estimates: 
+#&gt; =============================== 
+#&gt; (Intercept)        y.l1     RV_week    RV_month 
+#&gt;   3.388e-06   2.708e-01   1.894e-01   3.121e-01 
+#&gt; 
+#&gt; Bandwidth:  20 
+#&gt; </div><div class='input'>
+<span class='co'>##Casas et al (2018) TVHARQ model</span>
+<span class='va'>TVHARQ</span> <span class='op'>&lt;-</span> <span class='fu'>tvAR</span> <span class='op'>(</span><span class='va'>RV</span>, p <span class='op'>=</span> <span class='fl'>1</span>, exogen <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>cbind</a></span> <span class='op'>(</span><span class='va'>RV_week</span>, <span class='va'>RV_month</span><span class='op'>)</span>, 
+z<span class='op'>=</span><span class='va'>RQ</span>, bw <span class='op'>=</span> <span class='fl'>0.0062</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>TVHARQ</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; 
+#&gt; Class:  tvar 
+#&gt; 
+#&gt; Mean of coefficient estimates: 
+#&gt; =============================== 
+#&gt; (Intercept)        y.l1     RV_week    RV_month 
+#&gt;   3.042e-06   3.520e-01   1.645e-01   2.821e-01 
+#&gt; 
+#&gt; Bandwidth:  0.0062 
+#&gt; </div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

@@ -224,17 +224,14 @@ and monetary policy. <em>Review of Economic Studies</em>, 72, 821-852.</p>
 <code><a href='https://rdrr.io/r/base/print.html'>print</a></code> and <code><a href='summary.tvlm.html'>summary</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='r-in'><span class='co'>##Inflation rate, unemployment rate and treasury bill interest rate for </span></span>
-<span class='r-in'><span class='co'>##the US, as used in Primiceri (2005).</span></span>
-<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>usmacro</span>, package <span class='op'>=</span> <span class='st'>"bvarsv"</span><span class='op'>)</span></span>
-<span class='r-in'><span class='va'>VAR.fit</span> <span class='op'>&lt;-</span> <span class='fu'>vars</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/vars/man/VAR.html'>VAR</a></span><span class='op'>(</span><span class='va'>usmacro</span>, p <span class='op'>=</span> <span class='fl'>6</span>, type <span class='op'>=</span> <span class='st'>"const"</span><span class='op'>)</span></span>
-<span class='r-in'><span class='va'>tvVAR.fit</span> <span class='op'>&lt;-</span> <span class='fu'>tvVAR</span><span class='op'>(</span><span class='va'>usmacro</span>, p <span class='op'>=</span> <span class='fl'>6</span>, type <span class='op'>=</span> <span class='st'>"const"</span>, bw <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1.8</span>, <span class='fl'>20</span>, <span class='fl'>20</span><span class='op'>)</span><span class='op'>)</span></span>
-<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>tvVAR.fit</span><span class='op'>)</span></span>
-<span class='r-plt img'><img src='tvVAR-1.png' alt='' width='700' height='433' /></span>
-<span class='r-plt img'><img src='tvVAR-2.png' alt='' width='700' height='433' /></span>
-<span class='r-plt img'><img src='tvVAR-3.png' alt='' width='700' height='433' /></span>
-<span class='r-in'></span>
-</pre>
+    <pre class="examples"><div class='input'><span class='co'>##Inflation rate, unemployment rate and treasury bill interest rate for </span>
+<span class='co'>##the US, as used in Primiceri (2005).</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>usmacro</span>, package <span class='op'>=</span> <span class='st'>"bvarsv"</span><span class='op'>)</span>
+<span class='va'>VAR.fit</span> <span class='op'>&lt;-</span> <span class='fu'>vars</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/vars/man/VAR.html'>VAR</a></span><span class='op'>(</span><span class='va'>usmacro</span>, p <span class='op'>=</span> <span class='fl'>6</span>, type <span class='op'>=</span> <span class='st'>"const"</span><span class='op'>)</span>
+<span class='va'>tvVAR.fit</span> <span class='op'>&lt;-</span> <span class='fu'>tvVAR</span><span class='op'>(</span><span class='va'>usmacro</span>, p <span class='op'>=</span> <span class='fl'>6</span>, type <span class='op'>=</span> <span class='st'>"const"</span>, bw <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1.8</span>, <span class='fl'>20</span>, <span class='fl'>20</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>tvVAR.fit</span><span class='op'>)</span>
+</div><div class='img'><img src='tvVAR-1.png' alt='' width='700' height='433' /></div><div class='img'><img src='tvVAR-2.png' alt='' width='700' height='433' /></div><div class='img'><img src='tvVAR-3.png' alt='' width='700' height='433' /></div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

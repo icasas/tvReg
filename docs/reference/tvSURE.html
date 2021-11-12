@@ -306,27 +306,27 @@ time varying constraints in econometric models, <em>Statistica Sinica</em>.</p>
 <code><a href='https://rdrr.io/r/stats/confint.html'>confint</a></code>, <code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></code>, <code><a href='https://rdrr.io/r/base/print.html'>print</a></code> and <code><a href='summary.tvlm.html'>summary</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span></span>
-<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='st'>"Kmenta"</span>, package <span class='op'>=</span> <span class='st'>"systemfit"</span><span class='op'>)</span></span>
-<span class='r-in'><span class='va'>eqDemand</span> <span class='op'>&lt;-</span> <span class='va'>consump</span> <span class='op'>~</span> <span class='va'>price</span> <span class='op'>+</span> <span class='va'>income</span></span>
-<span class='r-in'><span class='va'>eqSupply</span> <span class='op'>&lt;-</span> <span class='va'>consump</span> <span class='op'>~</span> <span class='va'>price</span> <span class='op'>+</span> <span class='va'>farmPrice</span> <span class='op'>+</span> <span class='va'>trend</span></span>
-<span class='r-in'><span class='va'>system</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>demand <span class='op'>=</span> <span class='va'>eqDemand</span>, supply <span class='op'>=</span> <span class='va'>eqSupply</span><span class='op'>)</span></span>
-<span class='r-in'><span class='va'>eqSupply2</span> <span class='op'>&lt;-</span> <span class='va'>consump</span> <span class='op'>~</span>  <span class='va'>price</span> <span class='op'>+</span> <span class='va'>farmPrice</span> </span>
-<span class='r-in'><span class='va'>system2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>demand <span class='op'>=</span> <span class='va'>eqDemand</span>, supply <span class='op'>=</span> <span class='va'>eqSupply2</span><span class='op'>)</span></span>
-<span class='r-in'></span>
-<span class='r-in'><span class='co'>##OLS estimation of a system</span></span>
-<span class='r-in'><span class='va'>OLS</span> <span class='op'>&lt;-</span> <span class='fu'>systemfit</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/systemfit/man/systemfit.html'>systemfit</a></span><span class='op'>(</span><span class='va'>system</span>, method <span class='op'>=</span> <span class='st'>"OLS"</span>, data <span class='op'>=</span> <span class='va'>Kmenta</span><span class='op'>)</span></span>
-<span class='r-in'><span class='co'>##tvOLS estimation of a system with the local linear estimator</span></span>
-<span class='r-in'><span class='co'>##removing trend because it is included in the intercept changing over time</span></span>
-<span class='r-in'><span class='va'>TVOLS</span> <span class='op'>&lt;-</span> <span class='fu'>tvSURE</span><span class='op'>(</span><span class='va'>system2</span>, data <span class='op'>=</span> <span class='va'>Kmenta</span>,  est <span class='op'>=</span> <span class='st'>"ll"</span><span class='op'>)</span></span>
-<span class='r-in'></span>
-<span class='r-in'><span class='co'>##SUR/FGLS estimation</span></span>
-<span class='r-in'><span class='va'>FGLS</span> <span class='op'>&lt;-</span> <span class='fu'>systemfit</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/systemfit/man/systemfit.html'>systemfit</a></span><span class='op'>(</span><span class='va'>system</span>, data <span class='op'>=</span> <span class='va'>Kmenta</span>, method <span class='op'>=</span> <span class='st'>"SUR"</span><span class='op'>)</span></span>
-<span class='r-in'><span class='co'>##tvSURE estimation</span></span>
-<span class='r-in'><span class='va'>TVFGLS</span> <span class='op'>&lt;-</span> <span class='fu'>tvSURE</span><span class='op'>(</span><span class='va'>system</span>, data <span class='op'>=</span> <span class='va'>Kmenta</span>, method <span class='op'>=</span> <span class='st'>"tvFGLS"</span><span class='op'>)</span></span>
-<span class='r-in'><span class='op'>}</span></span>
-<span class='r-in'></span>
-</pre>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='st'>"Kmenta"</span>, package <span class='op'>=</span> <span class='st'>"systemfit"</span><span class='op'>)</span>
+<span class='va'>eqDemand</span> <span class='op'>&lt;-</span> <span class='va'>consump</span> <span class='op'>~</span> <span class='va'>price</span> <span class='op'>+</span> <span class='va'>income</span>
+<span class='va'>eqSupply</span> <span class='op'>&lt;-</span> <span class='va'>consump</span> <span class='op'>~</span> <span class='va'>price</span> <span class='op'>+</span> <span class='va'>farmPrice</span> <span class='op'>+</span> <span class='va'>trend</span>
+<span class='va'>system</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>demand <span class='op'>=</span> <span class='va'>eqDemand</span>, supply <span class='op'>=</span> <span class='va'>eqSupply</span><span class='op'>)</span>
+<span class='va'>eqSupply2</span> <span class='op'>&lt;-</span> <span class='va'>consump</span> <span class='op'>~</span>  <span class='va'>price</span> <span class='op'>+</span> <span class='va'>farmPrice</span> 
+<span class='va'>system2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>demand <span class='op'>=</span> <span class='va'>eqDemand</span>, supply <span class='op'>=</span> <span class='va'>eqSupply2</span><span class='op'>)</span>
+
+<span class='co'>##OLS estimation of a system</span>
+<span class='va'>OLS</span> <span class='op'>&lt;-</span> <span class='fu'>systemfit</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/systemfit/man/systemfit.html'>systemfit</a></span><span class='op'>(</span><span class='va'>system</span>, method <span class='op'>=</span> <span class='st'>"OLS"</span>, data <span class='op'>=</span> <span class='va'>Kmenta</span><span class='op'>)</span>
+<span class='co'>##tvOLS estimation of a system with the local linear estimator</span>
+<span class='co'>##removing trend because it is included in the intercept changing over time</span>
+<span class='va'>TVOLS</span> <span class='op'>&lt;-</span> <span class='fu'>tvSURE</span><span class='op'>(</span><span class='va'>system2</span>, data <span class='op'>=</span> <span class='va'>Kmenta</span>,  est <span class='op'>=</span> <span class='st'>"ll"</span><span class='op'>)</span>
+
+<span class='co'>##SUR/FGLS estimation</span>
+<span class='va'>FGLS</span> <span class='op'>&lt;-</span> <span class='fu'>systemfit</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/systemfit/man/systemfit.html'>systemfit</a></span><span class='op'>(</span><span class='va'>system</span>, data <span class='op'>=</span> <span class='va'>Kmenta</span>, method <span class='op'>=</span> <span class='st'>"SUR"</span><span class='op'>)</span>
+<span class='co'>##tvSURE estimation</span>
+<span class='va'>TVFGLS</span> <span class='op'>&lt;-</span> <span class='fu'>tvSURE</span><span class='op'>(</span><span class='va'>system</span>, data <span class='op'>=</span> <span class='va'>Kmenta</span>, method <span class='op'>=</span> <span class='st'>"tvFGLS"</span><span class='op'>)</span>
+<span class='op'>}</span>
+
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
