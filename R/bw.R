@@ -126,7 +126,8 @@ bw.default <- function(x, y, z = NULL, cv.block = 0, est = c("lc", "ll"), tkerne
 #' @rdname bw
 #' @method bw list
 #' @export
-bw.list <- function(x, y, z = NULL, cv.block = 0, est = c("lc", "ll"), tkernel = c("Triweight", "Epa", "Gaussian"),
+bw.list <- function(x, y, z = NULL, cv.block = 0, est = c("lc", "ll"), 
+                    tkernel = c("Triweight", "Epa", "Gaussian"),
                     singular.ok = TRUE, ...)
 {
   if(!inherits(x, "list"))
@@ -134,7 +135,7 @@ bw.list <- function(x, y, z = NULL, cv.block = 0, est = c("lc", "ll"), tkernel =
   neq <- length(x)
   if(neq < 2)
     stop("'x' should have at least two elements.\n")
-  if (sum(is.na(y)) >0)
+  if(sum(is.na(y)) > 0)
     stop("There are NA values in your data, please enter only complete cases. \n")
   if(is.null(y))
     stop("Parameter 'y' is missing.\n")
