@@ -26,13 +26,12 @@ The five basic functions in this package are `tvLM()`, `tvAR()`, `tvSURE()`, `tv
 
 ## Further information
 
-Details on the theory and applications to finance and macroeconomics can be found in [Casas, Isabel and Fernandez-Casal, 2019](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3363526),
-and in the package vignette <https://icasas.github.io/tvReg/articles/tvReg.html>.
+Details on the theory and applications to finance and macroeconomics can be found in [Casas, Isabel and Fernandez-Casal, 2022](https://journal.r-project.org/articles/RJ-2022-002/) and in the package vignette <https://icasas.github.io/tvReg/articles/tvReg.html>.
 
 
 ## References
 
-Casas, Isabel and Fernandez-Casal, Ruben, *tvReg: Time-varying Coefficient Linear Regression for Single and Multi-Equations in R* (April 1, 2019). Available at SSRN:<https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3363526>.
+Casas, Isabel and Fernandez-Casal, Ruben, *tvReg: Time-varying Coefficient Linear Regression for Single and Multi-Equations in R* (2022). R Journal, 14/1, pp. 79 - 100. [link](https://journal.r-project.org/articles/RJ-2022-002/)
 
 
 
