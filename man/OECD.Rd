@@ -20,8 +20,8 @@ A data frame with 680 rows and 7 columns.
 Variables related to the problem of healthcare spending.
 }
 \references{
-Casas, I., Gao, J., Peng B., and Xie, S. (2019). Ferreira, E., and Orbe, S. (2017) 
-Modelling Time-Varying Income Elasticities of Health Care Expenditure for the OECD. 
-Available at SSRN: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3262326
+Casas, I., Gao, J., Peng, B. and Xie, S. (2021). Time-Varying Income Elasticities 
+of Healthcare Expenditure for the OECD and Eurozone. 
+\emph{Journal of Applied Econometrics, 36, pp. 328-345}.
 }
 \keyword{datasets}

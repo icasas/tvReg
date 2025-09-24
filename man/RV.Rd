@@ -18,7 +18,7 @@ A data frame with 4264 rows and 6 variables.
 }
 \description{
 A dataset containing the daily realized variance, and some of its lags,
-obtained from 1-minute close prices of the S\&P 500. Similar data has
+obtained from 1-minute close prices of the SP 500. Similar data has
 been used in the HAR model in Corsi (2009), the HARQ and SHARQ models in
 Bollerslev et al (2016) and the TVHARQ and TVSHARQ models in 
 Casas et al (2018). The time period runs from Feb 1990 until 

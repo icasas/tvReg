@@ -36,7 +36,7 @@ tvGLS<- function(x, ...) UseMethod("tvGLS", x)
 #' @param y A matrix.
 #' @param z A vector with the smoothing variable.
 #' @param ez (optional) A scalar or vector with the smoothing values. If 
-#' values are included then the vector z is used.
+#' values are not included then the vector \code{z} is used instead.
 #' @param bw A numeric vector.
 #' @param Sigma An array.
 #' @param R A matrix.

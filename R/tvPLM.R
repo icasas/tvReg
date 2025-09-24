@@ -14,9 +14,9 @@
 #' the same for each equation which have common coefficients. 
 #' 
 #' @references
-#' Casas, I., Gao, J., Peng B., and Xie, S. (2019). Modelling Time-Varying Income Elasticities 
-#' of Health Care Expenditure for the OECD. 
-#' Available at SSRN: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3262326
+#' Casas, I., Gao, J., Peng, B. and Xie, S. (2021). Time-Varying Income Elasticities 
+#' of Healthcare Expenditure for the OECD and Eurozone. 
+#' \emph{Journal of Applied Econometrics, 36, pp. 328-345}. 
 #' 
 #' Sun, Y., Carrol, R.J and Li, D. (2009). Semiparametric Estimation of Fixed-Effects Panel Data 
 #' Varying Coefficient Models. \emph{Advances in Econometrics}, 25, pp. 101-129.
@@ -25,8 +25,8 @@
 #' @rdname tvPLM
 #' @param formula An object of class formula.
 #' @param z A vector containing the smoothing variable.
-#' @param ez (optional) A scalar or vector with the smoothing estimation values. If 
-#' values are included then the vector \code{z} is used.
+#' @param ez (optional) A scalar or vector with the smoothing values. If 
+#' values are not included then the vector \code{z} is used instead.
 #' @param data An optional data frame or matrix.
 #' @param index	Indicates the individual and time indexes. 
 #' @param bw An opcional scalar. It represents the bandwidth in

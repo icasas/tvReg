@@ -30,8 +30,8 @@ tvSURE(
 
 \item{z}{A vector containing the smoothing variable.}
 
-\item{ez}{(optional) A scalar or vector with the smoothing estimation values. If 
-values are included then the vector \code{z} is used.}
+\item{ez}{(optional) A scalar or vector with the smoothing values. If 
+values are not included then the vector \code{z} is used instead.}
 
 \item{bw}{An optional scalar or vector of length the number of equations. It represents the bandwidth in
 the estimation of trend coefficients. If NULL, it is selected by cross validation.}
@@ -56,8 +56,8 @@ the covariance matrix of the error term. Only necessary for method \code{tvGLS}.
 
 \item{tkernel}{A character, either "Triweight" (default), "Epa" or "Gaussian" kernel function.}
 
-\item{bw.cov}{An optional scalar. It represents the bandwidth in the "lc" nonparametric estimation of the
-time-varying covariance matrix. If NULL, it is selected by cross validation.}
+\item{bw.cov}{An optional scalar. It represents the bandwidth in the nonparametric estimation of the
+varying covariance matrix. If NULL, it is selected by cross validation.}
 
 \item{singular.ok}{Logical. If FALSE, a singular model is an error.}
 
@@ -163,10 +163,10 @@ https://ssrn.com/abstract=3043137
 
 Chen, X. B., Gao, J., Li, D., and Silvapulle, P (2017) Nonparametric Estimation and 
 Forecasting for Time-Varying Coefficient Realized Volatility Models.
-\emph{Journal of Business \& Economic Statistics}, pp.1-13
+\emph{Journal of Business and Economic Statistics}, pp.1-13
 
 Granger, C. W (2008) Non-Linear Models: Where Do We Go Next - Time Varying
-Parameter Models? \emph{Studies in Nonlinear Dynamics \& Econometrics}, 12, pp. 1-11.
+Parameter Models? \emph{Studies in Nonlinear Dynamics and Econometrics}, 12, pp. 1-11.
 
 Kristensen, D (2012) Non-parametric detection and estimation of structural change.
 \emph{Econometrics Journal}, 15, pp. 420-461.

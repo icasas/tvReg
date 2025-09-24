@@ -66,8 +66,8 @@ newexogen <- RV[2002:2004, c("RV_week", "RV_month")]
 forecast(TVHAR2, n.ahead = 3, newexogen = newexogen)
 
 data(usmacro, package = "bvarsv")
-model.tvVAR <- tvVAR(usmacro, p = 6, type = "const", bw = c(1.8, 20, 20))
-forecast(model.tvVAR, n.ahead = 10)
+tvVAR.fit <- tvVAR(usmacro, p = 6, type = "const", bw = c(1.8, 20, 20))
+forecast(tvVAR.fit, n.ahead = 10)
 
 data("Kmenta", package = "systemfit")
 eqDemand <- consump ~ price + income

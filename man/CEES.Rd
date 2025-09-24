@@ -28,6 +28,6 @@ until May 7, 2010 (T = 2856 observations). This dataset contains the standarised
 }
 \references{
 Aslanidis, N. and Casas, I. (2013) Nonparametric correlation models for portfolio allocation,
-\emph{Journal of Banking \& Finance}, 37, 2268 - 2283.
+\emph{Journal of Banking and Finance}, 37, 2268 - 2283.
 }
 \keyword{datasets}

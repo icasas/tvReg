@@ -35,10 +35,10 @@
 #' 
 #' Chen, X. B., Gao, J., Li, D., and Silvapulle, P (2017) Nonparametric Estimation and 
 #' Forecasting for Time-Varying Coefficient Realized Volatility Models.
-#' \emph{Journal of Business \& Economic Statistics}, pp.1-13
+#' \emph{Journal of Business and Economic Statistics}, pp.1-13
 #'
 #' Granger, C. W (2008) Non-Linear Models: Where Do We Go Next - Time Varying
-#' Parameter Models? \emph{Studies in Nonlinear Dynamics \& Econometrics}, 12, pp. 1-11.
+#' Parameter Models? \emph{Studies in Nonlinear Dynamics and Econometrics}, 12, pp. 1-11.
 #'
 #' Kristensen, D (2012) Non-parametric detection and estimation of structural change.
 #' \emph{Econometrics Journal}, 15, pp. 420-461.
@@ -51,8 +51,8 @@
 #' @rdname tvSURE
 #' @param formula A list of formulas, one for each equation.
 #' @param z A vector containing the smoothing variable.
-#' @param ez (optional) A scalar or vector with the smoothing estimation values. If 
-#' values are included then the vector \code{z} is used.
+#' @param ez (optional) A scalar or vector with the smoothing values. If 
+#' values are not included then the vector \code{z} is used instead.
 #' @param bw An optional scalar or vector of length the number of equations. It represents the bandwidth in
 #' the estimation of trend coefficients. If NULL, it is selected by cross validation.
 #' @param cv.block A positive scalar with the size of the block in leave one block out cross-validation.
@@ -67,8 +67,8 @@
 #' @param Sigma A matrix of dimensions neq x neq or an array of dimensions neq x neq x obs
 #' (neq = number of equations, obs = number of observations). It represents
 #' the covariance matrix of the error term. Only necessary for method \code{tvGLS}.
-#' @param bw.cov An optional scalar. It represents the bandwidth in the "lc" nonparametric estimation of the
-#' time-varying covariance matrix. If NULL, it is selected by cross validation.
+#' @param bw.cov An optional scalar. It represents the bandwidth in the nonparametric estimation of the
+#' varying covariance matrix. If NULL, it is selected by cross validation.
 #' @param est The nonparametric estimation method, one of "lc" (default) for linear constant or "ll" for local linear.
 #' @param tkernel A character, either "Triweight" (default), "Epa" or "Gaussian" kernel function.
 #' @param singular.ok	Logical. If FALSE, a singular model is an error.
@@ -250,24 +250,32 @@ tvSURE <- function (formula, z = NULL, ez = NULL, bw = NULL, cv.block = 0, data,
     if(is.null(bw.cov))
     {
       cat("Calculating variance-covariance estimation bandwidth...\n")
-      bw.cov <- bwCov(x = result$residuals, cv.block = cv.block, tkernel = tkernel)
+      bw.cov <- bwCov(x = result$residuals, z = z, cv.block = cv.block, tkernel = tkernel)
       cat("bw = ", bw.cov, "\n")
     }
-    Sigma <- tvCov(x = result$residuals, bw = bw.cov, tkernel = tkernel)
+    cat("\n Sigma estimation...")
+    Sigma <- tvCov(x = result$residuals, z = z,  bw = bw.cov, tkernel = tkernel)
+    cat("\n FGLS estimation until convergence...")
+    cat("\n Step 1, control maxiter ", control$maxiter, " control tolerance, ", control$tol)
     result <- tvGLS(x = x, y = y, z = z, ez = ez, bw = bw, Sigma = Sigma, R = R, r = r,
                     est = est, tkernel = tkernel)
+    
     itertemp <- 1
     tol <- control$tol
     maxiter <- control$maxiter
-    tolold <- sum(result$coefficients^2)
-    tolnew <- 0
-    while((abs(tolold-tolnew)>tol) && (itertemp < maxiter))
+    tolrel <- 1
+    while((tolrel>tol) && (itertemp < maxiter))
     {
-      tolold <- tolnew
-      Sigma <- tvCov(bw = bw.cov, x = result$residuals, tkernel = tkernel)
+      cat("\n Step ", itertemp + 1, " tol: ", abs(tolrel))
+      Sigma <- try(tvCov(x = result$residuals, z = z, bw = bw.cov, tkernel = tkernel))
+      if (!inherits(Sigma, "array"))
+      {
+        bw.cov <- bwCov(x = result$residuals, z = z, cv.block = cv.block, tkernel = tkernel)
+        Sigma <- try(tvCov(x = result$residuals, z = z, bw = bw.cov, tkernel = tkernel))
+      }
       temp <- tvGLS(x = x, y = y, z = z, ez = ez, bw = bw, Sigma = Sigma, R = R, r = r,
                     est = est, tkernel = tkernel)
-      tolnew <- sqrt(sum((result$coefficients - temp$coefficients)^2)/sum(result$coefficients^2))
+      tolrel <- mean(abs((result$coefficients - temp$coefficients)/result$coefficients))
       result <- temp
       itertemp <- itertemp + 1
     }

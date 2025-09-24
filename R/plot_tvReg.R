@@ -50,17 +50,16 @@ plot.tvsure <- function(x, eqs = NULL, vars = NULL,
   {
     sort.index <- sort.int(z, index.return = TRUE)$ix
     x.axis <- z[sort.index]
-    coefficients <- coefficients[sort.index, , , drop = FALSE]
+    coefficients <- coefficients[sort.index, , drop = FALSE]
     sub <- expression(z[t])
-    if(!is.null(lower))
+    if(!is.null(Lower))
     {
       Lower <- Lower[sort.index, , drop = FALSE]
       Upper <- Upper[sort.index, , drop = FALSE]
     }
   }
   if (x$level != 0)
-    sub <- paste0(sub, "\n", (x$level) * 100, "% Bootstrap CI, ",
-                 x$runs, " runs")
+    sub <- paste0(sub, "\n", (x$level) * 100, "% Bootstrap CI, ", x$runs, " runs")
   for (i in eqs)
   {
     var.names <- colnames(x$x[[i]])

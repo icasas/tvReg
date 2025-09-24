@@ -112,7 +112,7 @@ tvci.80 <- confint(tvci, level = 0.8)
 \references{
 Chen, X. B., Gao, J., Li, D., and Silvapulle, P (2017) Nonparametric estimation and 
 forecasting for time-varying coefficient realized volatility models,
-\emph{Journal of Business \& Economic Statistics}, online, 1-13.
+\emph{Journal of Business and Economic Statistics}, 36, 88-100.
 
 Mammen, E (1993) Bootstrap and wild bootstrap for high dimensional linear models,
 \emph{ Annals of Statistics}, 21, 255-285.

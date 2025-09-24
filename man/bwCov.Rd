@@ -8,6 +8,7 @@ covariance matrix.}
 \usage{
 bwCov(
   x,
+  z = NULL,
   cv.block = 0,
   est = c("lc", "ll"),
   tkernel = c("Triweight", "Epa", "Gaussian")
@@ -15,6 +16,8 @@ bwCov(
 }
 \arguments{
 \item{x}{A matrix or a data frame.}
+
+\item{z}{A vector with the variable over which coefficients are smooth over.}
 
 \item{cv.block}{A positive scalar with the size of the block in leave-one block-out cross-validation.
 By default 'cv.block=0' meaning leave-one-out cross-validation.}

@@ -23,8 +23,8 @@ tvLM(
 
 \item{z}{A vector with the smoothing variable.}
 
-\item{ez}{(optional) A scalar or vector with the smoothing estimation values. If 
-values are included then the vector \code{z} is used.}
+\item{ez}{(optional) A scalar or vector with the smoothing values. If 
+values are not included then the vector \code{z} is used instead.}
 
 \item{data}{An optional data frame or matrix.}
 

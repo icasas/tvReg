@@ -126,7 +126,7 @@ NULL
 #'
 #' @references
 #' Aslanidis, N. and Casas, I. (2013) Nonparametric correlation models for portfolio allocation,
-#' \emph{Journal of Banking \& Finance}, 37, 2268 - 2283.
+#' \emph{Journal of Banking and Finance}, 37, 2268 - 2283.
 #'
 #'
 #' @format A data frame with 2855 rows and 8 variables. Below the standarised rates of daily US dollar
@@ -149,7 +149,7 @@ NULL
 #' Daily realized variance
 #' 
 #' A dataset containing the daily realized variance, and some of its lags,
-#' obtained from 1-minute close prices of the S\&P 500. Similar data has
+#' obtained from 1-minute close prices of the SP 500. Similar data has
 #' been used in the HAR model in Corsi (2009), the HARQ and SHARQ models in
 #' Bollerslev et al (2016) and the TVHARQ and TVSHARQ models in 
 #' Casas et al (2018). The time period runs from Feb 1990 until 
@@ -194,9 +194,9 @@ NULL
 #' @docType data
 #'
 #' @references
-#' Casas, I., Gao, J., Peng B., and Xie, S. (2019). Ferreira, E., and Orbe, S. (2017) 
-#' Modelling Time-Varying Income Elasticities of Health Care Expenditure for the OECD. 
-#' Available at SSRN: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3262326
+#' Casas, I., Gao, J., Peng, B. and Xie, S. (2021). Time-Varying Income Elasticities 
+#' of Healthcare Expenditure for the OECD and Eurozone. 
+#' \emph{Journal of Applied Econometrics, 36, pp. 328-345}. 
 #' 
 #' @format A data frame with 680 rows and 7 columns. 
 #' \describe{

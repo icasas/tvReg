@@ -156,8 +156,8 @@ forecast.tvar <- function(object, n.ahead = 1, newz = NULL, newexogen = NULL, wi
 #' @method forecast tvvar
 #' @examples 
 #' data(usmacro, package = "bvarsv")
-#' model.tvVAR <- tvVAR(usmacro, p = 6, type = "const", bw = c(1.8, 20, 20))
-#' forecast(model.tvVAR, n.ahead = 10)
+#' tvVAR.fit <- tvVAR(usmacro, p = 6, type = "const", bw = c(1.8, 20, 20))
+#' forecast(tvVAR.fit, n.ahead = 10)
 #' 
 #' @export
 forecast.tvvar<-function (object, n.ahead = 1, newz = NULL, newexogen = NULL, winsize = 0, ...) 
@@ -180,14 +180,14 @@ forecast.tvvar<-function (object, n.ahead = 1, newz = NULL, newexogen = NULL, wi
     if(is.null(dim(newexogen)))
       newexogen <- matrix (newexogen, nrow = length(newexogen), ncol = 1)
     if(NROW(newexogen) != n.ahead)
-      stop("\nDimensions of 'newexogen' and 'n.ahead' are not compatible.\n")
+      stop("\nDimensions of 'newxexogen' and 'n.ahead' are not compatible.\n")
   }
   neq <- object$neq
   obs <- object$obs
   prediction <- matrix(NA, nrow = n.ahead, ncol = neq)
   colnames(prediction) <- colnames(object$y)
   is.rw <- !(winsize == 0)
-  winsize <- abs (winsize)
+  winsize <- abs(winsize)
   if(winsize > obs)
     winsize <- obs - 1
   i <- ifelse (is.rw, obs - winsize, 1)
@@ -213,8 +213,9 @@ forecast.tvvar<-function (object, n.ahead = 1, newz = NULL, newexogen = NULL, wi
       theta<- tvOLS(object)$coefficients
     }
     rhs <- c(tail(object$y, 1))
-    rhs <- c(rhs, tail(object$x, 1)[1:(nlags - neq)])
-    if(is.intercept) 
+    if(nlags-neq != 0) 
+      rhs <- c(rhs, tail(object$x, 1)[1:(nlags - neq)])
+    if(is.intercept)
       rhs <- c(rhs, "(Intercept)" = 1L)
     if(is.exogen)
       rhs <- c(rhs, newexogen[t, ])
@@ -225,6 +226,8 @@ forecast.tvvar<-function (object, n.ahead = 1, newz = NULL, newexogen = NULL, wi
   }
   return(prediction)
 }
+
+
 
 #' @rdname forecast-tvReg
 #' @method forecast tvsure

@@ -7,7 +7,7 @@
 #' @method .tvboot default
 #' @keywords internal
 #'
-.tvboot.default<-function (x, runs = 100, tboot = "wild")
+.tvboot.default<-function (x, runs = 100, tboot = "wild", ...)
 {
   if (!(any(class(x) %in% c("tvlm", "tvar"))))
   {
@@ -15,7 +15,7 @@
   }
   obs <- length(x$y)
   nvar <- NCOL (x$x)
-  resorig <- scale(x$residuals, scale = FALSE)
+  resorig <- c(scale(x$residuals, scale = FALSE))
   fitted <- x$fitted
   prob <- c(0.7236067977499789360962267892318777740001678466796875,
             0.2763932022500210639037732107681222259998321533203125)
@@ -36,7 +36,7 @@
 #' @method .tvboot tvplm
 #' @keywords internal
 #'
-.tvboot.tvplm <- function (x , runs = 100, tboot = "wild")
+.tvboot.tvplm <- function (x , runs = 100, tboot = "wild", ...)
 {
   obs <- x$obs
   neq <- x$neq
@@ -62,7 +62,7 @@
 #' @method .tvboot tvsure
 #' @keywords internal
 #'
-.tvboot.tvsure<-function (x, runs = 100, tboot = "wild")
+.tvboot.tvsure<-function (x, runs = 100, tboot = "wild", ...)
 {
   obs <- x$obs
   nvar<- x$nvar
@@ -86,7 +86,7 @@
 # @rdname tvReg-internals
 #' @method .tvboot tvirf
 #' @keywords internal
-.tvboot.tvirf<-function (x, runs = 0, tboot = "wild")
+.tvboot.tvirf<-function (x, runs = 0, tboot = "wild", ...)
 {
   ortho <- x$ortho
   cumulative <- x$cumulative

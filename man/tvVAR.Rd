@@ -28,8 +28,8 @@ neq = number of equations)}
 
 \item{z}{A vector containing the smoothing variable.}
 
-\item{ez}{(optional) A scalar or vector with the smoothing estimation values. If 
-values are included then the vector \code{z} is used.}
+\item{ez}{(optional) A scalar or vector with the smoothing values. If 
+values are not included then the vector \code{z} is used instead.}
 
 \item{bw}{An optional scalar or vector of length the number of equations. It represents the bandwidth in
 the estimation of trend coefficients. If NULL, it is selected by cross validation.}
