@@ -2,8 +2,8 @@ Package: tvReg
 Type: Package
 Title: Time-Varying Coefficient for Single and Multi-Equation
         Regressions
-Version: 0.5.9
-Date: 2023-09-01
+Version: 0.5.10
+Date: 2026-03-10
 Authors@R: c(person("Isabel", "Casas", email = "casasis@gmail.com", role = c("aut", "cre")),
         person("Ruben", "Fernandez-Casal", email = "rubenfcasal@gmail.com", role = "aut"))
 Description: Fitting time-varying coefficient models for single and multi-equation regressions, using kernel smoothing techniques.
@@ -15,11 +15,10 @@ Suggests: knitr, rmarkdown
 URL: https://github.com/icasas/tvReg
 BugReports: https://github.com/icasas/tvReg/issues
 Encoding: UTF-8
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.3
 VignetteBuilder: knitr
 Author: Isabel Casas [aut, cre],
   Ruben Fernandez-Casal [aut]
 Maintainer: Isabel Casas <casasis@gmail.com>
 Repository: CRAN
 NeedsCompilation: no
-Packaged: 2023-09-01 10:49:55 UTC; ysa
