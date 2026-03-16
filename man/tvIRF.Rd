@@ -15,6 +15,7 @@ tvIRF(
   ortho.cov = c("tv", "const"),
   bw.cov = NULL,
   cumulative = FALSE,
+  unit.shock = FALSE,
   ...
 )
 }
@@ -38,6 +39,10 @@ variance-covariance matrix. If left NULL, it is estimated.}
 
 \item{cumulative}{Logical, if TRUE the cumulated impulse response 
 coefficients are computed. Default is FALSE.}
+
+\item{unit.shock}{Logical. If TRUE, the impulse responses are calculated for
+a one unit shock. If FALSE (default), they are calculated for a one standard 
+deviation shock.}
 
 \item{...}{Other parameters passed to specific methods.}
 }
