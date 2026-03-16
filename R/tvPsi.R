@@ -1,4 +1,4 @@
-#' Time-Varying Coefficient Arrays of the Orthogonalised MA Represention
+#' Time-Varying Coefficient Arrays of the Orthogonalised MA Representation
 #'
 #' Returns the estimated orthogonalised time-varying coefficient arrays of the
 #' moving average representation of a stable \code{tvvar} object obtained with function \code{tvVAR}.
