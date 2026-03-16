@@ -95,6 +95,7 @@
   bw.cov <- x$bw.cov
   ortho.cov <- x$ortho.cov
   n.ahead <- x$n.ahead
+  unit.shock <- x$unit.shock
   x <- x$x
   if (inherits(x, "tvvar"))
   {
@@ -158,7 +159,7 @@
     varboot <- update(VAR)
     BOOT[[i]] <- .tvIRF(x = varboot, impulse = impulse, response = response, y.names = y.names,
                          n.ahead = n.ahead, ortho = ortho, cumulative = cumulative,
-                         ortho.cov = ortho.cov, bw.cov = bw.cov)$irf
+                         ortho.cov = ortho.cov, bw.cov = bw.cov, unit.shock = unit.shock)$irf
   }
   return(BOOT)
 }
