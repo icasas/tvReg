@@ -15,6 +15,7 @@ tvIRF(
   ortho.cov = c("tv", "const"),
   bw.cov = NULL,
   cumulative = FALSE,
+  unit.shock = FALSE,
   ...
 )
 }
@@ -38,6 +39,10 @@ variance-covariance matrix. If left NULL, it is estimated.}
 
 \item{cumulative}{Logical, if TRUE the cumulated impulse response 
 coefficients are computed. Default is FALSE.}
+
+\item{unit.shock}{Logical. If TRUE, the impulse responses are calculated for a 
+one unit shock. If FALSE (default), they are calculated for a one standard 
+deviation shock.}
 
 \item{...}{Other parameters passed to specific methods.}
 }
@@ -65,11 +70,18 @@ is using an error time-varying variance-covariance.}
 variance-covariance matrix. If NULL, it is calculated by cross-validation.}
 \item{cumulative}{Logical, if TRUE the cumulated impulse response 
 coefficients are computed. Default is FALSE.}
+\item{unit.shock}{Logical, if TRUE the unit impulse response is calculated.}
 }
 \description{
 Computes the time-varying impulse response coefficients of an object 
 of class \code{tvvar},  obtained with function \code{tvVAR} for \code{n.ahead} steps.
 }
+\section{Acknowledgment}{
+
+The inclusion of the \code{unit.shock} parameter was motivated by 
+suggestions from Sebin Nidhiri (University of Houston) for suggesting the unit shock feature.
+}
+
 \examples{
 \dontrun{
 ##Inflation rate, unemployment rate and treasury bill 
@@ -80,8 +92,12 @@ TVVAR <- tvVAR(usmacro, p = 4, type = "const")
 ##Estimate a the tvIRF with time-varying covariance function
 TVIRF <- tvIRF(TVVAR)
 
+## Estimate tvIRF with a one unit shock instead of one standard deviation
+TVIRF_unit <- tvIRF(TVVAR, unit.shock = TRUE)
+
 ##Cumulative impulse response function
 TVIRF2 <- tvIRF(TVVAR, cumulative = TRUE)
+
 }
 
 }

@@ -26,6 +26,7 @@
 .tvCov.cv(
   bw,
   x,
+  z = NULL,
   cv.block = 0,
   est = c("lc", "ll"),
   tkernel = c("Triweight", "Epa", "Gaussian")
@@ -52,7 +53,8 @@
   ortho,
   ortho.cov,
   bw.cov,
-  cumulative
+  cumulative,
+  unit.shock
 )
 
 .tvOLS.cv(
@@ -86,6 +88,8 @@ tvreg.control(maxiter = 100, tol = 1e-05)
 \item{bw}{A scalar.}
 
 \item{tkernel}{A character, either "Triweight" (default), "Epa" or "Gaussian" kernel function.}
+
+\item{z}{A vector.}
 
 \item{est}{A character, either "lc" or "ll" for local constant or local linear.}
 

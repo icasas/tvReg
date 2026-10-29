@@ -28,8 +28,8 @@ tvAR(
 
 \item{z}{A vector with the smoothing variable.}
 
-\item{ez}{(optional) A scalar or vector with the smoothing estimation values. If 
-values are included then the vector \code{z} is used.}
+\item{ez}{(optional) A scalar or vector with the smoothing values. If 
+values are not included then the vector \code{z} is used instead.}
 
 \item{bw}{An opcional scalar or vector of length the number of equations. It represents
 the bandwidth in the estimation of coefficients. If NULL, it is selected
@@ -115,9 +115,9 @@ Casas, I., Mao, X. and Veiga, H. (2018) Reexamining financial and economic
 predictability with new estimators of realized variance and variance 
 risk premium. Url= http://pure.au.dk/portal/files/123066669/rp18_10.pdf
 
-Chen, X. B., Gao, J., Li, D., and Silvapulle, P (2017) Nonparametric estimation and 
-forecasting for time-varying coefficient realized volatility models,
-\emph{Journal of Business \& Economic Statistics}, online, 1-13.
+Chen, X. B., Gao, J., Li, D., and Silvapulle, P (2017) Nonparametric Estimation and 
+Forecasting for Time-Varying Coefficient Realized Volatility Models.
+\emph{Journal of Business and Economic Statistics}, 36, 88-100.
 
 Corsi, F. (2009) A simple approximate long-memory model of realized 
 volatility. \emph{Journal of Financial Econometrics}, 7, 174-196.

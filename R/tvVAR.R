@@ -42,9 +42,9 @@
 #' plot(tvVAR.fit)
 #' 
 #' @references 
-#' Casas, I., Ferreira, E., and Orbe, S. (2017) Time-Varying Coefficient Estimation 
-#' in SURE Models: Application to Portfolio Management. Available at SSRN: 
-#' https://ssrn.com/abstract=3043137
+#' Casas, I., Ferreira, E., and Orbe, S. (2021). Time-Varying Coefficient Estimation 
+#' in SURE Models: Application to Portfolio Management. 
+#' \emph{Journal of Financial Econometrics}, 19, 707-745.
 #' 
 #' Primiceri, G.E. (2005) Time varying structural vector autoregressions 
 #' and monetary policy. \emph{Review of Economic Studies}, 72, 821-852.

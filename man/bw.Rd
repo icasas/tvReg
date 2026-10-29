@@ -76,23 +76,20 @@ or "ll" for local linear.}
 \item{singular.ok}{Logical. If FALSE, a singular model is an error.}
 
 \item{method}{A character with the choice of panel model/estimation method:
-If method = \code{tvPOLS} (default) then the data is pooled estimated with time-varying OLS. 
-No individual or time effects are estimated
-If method = \code{tvFE} then individual effects which might be correlated with 
-the regressors are estimated.
-If method = \code{tvRE} then individual effects are considered random and independent
-of the regressors.}
+\itemize{
+  \item \code{"tvPOLS"} (default): the data is pooled and estimated with time-varying OLS. 
+  No individual or time effects are estimated.
+  \item \code{"tvFE"}: individual effects which might be correlated with 
+  the regressors are estimated.
+  \item \code{"tvRE"}: individual effects are considered random and independent
+  of the regressors.
+}}
 }
 \value{
-\code{bw} returns a vector or a scalar with the bandwith to estimate the mean or the covariance
-residuals, fitted values.
-
-A scalar or a vector of scalars.
-
-A scalar.
+A scalar or a vector of scalars with the bandwidth(s) selected by cross-validation.
 }
 \description{
-Calculate bandwidth(s) by cross-validation for functions tvSURE, tvVAR and tvLM.
+Calculate bandwidth(s) by cross-validation for functions \code{tvSURE}, \code{tvVAR} and \code{tvLM}.
 }
 \examples{
 ##Generate data

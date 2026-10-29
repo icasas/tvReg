@@ -19,7 +19,10 @@
     <loc>http://github.com/icasas/tvReg/reference/FF5F.html</loc>
   </url>
   <url>
-    <loc>http://github.com/icasas/tvReg/reference/forecast.html</loc>
+    <loc>http://github.com/icasas/tvReg/reference/forecast-tvReg.html</loc>
+  </url>
+  <url>
+    <loc>http://github.com/icasas/tvReg/reference/OECD.html</loc>
   </url>
   <url>
     <loc>http://github.com/icasas/tvReg/reference/plot.tvReg.html</loc>
@@ -49,6 +52,9 @@
     <loc>http://github.com/icasas/tvReg/reference/tvCov.html</loc>
   </url>
   <url>
+    <loc>http://github.com/icasas/tvReg/reference/tvFE.html</loc>
+  </url>
+  <url>
     <loc>http://github.com/icasas/tvReg/reference/tvGLS.html</loc>
   </url>
   <url>
@@ -64,13 +70,19 @@
     <loc>http://github.com/icasas/tvReg/reference/tvPhi.html</loc>
   </url>
   <url>
+    <loc>http://github.com/icasas/tvReg/reference/tvPLM.html</loc>
+  </url>
+  <url>
     <loc>http://github.com/icasas/tvReg/reference/tvPsi.html</loc>
+  </url>
+  <url>
+    <loc>http://github.com/icasas/tvReg/reference/tvRE.html</loc>
   </url>
   <url>
     <loc>http://github.com/icasas/tvReg/reference/tvReg-internals.html</loc>
   </url>
   <url>
-    <loc>http://github.com/icasas/tvReg/reference/tvReg-methods.html</loc>
+    <loc>http://github.com/icasas/tvReg/reference/tvReg-package.html</loc>
   </url>
   <url>
     <loc>http://github.com/icasas/tvReg/reference/tvSURE.html</loc>

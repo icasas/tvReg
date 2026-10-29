@@ -6,6 +6,8 @@
 \usage{
 tvCov(
   x,
+  z = NULL,
+  ez = NULL,
   bw = NULL,
   cv.block = 0,
   est = c("lc", "ll"),
@@ -15,7 +17,12 @@ tvCov(
 \arguments{
 \item{x}{A matrix.}
 
-\item{bw}{A scalar.}
+\item{z}{A vector with the variable over which coefficients are smooth over.}
+
+\item{ez}{(optional) A scalar or vector with the smoothing values. If 
+values are not included then the vector \code{z} is used instead.}
+
+\item{bw}{(Optional) A scalar.}
 
 \item{cv.block}{A positive scalar with the size of the block in leave-one block-out cross-validation.
 By default 'cv.block=0' meaning leave-one-out cross-validation.}
@@ -25,10 +32,10 @@ By default 'cv.block=0' meaning leave-one-out cross-validation.}
 \item{tkernel}{A character, either "Triweight, "Epa" or "Gaussian" kernel functions.}
 }
 \value{
-A matrix of dimension obs x neq x neq.
+An array of dimension neq x neq x obs.
 }
 \description{
-Estimation of a time-varying variance-covariance matrix using the local constant or the local linear kernel
+Estimation of a time-varying/funcional coefficients variance-covariance matrix using the local constant or the local linear kernel
 smoothing methodologies.
 }
 \examples{
@@ -54,8 +61,8 @@ print(Sigma.hat[,,1])
 }
 \references{
 Aslanidis, N. and Casas, I (2013) Nonparametric correlation models for portfolio
-allocation. \emph{Journal of Banking \& Finance}, 37, 2268-2283
+allocation. \emph{Journal of Banking and Finance}, 37, 2268-2283
 }
 \seealso{
-\code{\link{bwCov}}
+\code{\link{bwCov}}, \code{\link{tvCor}}
 }

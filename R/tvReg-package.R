@@ -18,7 +18,7 @@
 #' fixed effects estimator, which is implemente in the \code{\link{tvFE}}.
 #' @section Further information:
 #' Details on the theory and applications to finance and macroeconomics can be found 
-#' in Casas and Fernandez-Casal (2019, \url{https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3363526}),
+#' in Casas and Fernandez-Casal (2022, \url{https://journal.r-project.org/articles/RJ-2022-002/}),
 #' and in the package vignette \url{https://icasas.github.io/tvReg/articles/tvReg.html}.
 #' @author Isabel Casas (\email{casasis@@gmail.com}),
 #' Ruben Fernandez-Casal (\email{rubenfcasal@@gmail.com}).
@@ -26,7 +26,6 @@
 #' Funded by the Horizon 2020. Framework Programme of the European Union.
 #' @name tvReg-package
 #' @aliases tvReg
-#' @docType package
 #' @import methods
 #' @import Matrix
 #' @import bvarsv
@@ -37,8 +36,8 @@
 #' @importFrom plm pdata.frame pdim index
 #' @references
 #' Casas, I. and Fernandez-Casal, R., \emph{tvReg: Time-varying Coefficient Linear 
-#' Regression for Single and Multi-Equations in R} (April 1, 2019). 
-#' Available at SSRN: \url{https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3363526}.
+#' Regression for Single and Multi-Equations in R} (June, 2022). The R Journal. 
+#' Available at \url{https://journal.r-project.org/articles/RJ-2022-002/}.
 NULL
 
 
@@ -49,7 +48,6 @@ NULL
 #' markets: North America (NA), Japan (JP), Asia Pacific (AP) and Europe (EU). It also contains the
 #' Fama/French 5 factors for each of the markets.
 #' @name FF5F
-#' @docType data
 #'
 #' @references
 #' Kennet R. French - Data Library (2017) 
@@ -122,11 +120,10 @@ NULL
 #' "devolatilisation", i.e. standarising the rates using a GARCH(1,1) estimate of the volatility.
 #
 #' @name CEES
-#' @docType data
 #'
 #' @references
 #' Aslanidis, N. and Casas, I. (2013) Nonparametric correlation models for portfolio allocation,
-#' \emph{Journal of Banking \& Finance}, 37, 2268 - 2283.
+#' \emph{Journal of Banking and Finance}, 37, 2268 - 2283.
 #'
 #'
 #' @format A data frame with 2855 rows and 8 variables. Below the standarised rates of daily US dollar
@@ -149,14 +146,13 @@ NULL
 #' Daily realized variance
 #' 
 #' A dataset containing the daily realized variance, and some of its lags,
-#' obtained from 1-minute close prices of the S\&P 500. Similar data has
+#' obtained from 1-minute close prices of the SP 500. Similar data has
 #' been used in the HAR model in Corsi (2009), the HARQ and SHARQ models in
 #' Bollerslev et al (2016) and the TVHARQ and TVSHARQ models in 
 #' Casas et al (2018). The time period runs from Feb 1990 until 
 #' Dec 2006.
 #
 #' @name RV
-#' @docType data
 #'
 #' @references
 #' 
@@ -191,12 +187,11 @@ NULL
 #' Variables related to the problem of healthcare spending. 
 #' 
 #' @name OECD
-#' @docType data
 #'
 #' @references
-#' Casas, I., Gao, J., Peng B., and Xie, S. (2019). Ferreira, E., and Orbe, S. (2017) 
-#' Modelling Time-Varying Income Elasticities of Health Care Expenditure for the OECD. 
-#' Available at SSRN: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3262326
+#' Casas, I., Gao, J., Peng, B. and Xie, S. (2021). Time-Varying Income Elasticities 
+#' of Healthcare Expenditure for the OECD and Eurozone. 
+#' \emph{Journal of Applied Econometrics, 36, pp. 328-345}. 
 #' 
 #' @format A data frame with 680 rows and 7 columns. 
 #' \describe{

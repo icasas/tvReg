@@ -34,7 +34,7 @@ tvRE(x, ...)
 \item{z}{A vector with the variable over which coefficients are smooth over.}
 
 \item{ez}{(optional) A scalar or vector with the smoothing values. If 
-values are included then the vector z is used.}
+values are not included then the vector \code{z} is used instead.}
 
 \item{bw}{A numeric vector with the bandwidth.}
 

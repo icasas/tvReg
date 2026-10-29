@@ -27,8 +27,8 @@ tvPLM(
 
 \item{z}{A vector containing the smoothing variable.}
 
-\item{ez}{(optional) A scalar or vector with the smoothing estimation values. If 
-values are included then the vector \code{z} is used.}
+\item{ez}{(optional) A scalar or vector with the smoothing values. If 
+values are not included then the vector \code{z} is used instead.}
 
 \item{data}{An optional data frame or matrix.}
 
@@ -121,9 +121,9 @@ tvre <- tvPLM(lhe~lgdp+pop65+pop14+public, index = c("country", "year"),
 }
 }
 \references{
-Casas, I., Gao, J., Peng B., and Xie, S. (2019). Modelling Time-Varying Income Elasticities 
-of Health Care Expenditure for the OECD. 
-Available at SSRN: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3262326
+Casas, I., Gao, J., Peng, B. and Xie, S. (2021). Time-Varying Income Elasticities 
+of Healthcare Expenditure for the OECD and Eurozone. 
+\emph{Journal of Applied Econometrics, 36, pp. 328-345}. 
 
 Sun, Y., Carrol, R.J and Li, D. (2009). Semiparametric Estimation of Fixed-Effects Panel Data 
 Varying Coefficient Models. \emph{Advances in Econometrics}, 25, pp. 101-129.

@@ -1,15 +1,50 @@
+# tvReg 0.5.11
+
+* Fixed a bug in plot methods where non-finite values caused a crash on arm64 architectures
+
+# tvReg 0.5.10
+
+* Added functionality of the unit shock inside function `tvIRF` by adding `unit.shock` argument to `tvIRF()` and `tvPsi()`. 
+  This allows users to compute impulse responses to a one-unit orthogonalized 
+  shock, facilitating interpretation in macroeconomic contexts.
+  
+* Improved computational efficiency in `tvPsi()` by moving 
+  covariance decomposition outside the horizon loop.
+  
+* Improved bandwidth selection robustness.
+
+* Updated references and citation.
+
+* Acknowledgment: Special thanks to Sebin Nidhiri (University of Houston) for suggesting the unit shock feature.
+
+# tvReg 0.5.9
+
+* Bug fix in `bwCov` when `bw` is `NULL`.
+
+* Added function `tvCor` to calculate the correlation matrix correspondent to `tvCov`
+
+# tvReg 0.5.8
+
+* Bug fix in `plot`for `tvsure` objects.
+
+* Functionality addition in `tvCov` and `bwCov` to calculate covariance matrices that may vary depending on a random variable.
+
+* Fixing some parameter documentation.
+
+# tvReg 0.5.7
+
+* Bug fix in `forecast` for `tvvar` objects with 1 lag. We thank Michael Wolf for reporting it to us.
+
 # tvReg 0.5.6
 
 * Added package documentation (in "tvReg-package.R", which now also includes data documentation). 
 
 * Changed imports in NAMESPACE. Now only the necessary functions of `plm` are imported (to avoid new compatibility issues between packages `Matrix` and `plm`).
 
-
 # tvReg 0.5.5
 
 * Updated `RV` dataset and its variables description.
 * Fixed bug in `tvAR`and `tvVAR` when `exogen` is only one column.
-
 
 # tvReg 0.5.4
 
@@ -18,7 +53,6 @@
 * Fixed bug in `predict` for objects obtained with `tvFE`
 * Fixed bug in `tvSURE` for datasets with different name than data
 * Added kernel function `Triweight` and make it the default
-
 
 # tvReg 0.5.3
 
@@ -66,7 +100,6 @@
 * Updated documentation `tvOLS matrix`, `forecast.tvar`, `forecast.tvlm` and
   `forecast.tvsure`.
   
-
 # tvReg 0.4.0
 
 * Removed class `tvlm` from objects of class `tvar`.

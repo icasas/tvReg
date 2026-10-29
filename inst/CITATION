@@ -10,11 +10,11 @@ bibentry(bibtype = "Manual",
          note = note,
          url = "https://CRAN.R-project.org/package=tvReg")
 
-bibentry(bibtype = "TechReport",
+bibentry(bibtype = "Article",
          title = "tvReg: Time-Varying Coefficients Linear Regression for Single and Multi-Equations in R",
          author = c(person("Isabel", "Casas"),
                     person("Ruben", "Fernandez-Casal")),
-         year = 2019,
-         note = note,
-         institution = "SSRN",
-         url = "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3363526")
+         journal = "The R Journal",
+         year = 2022,
+         doi = "10.32614/RJ-2022-002",
+         url = "https://journal.r-project.org/articles/RJ-2022-002/")

@@ -19,8 +19,8 @@
 #' @aliases tvlm-class tvlm
 #' @param formula An object of class formula.
 #' @param z A vector with the smoothing variable.
-#' @param ez (optional) A scalar or vector with the smoothing estimation values. If 
-#' values are included then the vector \code{z} is used.
+#' @param ez (optional) A scalar or vector with the smoothing values. If 
+#' values are not included then the vector \code{z} is used instead.
 #' @param data An optional data frame or matrix.
 #' @param bw An opcional scalar. It represents the bandwidth in
 #' the estimation of trend coefficients. If NULL, it is selected by cross validation. 

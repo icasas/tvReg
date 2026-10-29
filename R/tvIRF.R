@@ -16,6 +16,9 @@
 #' variance-covariance matrix. If left NULL, it is estimated.
 #' @param cumulative Logical, if TRUE the cumulated impulse response 
 #' coefficients are computed. Default is FALSE.
+#' @param unit.shock Logical. If TRUE, the impulse responses are calculated for a 
+#' one unit shock. If FALSE (default), they are calculated for a one standard 
+#' deviation shock.
 #' @param ... Other parameters passed to specific methods.
 #'
 #' @return \code{tvIRF} returns and object of class \code{tvirf} with the 
@@ -41,6 +44,10 @@
 #' variance-covariance matrix. If NULL, it is calculated by cross-validation.}
 #' \item{cumulative}{Logical, if TRUE the cumulated impulse response 
 #' coefficients are computed. Default is FALSE.}
+#' \item{unit.shock}{Logical, if TRUE the unit impulse response is calculated.}
+#' @section Acknowledgment:
+#' The inclusion of the \code{unit.shock} parameter was motivated by 
+#' suggestions from Sebin Nidhiri (University of Houston) for suggesting the unit shock feature.
 #' 
 #' @seealso \code{\link{bw}}, \code{\link{tvVAR}}, \code{\link{confint}}, 
 #' \code{\link{plot}}, \code{\link{print}} and \code{\link{summary}}
@@ -55,15 +62,20 @@
 #' ##Estimate a the tvIRF with time-varying covariance function
 #' TVIRF <- tvIRF(TVVAR)
 #' 
+#' ## Estimate tvIRF with a one unit shock instead of one standard deviation
+#' TVIRF_unit <- tvIRF(TVVAR, unit.shock = TRUE)
+#' 
 #' ##Cumulative impulse response function
 #' TVIRF2 <- tvIRF(TVVAR, cumulative = TRUE)
+#' 
+
 #' }
 #' 
 #' @rdname tvIRF
 #' @export
 tvIRF<-function (x, impulse = NULL, response = NULL, n.ahead = 10,
                        ortho = TRUE,  ortho.cov = c("tv", "const"), 
-                       bw.cov = NULL, cumulative = FALSE, ...)
+                       bw.cov = NULL, cumulative = FALSE, unit.shock = FALSE, ...)
 {
   if (!inherits(x, "tvvar")) 
     stop("\nPlease provide an object of class 'tvvar', 
@@ -100,26 +112,29 @@ tvIRF<-function (x, impulse = NULL, response = NULL, n.ahead = 10,
   ortho.cov <- match.arg(ortho.cov)
   irs <- .tvIRF(x = x, impulse = impulse, response = response,
               y.names = y.names, n.ahead = n.ahead, ortho = ortho,
-              cumulative = cumulative, ortho.cov = ortho.cov, bw.cov = bw.cov)
+              cumulative = cumulative, ortho.cov = ortho.cov, bw.cov = bw.cov,
+              unit.shock = unit.shock)
   result <- list(irf = irs$irf, Lower = NULL, Upper = NULL, response = response,
                  impulse = impulse, x = x,  n.ahead = n.ahead, ortho = ortho,
                  ortho.cov = ortho.cov, bw.cov = irs$bw.cov, 
-                 cumulative = cumulative, level = 0, runs = 0, 
-                 tboot = NULL, BOOT = NULL, match = match.call())
+                 cumulative = cumulative, unit.shock = unit.shock,
+                 level = 0, runs = 0, tboot = NULL, BOOT = NULL, match = match.call())
   class(result) <- "tvirf"
   return(result)
 }
 
+
 #' @rdname tvReg-internals
 #' @keywords internal
 .tvIRF <- function (x, impulse, response, y.names, n.ahead, ortho, ortho.cov, bw.cov, 
-                    cumulative)
+                    cumulative, unit.shock)
 {
   if (inherits(x, "tvvar"))
   {
     if (ortho)
     {
-      result <-  tvPsi(x, nstep = n.ahead, ortho.cov, bw.cov = bw.cov)
+      result <-  tvPsi(x, nstep = n.ahead, ortho.cov = ortho.cov, bw.cov = bw.cov, 
+                       unit.shock=unit.shock)
       irf <- result$Psi
       bw.cov <- result$bw.cov
     }
@@ -128,6 +143,8 @@ tvIRF<-function (x, impulse = NULL, response = NULL, n.ahead = 10,
       irf <- tvPhi(x, nstep = n.ahead)
     }
   }
+  
+  
   dimnames(irf) <- list(NULL, y.names, y.names, NULL)
   idx <- length(impulse)
   irs <- list()

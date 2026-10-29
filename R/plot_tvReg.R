@@ -50,17 +50,16 @@ plot.tvsure <- function(x, eqs = NULL, vars = NULL,
   {
     sort.index <- sort.int(z, index.return = TRUE)$ix
     x.axis <- z[sort.index]
-    coefficients <- coefficients[sort.index, , , drop = FALSE]
+    coefficients <- coefficients[sort.index, , drop = FALSE]
     sub <- expression(z[t])
-    if(!is.null(lower))
+    if(!is.null(Lower))
     {
       Lower <- Lower[sort.index, , drop = FALSE]
       Upper <- Upper[sort.index, , drop = FALSE]
     }
   }
   if (x$level != 0)
-    sub <- paste0(sub, "\n", (x$level) * 100, "% Bootstrap CI, ",
-                 x$runs, " runs")
+    sub <- paste0(sub, "\n", (x$level) * 100, "% Bootstrap CI, ", x$runs, " runs")
   for (i in eqs)
   {
     var.names <- colnames(x$x[[i]])
@@ -87,7 +86,16 @@ plot.tvsure <- function(x, eqs = NULL, vars = NULL,
       {
         for (j in ((count-1)*3 + 1):(min(count*3, length(plotvars))))
         {
-          ylim <- range(coef[, j], upper[, j], lower[, j])
+          all_vals <- c(coef[, j], upper[, j], lower[, j])
+          finite_vals <- all_vals[is.finite(all_vals)]
+          if (length(finite_vals) > 0) 
+          {
+            ylim <- range(finite_vals)
+          } 
+          else 
+          {
+            ylim <- c(-1, 1)
+          }
           graphics::plot(x.axis, coef[, j], axes = FALSE, type = "l", ylab = var.names[j],
                          ylim = ylim, ...)
           graphics::axis(2, at = pretty(ylim)[-1])
@@ -112,7 +120,17 @@ plot.tvsure <- function(x, eqs = NULL, vars = NULL,
       for (j in 1:length(plotvars))
       {
         graphics::par(mfrow = c(1, 1), mar = c(5, 5, 0, 1), oma = c(2, 0, 6, 0))
-        ylim <- range(coef[, j], upper[, j], lower[, j])
+        all_vals <- c(coef[, j], upper[, j], lower[, j])
+        finite_vals <- all_vals[is.finite(all_vals)]
+        if (length(finite_vals) > 0) 
+        {
+          ylim <- range(finite_vals)
+        } 
+        else 
+        {
+          ylim <- c(-1, 1)
+        }
+        
         graphics::plot(x.axis, coef[, j], axes = FALSE, type = "l", 
                        ylab = var.names[j], ylim = ylim, xlab ="", ...)
         graphics::axis(2, at = pretty(ylim)[-1])
@@ -205,6 +223,16 @@ plot.tvplm <- plot.tvlm
       ylim <- range(coefficients[, j])
       if(!is.null (lower))
         ylim <- range(ylim, lower[, j], upper[, j]) 
+      all_vals <- c(ylim, lower[, j], upper[, j])
+      finite_vals <- all_vals[is.finite(all_vals)]
+      if (length(finite_vals) > 0) 
+      {
+        ylim <- range(finite_vals)
+      } 
+      else 
+      {
+        ylim <- c(-1, 1)
+      }
     }
     graphics::plot(x.axis, coefficients[, j], xlab = "", ylab = var.names[j], 
                    type = "l", ylim = ylim, axes = FALSE, ...)
@@ -246,13 +274,26 @@ plot.tvvar <- function(x, ...)
   graphics::par(mar = c(2, 3, 2, 1), mfrow = c(2,1), cex = 1)
   for ( j in 1:neq)
   {
-    ylim <- range(y[, j], fitted[, j])
+    all_vals <- c(y[, j], fitted[, j])
+    finite_vals <- all_vals[is.finite(all_vals)]
+    if (length(finite_vals) > 0) 
+    {
+      ylim <- range(finite_vals)
+    } 
+    else 
+    {
+      ylim <- c(-1, 1)
+    }
+    
     graphics::plot(1:obs, y[, j], ylim = ylim, xlab = "", ylab  = "",
                    main = paste("Diagram of fit for ", var.names[j], sep = ""),
                    pch = 20, cex = 0.5, yaxt = "n")
     graphics::lines(1:obs, fitted[, j], col = 2)
     graphics::axis(2, at = pretty(ylim)[-1])
-    ylim <- range(residuals[, j])
+    res_j <- residuals[, j]
+    ylim <- range(res_j[is.finite(res_j)])
+    if(any(!is.finite(ylim))) 
+      ylim <- c(-1, 1)
     graphics::plot(1:obs, residuals[, j], xlab = "", ylab = "", type = "l",
                    main = paste("Diagram of residuals for ", var.names[j], 
                                 sep = ""), yaxt ="n")
@@ -309,10 +350,11 @@ plot.tvirf <- function (x, obs.index = NULL, impulse = NULL, response = NULL,
   else
     obs.index2 <- obs.index
   x.axis <- 1:tail(dim(x$irf[[1]]), 1)
+  shock_type <- if(x$unit.shock) "Unit Shock" else "One SD Shock"
   for (i in 1:length(impulse))
   {
     iname <- inames[i]
-    main <- paste0("Impulse variable: ", iname)
+    main <- paste0("Impulse variable: ", iname, " - ", shock_type)
     if (x$cumulative)
       main <- paste(main, "(cumulative)", sep = " ")
     sub <- "horizon"
@@ -344,7 +386,16 @@ plot.tvirf <- function (x, obs.index = NULL, impulse = NULL, response = NULL,
         for (j in ((count-1)*4 +1):(min(count*4, nresponse)))
         {
           rname <- rnames[j]
-          ylim <- range(impulses[rname, ], upper[rname, ], lower[rname, ])
+          all_vals <- c(impulses[rname, ], lower[rname, ], upper[rname, ])
+          finite_vals <- all_vals[is.finite(all_vals)]
+          if (length(finite_vals) > 0) 
+          {
+            ylim <- range(finite_vals)
+          } 
+          else 
+          {
+            ylim <- c(-1, 1)
+          }
           graphics::plot(x.axis, impulses[rname, ], axes = FALSE, type = "l", ylab = ylabel[j],
                          ylim = ylim, ...)
           graphics::axis(2, at = pretty(ylim)[-1])
@@ -367,15 +418,25 @@ plot.tvirf <- function (x, obs.index = NULL, impulse = NULL, response = NULL,
     }
     else if(plot.type == "single")
     {
+      
       graphics::par(mfrow = c(1, 1), mar = c(4, 4, 4, 1), oma = c(3, 0, 2, 1))
       ylabel <- rnames
     
       for (j in 1:length(response))
       {
         rname <- rnames[j]
-        ylim <- range(c(impulses[rname, ], lower[rname, ], upper[rname, ]))
+        all_vals <- c(impulses[rname, ], lower[rname, ], upper[rname, ])
+        finite_vals <- all_vals[is.finite(all_vals)]
+        if (length(finite_vals) > 0) 
+        {
+          ylim <- range(finite_vals)
+        } 
+        else 
+        {
+          ylim <- c(-1, 1)
+        }
         graphics::plot(x.axis, impulses[rname, ], type = "l", ylim = ylim, axes = FALSE,
-                     ylab = ylabel[j], main = main, xlab = "", ...)
+                     ylab = ylabel[j], main = "", xlab = "", ...)
         if(!is.null(lower))
         {
           graphics::polygon(c(rev(x.axis), x.axis), c(rev(upper[rname, ]), lower[rname,]),

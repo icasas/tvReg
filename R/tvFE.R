@@ -20,7 +20,7 @@ tvFE <- function(x, ...) UseMethod("tvFE", x)
 #' @param y A vector with dependent variable.
 #' @param z A vector with the variable over which coefficients are smooth over.
 #' @param ez (optional) A scalar or vector with the smoothing values. If 
-#' values are included then the vector z is used.
+#' values are not included then the vector \code{z} is used instead.
 #' @param bw A numeric vector.
 #' @param neq A sclar with the number of equations
 #' @param obs A scalar with the number of time observations

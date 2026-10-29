@@ -28,8 +28,8 @@ neq = number of equations)}
 
 \item{z}{A vector containing the smoothing variable.}
 
-\item{ez}{(optional) A scalar or vector with the smoothing estimation values. If 
-values are included then the vector \code{z} is used.}
+\item{ez}{(optional) A scalar or vector with the smoothing values. If 
+values are not included then the vector \code{z} is used instead.}
 
 \item{bw}{An optional scalar or vector of length the number of equations. It represents the bandwidth in
 the estimation of trend coefficients. If NULL, it is selected by cross validation.}
@@ -80,9 +80,9 @@ plot(tvVAR.fit)
 
 }
 \references{
-Casas, I., Ferreira, E., and Orbe, S. (2017) Time-Varying Coefficient Estimation 
-in SURE Models: Application to Portfolio Management. Available at SSRN: 
-https://ssrn.com/abstract=3043137
+Casas, I., Ferreira, E., and Orbe, S. (2021). Time-Varying Coefficient Estimation 
+in SURE Models: Application to Portfolio Management. 
+\emph{Journal of Financial Econometrics}, 19, 707-745.
 
 Primiceri, G.E. (2005) Time varying structural vector autoregressions 
 and monetary policy. \emph{Review of Economic Studies}, 72, 821-852.

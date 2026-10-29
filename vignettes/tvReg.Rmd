@@ -427,8 +427,7 @@ The user has the option to pick a subset of impulse variables and/or response va
 The horizon of the TVIRF coefficients can be chosen by the user with argument *n.ahead*, the default is 10.
 
 ### Orthogonal TVIRF
-The *tvIRF* calculates one impulse response function for each point in time. It is likely that the errors variance-covariance matrix of a process with time-varying coefficients is also time-varying. Those, the default of
-argument *ortho.cov = "tv"*. Note that the user can enter a value of the bandwidth for the covariance matrix estimation in *bw.cov*. This function calls function *tvCov* in the calculation of the MA ($\infty$) coefficients. It is possible to use a constant variance-covariance matrix by setting *ortho.cov = "const"*.
+The *tvIRF* calculates one impulse response function for each point in time. It is likely that the errors variance-covariance matrix of a process with time-varying coefficients is also time-varying. Thus, the default is argument *ortho.cov = "tv"*. Note that the user can enter a value of the bandwidth for the covariance matrix estimation in *bw.cov*. This function calls function *tvCov* in the calculation of the MA ($\infty$) coefficients. It is possible to use a constant variance-covariance matrix by setting *ortho.cov = "const"*.
 
 The chunk below shows how to obtain the IRF and TVIRF from the previous monetary policy example.
 
@@ -448,23 +447,32 @@ Note that there is one IRF for each point in time. The *plot* method of class at
 ##Plot the mean all tvIRF over time
 plot(model.tvIRF)
 
-##Plot the effect of a shock in the interest rates (tbi) on the inflation (inf)
+##Plot the effect of a standard deviation shock in the interest rates (tbi) on the inflation (inf)
 ##at time 100
 plot(model.tvIRF, obs.index = 100, impulse = "tbi", response = "inf")
 ```
 
+To obtain a unit shock TVIRF, which can be easier to interpret in certain economic applications, set the parameter *unit.shock =TRUE*.
+
+```{r tvIRF2.1}
+##Estimate a the impulse response functions with irf and tvIRF to interpret unit shocks from
+set.seed(42)
+model.tvIRF2 <- tvIRF(model.tvVAR, unit.shock = TRUE)
+
+##Plot the mean all tvIRF over time
+plot(confint(model.tvIRF2))
+```
 
 ### Cumulative TVIRF
 If the user desires to obtain the cumulative TVIRF values, then argument  *cumulative* must be set to *TRUE*. See example below.
 
 ```{r tvIRF3}
 ##Estimate a the tvIRF with time-varying covariance function
-model.tvIRF2 <- tvIRF(model.tvVAR, cumulative = TRUE)
+model.tvIRF3 <- tvIRF(model.tvVAR, cumulative = TRUE)
 
 ##Plot the cumulative effect on a shock in short term interest rates (tbi) 
 ##on the inflation (inf)
-plot <- plot(model.tvIRF2, impulse ="tbi", response = "inf")
-
+plot(model.tvIRF3, impulse ="tbi", response = "inf")
 
 ```
 
