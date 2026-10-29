@@ -7,7 +7,7 @@
 #' @method .tvboot default
 #' @keywords internal
 #'
-.tvboot.default<-function (x, runs = 100, tboot = "wild", ...)
+.tvboot.default<-function (x, runs = 100, tboot = c("wild", "wild2", "lbwb"), ...)
 {
   if (!(any(class(x) %in% c("tvlm", "tvar"))))
   {
@@ -15,21 +15,57 @@
   }
   obs <- length(x$y)
   nvar <- NCOL (x$x)
-  resorig <- c(scale(x$residuals, scale = FALSE))
-  fitted <- x$fitted
-  prob <- c(0.7236067977499789360962267892318777740001678466796875,
-            0.2763932022500210639037732107681222259998321533203125)
-  binar <- c((1-sqrt(5))*0.5, (1+sqrt(5))*0.5)
+  beta.pilot <- NULL
+  tboot <- match.arg(tboot)
+  if(tboot == "lbwb")
+  {
+    h <- x$bw
+    l <- ceiling(4.5 * (obs * h)^(1/4))
+    model.pilot <- update(x, bw = 2*(h^(5/9)))
+    resorig <- c(scale(residuals(model.pilot), scale = FALSE))
+    fitted <- model.pilot$fitted
+    beta.pilot <- model.pilot$coefficients
+  }
+  else
+  {
+    resorig <- c(scale(x$residuals, scale = FALSE))
+    fitted <- x$fitted
+    prob <- c(0.7236067977499789360962267892318777740001678466796875,
+              0.2763932022500210639037732107681222259998321533203125)
+    binar <- c((1-sqrt(5))*0.5, (1+sqrt(5))*0.5)
+  }
   yboot <- matrix(NA, nrow = obs, ncol = runs)
+
   for (i in 1:runs) 
   {
     if (tboot == "wild")
       resid <- resorig*sample(binar, obs, replace = TRUE, prob = prob)
     else if (tboot == "wild2")
       resid <- resorig*stats::rnorm(obs)
+    else if (tboot == "lbwb")
+    {
+      obs.blocks <- ceiling(obs / l)
+      u.star <- numeric(obs.blocks * l)
+      for (k in 1:obs.blocks)
+      {
+        target <- (k - 1) * l + 1
+        l.index <- max(1, target - l)
+        u.index <- min(obs - l + 1, target + l)
+        pi.i <- sample(l.index:u.index, 1)
+        
+        block.selected <- resorig[pi.i:(pi.i + l - 1)]
+        fill.start <- (k - 1) * l + 1
+        len_to_fill <- min(l, obs - fill.start + 1)
+        
+        # Apply local normal multiplier over the selected residual block
+        u.star[fill.start:(fill.start + len_to_fill - 1)] <- stats::rnorm(1) * block.selected[1:len_to_fill]
+      }
+      resid <- u.star[1:obs]
+    }
     yboot[, i] <- fitted + resid
   }
-  return(.tvLM.ci(x, yboot))
+  return(list(BOOT = .tvLM.ci(x, yboot), beta.pilot = beta.pilot))
+    
 }
 
 # @rdname tvReg-internals
@@ -86,7 +122,7 @@
 # @rdname tvReg-internals
 #' @method .tvboot tvirf
 #' @keywords internal
-.tvboot.tvirf<-function (x, runs = 0, tboot = "wild", ...)
+.tvboot.tvirf<-function (x, runs = 100, tboot = c("wild", "wild2", "lbwb"), ...)
 {
   ortho <- x$ortho
   cumulative <- x$cumulative
@@ -96,14 +132,15 @@
   ortho.cov <- x$ortho.cov
   n.ahead <- x$n.ahead
   unit.shock <- x$unit.shock
-  x <- x$x
-  if (inherits(x, "tvvar"))
+  tboot <- match.arg(tboot)
+  modelo.orig <- x$x
+  if (inherits(modelo.orig, "tvvar")) 
   {
-    VAR <- eval.parent(x)
-  }
-  else
+    VAR <- modelo.orig
+  } 
+  else 
   {
-    stop("Bootstrap not implemented for this class.\n")
+    VAR <- eval.parent(modelo.orig)
   }
   p <- VAR$p
   neq <- VAR$neq
@@ -120,26 +157,58 @@
   {#in case there are exogen variables
     Zdet <- as.matrix(X[, (neq * (p + 1) + 1):NCOL(X)])
   }
-  resorig <- scale(VAR$residuals, scale = FALSE)
-  fitted <- VAR$fitted
+  beta.pilot <- NULL
+  if(tboot == "lbwb") 
+  {
+    l <- floor(obs^(1/3))
+    model.pilot <- update(VAR, bw =  2*(VAR$bw)^(5/9)) 
+    resorig <- scale(residuals(model.pilot), scale = FALSE)
+    fitted <- model.pilot$fitted
+    beta.pilot <- model.pilot$coefficients
+  } 
+  else 
+  {
+    resorig <- scale(VAR$residuals, scale = FALSE)
+    prob <- c(0.7236067977499789360962267892318777740001678466796875,
+              0.2763932022500210639037732107681222259998321533203125)
+    binar <- c((1-sqrt(5))*0.5, (1+sqrt(5))*0.5)
+    fitted <- VAR$fitted
+  }
+
   yorig <- VAR$y.orig
-  prob <- c(0.7236067977499789360962267892318777740001678466796875,
-            0.2763932022500210639037732107681222259998321533203125)
-  binar <- c((1-sqrt(5))*0.5, (1+sqrt(5))*0.5)
   for (i in 1:runs)
   {
     if (tboot == "wild")
     {
       resid <- resorig*sample(binar, obs, replace = TRUE, prob = prob)
-      lasty <- c(t(yorig[p:1, ]))
-      ystar[c(1:p), ] <- yorig[c(1:p), ]
     }
     else if (tboot == "wild2")
     {
       resid  <-resorig*stats::rnorm(obs*neq)
-      lasty <- c(t(yorig[p:1, ]))
-      ystar[c(1:p), ] <- yorig[c(1:p), ]
     }
+    else if (tboot == "lbwb") 
+    {
+      # Multivariate LBWB: block the entire (neq) vector
+      obs.blocks <- ceiling(obs/l)
+      resid <- matrix(0, nrow = obs, ncol = neq)
+      
+      for (k in 1:obs.blocks)
+      {
+        l.index <- max(1, k * l - 2 * l + 1)
+        u.index <- min(obs - l + 1, k * l + 1)
+        pi.i <- sample(l.index:u.index, 1)
+        block.selected <- resorig[pi.i:(pi.i + l - 1), , drop = FALSE]
+        fill.start <- (k - 1) * l + 1
+        len_to_fill <- min(l, obs - fill.start + 1)
+        if(len_to_fill > 0) 
+        {
+          resid[fill.start:(fill.start + len_to_fill - 1), ] <- 
+            stats::rnorm(1) * block.selected[1:len_to_fill, , drop = FALSE]
+        }
+      }
+    }
+    lasty <- c(t(yorig[p:1, ]))
+    ystar[c(1:p), ] <- yorig[c(1:p), ]
     for (j in 1:obs)
     {
       lasty <- lasty[1:(neq * p)]
@@ -161,5 +230,5 @@
                          n.ahead = n.ahead, ortho = ortho, cumulative = cumulative,
                          ortho.cov = ortho.cov, bw.cov = bw.cov, unit.shock = unit.shock)$irf
   }
-  return(BOOT)
+  return(list(BOOT = BOOT, beta.pilot = beta.pilot))
 }

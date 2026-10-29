@@ -1,3 +1,18 @@
+# tvReg 0.6.0
+
+* Inference Enhancement. Integrated the "lbwb" (Local Bootstrap Bandwidth) methodology for more robust inference for `tvlm`, `tvar` and `tvirf` objects. Updated the `tvBOOT` and `confint` functions to support this approach. 
+
+* Added Local Modified Cross-Validation (LMCV) for bandwidth selection for methods `tvLM`, `tvAR`, `tvVAR` and `tvSURE``
+
+* Optimized the bandwidth search algorithm. The optimization process now initializes using a 7-point 
+  logarithmic grid search instead of a random value. This ensures reproducibility as the user will get 
+  the same bandwidth results across multiple runs.
+
+* Fixed bug in `plot.tvirf` for a single time index plot.
+* Fixed `tvAR` block CV bug that now correctly forwards the `cv.block`, enabling proper block cross-validation 
+ for autoregressive time series.
+
+
 # tvReg 0.5.11
 
 * Fixed a bug in plot methods where non-finite values caused a crash on arm64 architectures

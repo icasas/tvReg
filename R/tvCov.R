@@ -22,7 +22,7 @@
 #'
 #' @examples
 #' ##Generate two independent (uncorrelated series)
-#' y <- cbind(rnorm(100, sd = 4), rnorm(100, sd = 1))
+#' y <- cbind(stats::rnorm(100, sd = 4), stats::rnorm(100, sd = 1))
 #'
 #' ##Estimation variance-variance matrix. If the bandwidth is unknown, it can
 #' ##calculated with function bwCov()
@@ -184,7 +184,7 @@ tvCov <- function(x, z = NULL, ez = NULL, bw = NULL, cv.block = 0, est = c("lc",
 #'
 #' @examples
 #' ##Generate two independent (uncorrelated series)
-#' y <- cbind(rnorm(100, sd = 4), rnorm(100, sd = 1))
+#' y <- cbind(stats::rnorm(100, sd = 4), stats::rnorm(100, sd = 1))
 #'
 #' ##Estimation variance-variance matrix. If the bandwidth is unknown, it can
 #' ##calculated with function bwCov()

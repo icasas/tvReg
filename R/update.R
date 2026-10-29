@@ -9,10 +9,11 @@
 #' @export
 update.tvlm <- function(object, ...)
 {
-  result <- tvOLS(object)
+  result<- tvOLS(object)
   object$coefficients <- result$coefficients
   object$fitted <- result$fitted
   object$residuals <- result$residuals
+  object$bw <- result$bw
   return(object)
 }
 
@@ -27,10 +28,11 @@ update.tvar <- update.tvlm
 #' @export
 update.tvvar <- function(object, ...)
 {
-  results <- tvOLS(object)
-  object$coefficients <- results$coefficients
-  object$fitted <- results$fitted
-  object$residuals <- results$residuals
+  result <- tvOLS(object)
+  object$coefficients <- result$coefficients
+  object$fitted <- result$fitted
+  object$residuals <- result$residuals
+  object$bw <- result$bw
   class(object) <- "tvvar"
   return(object)
 }
@@ -45,7 +47,7 @@ update.tvsure <- function(object, ...)
   neq <- object$neq
   if (method %in% c("identity", "tvOLS"))
     object$Sigma <- NULL
-  result <- tvGLS(object)
+  result<- tvGLS(object)
   object$coefficients <- result$coefficients
   class(object) <- "tvsure"
   return(object)
@@ -60,10 +62,10 @@ update.tvplm <- function(object, ...)
   if (method != "within")
   {
     object$Sigma <- NULL
-    result <- tvRE(object)
+    result<- tvRE(object)
     if(method == "random")
     {
-      result <- tvRE(object)
+      result<- tvRE(object)
       itertemp <- 1
       tol <- object$control$tol
       maxiter <- object$control$maxiter
@@ -75,13 +77,13 @@ update.tvplm <- function(object, ...)
         object$Sigma <- result$Sigma
         temp <- tvRE(object)
         tolnew <- sqrt(sum((result$coefficients - temp$coefficients)^2)/sum(result$coefficients^2))
-        result <- temp
+        result<- temp
         itertemp <- itertemp + 1
       }
     }
   }
   else 
-    result <- tvFE(object)
+    result<- tvFE(object)
   object$coefficients <- result$coefficients
   object$alpha <- result$alpha
   object$fitted <- result$fitted

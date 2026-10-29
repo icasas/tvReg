@@ -14,7 +14,7 @@
 #' 
 #' @param y A vector with the dependent variable.
 #' @param p A scalar indicating the number of lags in the model.
-#' @param bw An opcional scalar or vector of length the number of equations. It represents
+#' @param bw An optional scalar or vector of length the number of equations. It represents
 #' the bandwidth in the estimation of coefficients. If NULL, it is selected
 #' by cross validation.
 #' @inheritParams tvLM
@@ -33,15 +33,23 @@
 #' \item{ez}{A vector with the smoothing estimation values.}
 #' \item{y.orig}{A vector with the original variable y.}
 #' \item{bw}{Bandwidth of mean estimation.}
-#' \item{type}{Whether the model has a constant or not.}
+#' \item{cv.block}{A positive integer with the block size for cross-validation.}
+#' \item{lmcv}{Logical. If \code{TRUE}, local modified cross-validation (LMCV) was used to select the bandwidth.}
+#' \item{local.bw}{Numeric. The bandwidth used to calculate local weights in LMCV.}
+#' \item{mask}{Logical vector indicating which variables are estimated (not fixed).}
 #' \item{exogen}{A matrix or data.frame with other exogenous variables.}
-#' \item{p}{Number of lags}
+#' \item{p}{Number of lags.}
+#' \item{type}{Whether the model has a constant or not.}
 #' \item{obs}{Number of observations in estimation.}
 #' \item{totobs}{Number of observations in the original set.}
+#' \item{est}{Nonparametric estimation methodology.}
+#' \item{tkernel}{Kernel used in estimation.}
+#' \item{singular.ok}{Logical. If \code{FALSE}, the function stops if the design matrix is singular.}
 #' \item{level}{Confidence interval range.}
 #' \item{runs}{Number of bootstrap replications.}
 #' \item{tboot}{Type of bootstrap.}
 #' \item{BOOT}{List with all bootstrap replications of \code{coefficients}, if done.}
+#' \item{call}{The matched call.}
 #' 
 #' @seealso  \code{\link{bw}}, \code{\link{tvLM}}, \code{\link{confint}}, 
 #' \code{\link{plot}}, \code{\link{print}} and \code{\link{summary}}
@@ -86,8 +94,9 @@
 #' @rdname tvAR
 #' @inheritParams tvVAR
 #' @export
-tvAR <- function (y, p = 1, z = NULL, ez = NULL, bw = NULL, cv.block = 0, type = c("const", "none"), exogen = NULL,
-                  fixed = NULL, est = c("lc", "ll"), tkernel = c("Triweight", "Epa", "Gaussian"), singular.ok = TRUE)
+tvAR <- function (y, p = 1, z = NULL, ez = NULL, bw = NULL, cv.block = 0, lmcv = FALSE, local.bw = NULL,
+                  type = c("const", "none"), exogen = NULL, fixed = NULL, est = c("lc", "ll"), 
+                  tkernel = c("Triweight", "Epa", "Gaussian"), singular.ok = TRUE)
 {
   if(!is.null(dim(y)))
     stop("\nWrong dimension of 'y', it should be a vector.")
@@ -143,7 +152,8 @@ tvAR <- function (y, p = 1, z = NULL, ez = NULL, bw = NULL, cv.block = 0, type =
   if(is.null(bw))
   {
     cat("Calculating regression bandwidth...\n")
-    bw <- bw(x = datamat, y = yend, z = z, tkernel = tkernel, est = est, singular.ok = singular.ok)
+    bw <- bw(x = datamat, y = yend, z = z, cv.block = cv.block, lmcv = lmcv, 
+             local.bw = local.bw, tkernel = tkernel, est = est, singular.ok = singular.ok)
   }
   results <- tvOLS(x = datamat, y = yend, z = z, ez = ez, bw = bw, est = est, tkernel = tkernel,
                    singular.ok = singular.ok)
@@ -151,8 +161,9 @@ tvAR <- function (y, p = 1, z = NULL, ez = NULL, bw = NULL, cv.block = 0, type =
   colnames(coefficients) <- colnames(rhs)[mask]
   result <- list(coefficients = coefficients, Lower = NULL, Upper = NULL,  fitted = results$fitted,
                  residuals = results$resid, x = datamat, y = yend, z = z, ez = ez, y.orig = y.orig, 
-                 bw = bw, cv.block = cv.block, mask = mask, exogen = exogen, p = p, type = type, obs = sample, 
-                 totobs = sample + p, est = est, tkernel = tkernel, singular.ok = singular.ok, level = 0, 
+                 bw = bw, cv.block = cv.block, lmcv = lmcv, local.bw = local.bw, mask = mask, 
+                 exogen = exogen, p = p, type = type, obs = sample, totobs = sample + p, est = est, 
+                 tkernel = tkernel, singular.ok = singular.ok, level = 0, 
                  runs = 0, tboot = NULL, BOOT = NULL, call = match.call())
   class(result) <- "tvar"
   return(result)

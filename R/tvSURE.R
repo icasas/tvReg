@@ -57,6 +57,10 @@
 #' the estimation of trend coefficients. If NULL, it is selected by cross validation.
 #' @param cv.block A positive scalar with the size of the block in leave one block out cross-validation.
 #' By default 'cv.block = 0' meaning leave one out cross-validation.
+#' @param lmcv. Logical. If \code{FALSE} (default), general cross-validation is used. 
+#' If \code{TRUE}, local modified cross-validation (LMCV) is applied.
+#' @param local.bw A numeric value or \code{NULL}. The window size used to weight 
+#' the local modified cross-validation. If \code{NULL}, it is automatically calculated.
 #' @param data A matrix or data frame containing variables in the formula.
 #' @param method A character, a matrix of dimensions neq x neq or an array of dimensions obs x neq x neq, where
 #' \code{obs} is the number of observations and \code{neq} is the number of equations.
@@ -80,8 +84,8 @@
 #' \code{\link{tvreg.control}} for details.
 #' @param ... Other parameters passed to specific methods.
 #' @return \code{tvSURE} returns a list of the class \code{tvsure} containing the results of the whole system, results of the estimation
-#' and confidence instervals if chosen.
-#' The object of class \code{tvsure} have the following components:
+#' and confidence intervals if chosen.
+#' The object of class \code{tvsure} has the following components:
 #' \item{coefficients}{An array of dimension obs x nvar x neq (obs = number of observations, nvar = number of variables
 #' in each equation, neq = number of equations in the system) with the time-varying coefficients estimates.}
 #' \item{Lower}{If \code{level} non equal zero, an array of dimension obs x nvar x neq containing the confidence 
@@ -96,20 +100,25 @@
 #' \item{z}{A vector with the smoothing variable.}
 #' \item{ez}{A vector with the smoothing estimation values.}
 #' \item{bw}{Bandwidth of mean estimation.}
+#' \item{cv.block}{A positive integer with the block size for cross-validation.}
+#' \item{lmcv}{Logical. If \code{TRUE}, local modified cross-validation (LMCV) was used to select the bandwidth.}
+#' \item{local.bw}{Numeric. The bandwidth used to calculate local weights in LMCV.}
 #' \item{obs}{Integer specifying the number of observations in each equation (balanced sample).}
 #' \item{neq}{Integer specifying the number of equations.}
 #' \item{nvar}{Vector of integers specifying the number of variables in each equation.}
 #' \item{method}{Estimation method.}
-#' \item{est}{Nonparemtric estimation methodology.}
+#' \item{est}{Nonparametric estimation methodology.}
 #' \item{tkernel}{Kernel type.}
-#' \item{bw.cov}{Bandwidht of Sigma estimation.}
+#' \item{bw.cov}{Bandwidth of Sigma estimation.}
 #' \item{level}{Confidence interval range.}
 #' \item{runs}{Number of bootstrap replications.}
 #' \item{tboot}{Type of bootstrap.}
 #' \item{BOOT}{List with all bootstrap replications of \code{coefficients}, if done.}
 #' \item{R}{Restrictions matrix.}
 #' \item{r}{Restrictions vector.}
+#' \item{control}{A list with control parameters for the estimation.}
 #' \item{formula}{Initial formula.}
+#' \item{call}{The matched call.}
 #' 
 #' @seealso \code{\link{bw}}, \code{\link{tvCov}},  \code{\link{tvVAR}}, 
 #' \code{\link{confint}}, \code{\link{plot}}, \code{\link{print}} and \code{\link{summary}}
@@ -136,7 +145,8 @@
 #' }
 #'
 #'@export
-tvSURE <- function (formula, z = NULL, ez = NULL, bw = NULL, cv.block = 0, data,  
+tvSURE <- function (formula, z = NULL, ez = NULL, bw = NULL, cv.block = 0, 
+                    lmcv = FALSE, local.bw = NULL, data,  
                     method = c("tvOLS", "tvFGLS", "tvGLS"), Sigma = NULL, 
                     est = c("lc", "ll"), tkernel = c("Triweight", "Epa", "Gaussian"),
                     bw.cov = NULL, singular.ok = TRUE, R = NULL, r = NULL,
@@ -214,7 +224,8 @@ tvSURE <- function (formula, z = NULL, ez = NULL, bw = NULL, cv.block = 0, data,
     if (is.null(bw))
     {
       cat("Calculating regression bandwidth...\n")
-      bw <- bw(x = x, y = y, z = z, cv.block = cv.block, est = est, tkernel = tkernel, 
+      bw <- bw(x = x, y = y, z = z, cv.block = cv.block, lmcv = lmcv, local.bw = local.bw,
+               est = est, tkernel = tkernel, 
                singular.ok = singular.ok)
       cat("bw = ", bw, "\n")
     }
@@ -235,7 +246,8 @@ tvSURE <- function (formula, z = NULL, ez = NULL, bw = NULL, cv.block = 0, data,
     if (is.null(bw))
     {
       cat("Calculating regression bandwidth...\n")
-      bw <- bw(x = x, y = y, z = z, cv.block = cv.block, est = est, tkernel = tkernel, 
+      bw <- bw(x = x, y = y, z = z, cv.block = cv.block, lmcv = lmcv, local.bw = local.bw,
+               est = est, tkernel = tkernel, 
                singular.ok = singular.ok)
       cat("bw = ", bw, "\n")
     }
@@ -333,9 +345,9 @@ tvSURE <- function (formula, z = NULL, ez = NULL, bw = NULL, cv.block = 0, data,
   colnames(coefficients) <- var.names
   result <- list(coefficients =  coefficients, Lower = NULL, Upper = NULL, Sigma = Sigma,
                  fitted = fitted, residuals = resid, x = x, y = y, z = z, ez = ez,
-                 bw = bw, cv.block = cv.block, obs = obs, neq = neq, nvar = nvar, 
-                 method = method, est =  est, tkernel = tkernel, bw.cov = bw.cov, 
-                 level = 0, runs = 0, tboot = NULL, BOOT = NULL,
+                 bw = bw, cv.block = cv.block, lmcv = lmcv, local.bw = local.bw, 
+                 obs = obs, neq = neq, nvar = nvar, method = method, est =  est, 
+                 tkernel = tkernel, bw.cov = bw.cov, level = 0, runs = 0, tboot = NULL, BOOT = NULL,
                  R = R, r = r, control = control, formula = formula, call = match.call())
   class(result) <- "tvsure"
   return(result)

@@ -7,9 +7,10 @@
 #' either a vector of numbers or a vector of names. If missing, all parameters are considered.
 #' @param level Numeric, the confidence level required (between 0 and 1). 
 #' @param runs (optional) Number of bootstrap replications.
-#' @param tboot Type of wild bootstrap, choices 'wild'(default), 'wild2'. Option 'wild' uses the
-#' distribution suggested by Mammen (1993) in the wild resampling, while 'wild2' uses the standard
-#' normal.
+#' @param tboot Type of wild bootstrap, choices 'wild'(default), 'wild2' and 'lbwb'. 
+#' Option 'wild' uses the distribution suggested by Mammen (1993) in the wild resampling, 
+#' while 'wild2' uses the standard normal. The option of Local Blockwise Wild Bootstrap, 'lbwb', 
+#' uses block-bootstrap suggested by Lin et al (2025).
 #' @param ... Other parameters passed to specific methods.
 #' @seealso \code{\link{tvLM}}, \code{\link{tvAR}}, \code{\link{tvVAR}},
 #' \code{\link{tvSURE}}
@@ -17,12 +18,16 @@
 #' @return an object of class \code{tvsure} with BOOT, Lower and Upper different from NULL.
 #'
 #' @references
-#' Chen, X. B., Gao, J., Li, D., and Silvapulle, P (2017) Nonparametric estimation and 
+#' Chen, X. B., Gao, J., Li, D., and Silvapulle, P. (2017) Nonparametric estimation and 
 #' forecasting for time-varying coefficient realized volatility models,
 #' \emph{Journal of Business and Economic Statistics}, 36, 88-100.
 #'
-#' Mammen, E (1993) Bootstrap and wild bootstrap for high dimensional linear models,
+#' Mammen, E. (1993) Bootstrap and wild bootstrap for high dimensional linear models,
 #' \emph{ Annals of Statistics}, 21, 255-285.
+#' 
+#' Lin, Y., Song, M., and van der Sluis, B. (2025) Bootstrap Inference for Linear 
+#' Time-Varying Coefficient Models in Locally Stationary Time Series, 
+#' \emph{Journal of Computational and Graphical Statistics}, 34:2, 654-667.
 #'
 #' @examples
 #' \dontrun{
@@ -32,7 +37,7 @@
 #' set.seed(42)
 #' tau <- seq(1:200)/200
 #' beta <- data.frame(beta1 = sin(2*pi*tau), beta2= 2*tau)
-#' X1 <- rnorm(200)
+#' X1 <- stats::rnorm(200)
 #' X2 <- rchisq(200, df = 4)
 #' error <- rt(200, df = 10)
 #' y <- apply(cbind(X1, X2)*beta, 1, sum) + error
@@ -40,7 +45,7 @@
 #' 
 #' ##Fitting the model and confidence interval calculation
 #' model.tvlm <-  tvLM(y ~ 0 + X1 + X2, data = data, bw = 0.29)
-#' tvci <- confint(model.tvlm, level = 0.95, runs = 20)
+#' tvci <- confint(model.tvlm, level = 0.95, runs = 20, tboot = "lbwb")
 #' 
 #' ##If a second confidence interval on the "same" object is calculated, 
 #' ##for example with a different level, the calculation is faster
@@ -51,8 +56,10 @@
 #' @method confint tvlm
 #' @export 
 #'
+
+
 confint.tvlm <- function(object, parm, level = 0.95, 
-                         runs = 100, tboot = c("wild", "wild2"), ...)
+                         runs = 100, tboot = c("wild", "wild2", "lbwb"), ...)
 {
   if (!any(class(object) %in% c("tvlm", "tvar", "tvsure")))
     stop("\nConfidence intervals not implemented for this class.\n")
@@ -64,24 +71,34 @@ confint.tvlm <- function(object, parm, level = 0.95,
   BOOT <- object$BOOT
   if(is.null(BOOT))
   {
-    BOOT <- .tvboot(x = object, runs = runs, tboot = tboot)
+    boot_out <- .tvboot(x = object, runs = runs, tboot = tboot)
+    BOOT <- boot_out$BOOT
+    object$beta.pilot <- boot_out$beta.pilot
   }
   else
   {
     if (object$tboot != tboot)
     {
-      BOOT <- .tvboot(x = object, runs = runs, tboot = tboot)
+      boot_out <- .tvboot(x = object, runs = runs, tboot = tboot)
+      BOOT <- boot_out$BOOT
+      object$beta.pilot <- boot_out$beta.pilot
     }
     else if (object$tboot == tboot & object$runs < runs)
     {
-      temp <- .tvboot(x = object, runs = runs - object$runs, tboot = tboot)
-      BOOT <- c(object$BOOT, temp)
+      boot_out <- .tvboot(x = object, runs = runs - object$runs, tboot = tboot)
+      BOOT <- c(object$BOOT, boot_out$BOOT)
+      object$beta.pilot <- boot_out$beta.pilot
     }
   }
   object$level <- level
   object$tboot <- tboot
   object$runs <- runs
   B <- object$coefficients
+  if(tboot == "lbwb")
+  {
+    B.pilot <- object$beta.pilot
+    if(is.null(B.pilot)) stop("Pilot coefficients are missing for LBWB.")
+  }
   obs <- object$obs
   nvar <- ncol(object$x)
   if(inherits(object, "tvsure"))
@@ -107,7 +124,16 @@ confint.tvlm <- function(object, parm, level = 0.95,
           temp[,i] <- BOOT[[i]][ , sum(nvar[1:m]) - nvar[m] + l]
         }
         sd.star <- apply(temp, 1, stats::sd)
-        c.hat <- apply(abs(temp-B[ , sum(nvar[1:m]) - nvar[m] + l])/sd.star, 1, 
+        if (tboot == "lbwb") 
+        {
+          B.ref <- B.pilot[, sum(nvar[1:m]) - nvar[m] + l]
+        } 
+        else 
+        {
+          B.ref <- B[, sum(nvar[1:m]) - nvar[m] + l]
+        }
+        
+        c.hat <- apply(abs(temp - B.ref)/sd.star, 1, 
                        stats::quantile, prob = upper, na.rm = TRUE)
         mat.l[,sum(nvar[1:m]) - nvar[m] + l] <- B[, sum(nvar[1:m]) - nvar[m] + l] - c.hat*sd.star
         mat.u[,sum(nvar[1:m]) - nvar[m] + l] <- B[, sum(nvar[1:m]) - nvar[m] + l] + c.hat*sd.star
@@ -123,8 +149,15 @@ confint.tvlm <- function(object, parm, level = 0.95,
         temp[,i] <- BOOT[[i]][, l]
       }
       sd.star <- apply(temp, 1, stats::sd)
-      c.hat <- apply(abs(temp-B[, l])/sd.star, 1, stats::quantile,
-                     prob = upper, na.rm = TRUE)
+      # Replace your current B.ref line with this:
+      if (tboot == "lbwb") {
+        B.ref <- B.pilot[, l]
+      } else {
+        B.ref <- B[, l]
+      }
+      
+      c.hat <- apply(abs(temp - B.ref)/sd.star, 1, 
+                     stats::quantile, prob = upper, na.rm = TRUE)
       mat.l[, l] <- B[, l] - c.hat*sd.star
       mat.u[, l] <- B[, l] + c.hat*sd.star
     }
@@ -151,9 +184,10 @@ confint.tvsure <- confint.tvlm
 #' @method confint tvvar 
 #' @export 
 confint.tvvar <- function(object, parm, level = 0.95, 
-                          runs = 100, tboot = c("wild", "wild2") , ...)
+                          runs = 100, tboot = c("wild", "wild2", "lbwb"),
+                          type = c("pointwise", "simultaneous"), ...)
 {
-  stop("\nNo function confint for class 'tvvar'\n")
+  stop("\nConfidence intervals are calculated on the 'tvirf' object, not directly on 'tvvar'. Use confint(tvirf_object) instead.\n")
 }
 
 
@@ -162,149 +196,207 @@ confint.tvvar <- function(object, parm, level = 0.95,
 #' @export 
 #'
 confint.tvirf <- function(object, parm, level = 0.95, 
-                          runs = 100, tboot = c("wild", "wild2") , ...)
+                          runs = 100, tboot = c("wild", "wild2", "lbwb"),
+                          type = c("pointwise", "simultaneous"), ...)
 {
   if (!inherits(object, "tvirf"))
     stop("\nConfidence intervals not implemented for this class.\n")
-  if(runs <= 0)
+  if (runs <= 0)
     stop("\nVariable 'runs' accepts integer values greater than 0.\n")
   if (level <= 0 | level > 1)
     stop("\nVariable 'level' accepts values between 0 and 1.\n")
+  
   tboot <- match.arg(tboot)
+  type  <- match.arg(type)
+  
   BOOT <- object$BOOT
-  if(is.null(BOOT))
+  if (is.null(BOOT) || is.null(object$tboot) || (object$tboot != tboot)) 
   {
-    BOOT <- .tvboot(x = object, runs = runs, tboot = tboot)
+    boot_out <- .tvboot(x = object, runs = runs, tboot = tboot)
+    BOOT <- boot_out$BOOT
+    object$beta.pilot <- boot_out$beta.pilot
+  } 
+  else if (object$runs < runs) 
+  {
+    boot_out <- .tvboot(x = object, runs = runs - object$runs, tboot = tboot)
+    BOOT <- append(object$BOOT, boot_out$BOOT)
+    object$beta.pilot <- boot_out$beta.pilot
   }
+  
+  object$level <- level
+  object$runs  <- runs
+  object$tboot <- tboot
+  object$type  <- type
+  
+  irf <- object$irf
+  if (tboot == "lbwb") 
+  {
+    if (is.null(object$beta.pilot)) stop("Pilot coefficients missing for LBWB.")
+    if (inherits(object$x, "tvvar")) 
+    {  
+      VAR_pilot <- object$x
+    }
+    else 
+    {
+      VAR_pilot <- eval.parent(object$x)
+    }
+    VAR_pilot$coefficients <- object$beta.pilot 
+    
+    irf_ref <- .tvIRF(x = VAR_pilot, impulse = object$impulse, 
+                      response = object$response, y.names = colnames(VAR_pilot$y),
+                      n.ahead = object$n.ahead, ortho = object$ortho, 
+                      cumulative = object$cumulative, 
+                      ortho.cov = object$ortho.cov, bw.cov = object$bw.cov, 
+                      unit.shock = object$unit.shock)$irf
+  } 
   else
   {
-    if (object$tboot != tboot)
-    {
-      BOOT <- .tvboot(x = object, runs = runs, tboot = tboot)
-    }
-    else if (object$tboot == tboot & object$runs < runs)
-    {
-      temp <- .tvboot(x = object, runs = runs - object$runs, tboot = tboot)
-      BOOT <- c(object$BOOT, temp)
-    }
+    irf_ref <- irf
   }
-  object$level <- level
-  object$runs <- runs
-  object$tboot <- tboot
-  irf <- object$irf
-  impulse <- object$impulse
-  response <- object$response
-  obs <- object$x$obs
-  n.ahead <- object$n.ahead
-  idx1 <- length(impulse)
-  idx2 <- length(response)
-  idx3 <- n.ahead + 1
-  mat.l <- array(NA, dim = c(obs, idx2, n.ahead + 1))
-  mat.u <- array(NA, dim = c(obs, idx2, n.ahead + 1))
-  temp <- matrix(NA, nrow = obs, ncol = runs)
-  alpha <-  1 - level
-  lower <- alpha/2
-  upper <- 1 - lower
-  Lower <- list()
-  Upper <- list()
-  for (j in 1:idx1)
-  {#impulse
+  
+  idx1 <- length(object$impulse)
+  idx2 <- length(object$response)
+  idx3 <- object$n.ahead + 1
+  alpha <- 1 - level
+  upper_prob <- 1 - (alpha / 2)
+  Lower <- Upper <- list()
+  
+  nobs <- object$x$obs
+  for (j in 1:idx1) 
+  {
+    mat.l <- array(NA, dim = c(nobs, idx2, idx3))
+    mat.u <- array(NA, dim = c(nobs, idx2, idx3))
+    
     for (m in 1:idx2)
-    {#response
-      for (l in 1:idx3)
-      {#horizon
-        for (i in 1:runs)
-        {
-          temp[,i] <- BOOT[[i]][[j]][, m, l]
-        }
+    {
+      for (l in 1:idx3) 
+      {
+        temp <- sapply(BOOT, function(b) b[[j]][, m, l])
+        if (is.null(dim(temp)))
+          temp <- matrix(temp, nrow = nobs, ncol = length(BOOT))
+        
         sd.star <- apply(temp, 1, stats::sd)
-        if (sum(sd.star) == 0)
-          c.hat <- apply(temp - irf[[j]][, m, l], 1, stats::quantile,
-                         prob = upper, na.rm = TRUE)
-        else
-          c.hat <- apply(abs(temp - irf[[j]][, m, l])/sd.star, 1, stats::quantile,
-                         prob = upper, na.rm = TRUE)
-        mat.l[,m, l] <- irf[[j]][, m, l] - c.hat*sd.star
-        mat.u[,m, l] <- irf[[j]][, m, l] + c.hat*sd.star
+        sd.star[sd.star == 0] <- 1e-8 # Avoid division by zero
+        center <- irf_ref[[j]][, m, l]
+        
+        t.stat <- abs(temp - center) / sd.star
+        
+        if (type == "pointwise") 
+        {
+          c.hat <- apply(t.stat, 1, stats::quantile, prob = upper_prob, na.rm = TRUE)
+        } 
+        else 
+        {
+          sup_t <- apply(t.stat, 2, max, na.rm = TRUE)
+          c.hat <- stats::quantile(sup_t, prob = level, na.rm = TRUE)
+        }
+        
+        mat.l[, m, l] <- irf[[j]][, m, l] - c.hat * sd.star
+        mat.u[, m, l] <- irf[[j]][, m, l] + c.hat * sd.star
       }
     }
-    dimnames(mat.l) <- list(NULL, response, NULL)
-    dimnames(mat.u) <- list(NULL, response, NULL)
+    dimnames(mat.l) <- dimnames(mat.u) <- list(NULL, object$response, NULL)
     Lower[[j]] <- mat.l
     Upper[[j]] <- mat.u
   }
-  names(Lower) <- impulse
-  names(Upper) <- impulse
-  object$BOOT <- BOOT
+  
+  names(Lower) <- names(Upper) <- object$impulse
+  object$BOOT  <- BOOT
   object$Lower <- Lower
   object$Upper <- Upper
   return(object)
 }
+
 
 #' @rdname confint.tvReg
 #' @method confint tvplm
 #' @export 
 #'
 confint.tvplm <- function(object, parm, level = 0.95,  
-                          runs = 100, tboot = c("wild", "wild2"), ...)
+                          runs = 100, tboot = c("wild", "wild2", "lbwb"),
+                          type = c("pointwise", "simultaneous"), ...)
 {
   if (!inherits(object, "tvplm"))
     stop("\nConfidence intervals not implemented for this class.\n")
-  if(runs <= 0)
+  if (runs <= 0)
     stop("\nVariable 'runs' accepts integer values greater than 0.\n")
   if (level <= 0 | level > 1)
     stop("\nVariable 'level' accepts values between 0 and 1.\n")
+  
   tboot <- match.arg(tboot)
+  type  <- match.arg(type)
+  
   BOOT <- object$BOOT
-  if(is.null(BOOT))
+  if (is.null(BOOT) || is.null(object$tboot) || (object$tboot != tboot))
   {
-    BOOT <- .tvboot(x = object, runs = runs, tboot = tboot)
+    boot_out <- .tvboot(x = object, runs = runs, tboot = tboot)
+    BOOT <- boot_out$BOOT
+    object$beta.pilot <- boot_out$beta.pilot
   }
-  else
+  else if (object$runs < runs)
   {
-    if (object$tboot != tboot)
-    {
-      BOOT <- .tvboot(x = object, runs = runs, tboot = tboot)
-    }
-    else if (object$tboot == tboot & object$runs < runs)
-    {
-      temp <- .tvboot(x = object, runs = runs - object$runs, tboot = tboot)
-      BOOT <- c(object$BOOT, temp)
-    }
+    boot_out <- .tvboot(x = object, runs = runs - object$runs, tboot = tboot)
+    BOOT <- c(object$BOOT, boot_out$BOOT)
+    object$beta.pilot <- boot_out$beta.pilot
   }
+  
   object$level <- level
-  object$runs <- runs
+  object$runs  <- runs
   object$tboot <- tboot
-  obs <- object$obs
+  object$type  <- type
+  
+  obs  <- object$obs
   nvar <- object$nvar
-  B <- object$coefficients
+  B    <- object$coefficients
+  
+  if (tboot == "lbwb")
+  {
+    B.pilot <- object$beta.pilot
+    if (is.null(B.pilot)) stop("Pilot coefficients missing for LBWB.")
+  }
+  
   mat.l <- matrix(NA, nrow = obs, ncol = nvar)
   mat.u <- matrix(NA, nrow = obs, ncol = nvar)
-  temp <- matrix(NA, nrow = obs, ncol = runs)
-  alpha <-  1 - level
-  lower <- alpha/2
-  upper <- 1 - lower
-  Lower <- list()
-  Upper <- list()
+  temp  <- matrix(NA, nrow = obs, ncol = runs)
+  
+  alpha <- 1 - level
+  upper <- 1 - (alpha / 2)
+  
   for (l in 1:nvar) 
   {
     for (i in 1:runs) 
     {
-      temp[,i] <- BOOT[[i]][,l]
+      temp[, i] <- BOOT[[i]][, l]
     }
     sd.star <- apply(temp, 1, stats::sd)
-    c.hat <- apply(abs(temp-B[,l])/sd.star, 1, stats::quantile, 
-                   prob=upper, na.rm=TRUE)
-    mat.l[,l] <- B[, l ] - c.hat*sd.star
-    mat.u[,l] <- B[, l ] + c.hat*sd.star
+    sd.star[sd.star == 0] <- 1e-8
+    
+    B.ref <- if (tboot == "lbwb") B.pilot[, l] else B[, l]
+    t.stat <- abs(temp - B.ref) / sd.star
+    
+    if (type == "pointwise") 
+    {
+      c.hat <- apply(t.stat, 1, stats::quantile, prob = upper, na.rm = TRUE)
+    }
+    else 
+    {
+      sup_t <- apply(t.stat, 2, max, na.rm = TRUE)
+      c.hat <- stats::quantile(sup_t, prob = level, na.rm = TRUE)
+    }
+    
+    mat.l[, l] <- B[, l] - c.hat * sd.star
+    mat.u[, l] <- B[, l] + c.hat * sd.star
   }
+  
   colnames(mat.l) <- colnames(B)
   colnames(mat.u) <- colnames(B)
-  object$BOOT <- BOOT
+  
+  object$BOOT  <- BOOT
   object$Lower <- mat.l
   object$Upper <- mat.u
   return(object)
 }
+
 
 #' @rdname tvReg-internals
 #' @keywords internal
@@ -429,15 +521,23 @@ confint.tvplm <- function(object, parm, level = 0.95,
       if(inherits(result, "try-error"))
         stop("\nSystem is computationally singular, the inverse cannot be calculated. 
              Possibly, the 'bw' is too small for values in 'ez'.\n")
-      if(est =="ll")
+      if (est == "ll") 
       {
-        temp <- result[1:nvar[1]]
-        for(i in 2:neq)
-          temp <- c(temp, result[(1:nvar[i]) + 2 * sum(nvar[1:(i-1)])])            
+        temp <- numeric(sum(nvar))
+        start.ind <- 1
+        start.res <- 1
+        for (i in 1:neq) 
+        {
+          temp[start.ind:(start.ind + nvar[i] - 1)] <- result[start.res:(start.res + nvar[i] - 1)]
+          start.ind <- start.ind + nvar[i]
+          start.res <- start.res + 2 * nvar[i]
+        }
         theta[t, ] <- temp
-      }
-      else
+      } 
+      else 
+      {
         theta[t, ] <- result
+      }
       if(!is.null(R))
       {
         theta[t, ] <- drop(theta[t, ] - mat %*% (R %*% theta[t, ] - r))
@@ -493,15 +593,23 @@ confint.tvplm <- function(object, parm, level = 0.95,
         if(inherits(result, "try-error"))
           stop("\nSystem is computationally singular, the inverse cannot be calculated. 
                Possibly, the 'bw' is too small for values in 'ez'.\n")
-        if(est =="ll")
+        if (est == "ll") 
         {
-          temp <- result[1:nvar[1]]
-          for(i in 2:neq)
-            temp <- c(temp, result[(1:nvar[i]) + 2 * sum(nvar[1:(i-1)])])            
+          temp <- numeric(sum(nvar))
+          start.ind <- 1
+          start.res <- 1
+          for (i in 1:neq) 
+          {
+            temp[start.ind:(start.ind + nvar[i] - 1)] <- result[start.res:(start.res + nvar[i] - 1)]
+            start.ind <- start.ind + nvar[i]
+            start.res <- start.res + 2 * nvar[i]
+          }
           theta[t, ] <- temp
-        }
-        else
+        } 
+        else 
+        {
           theta[t, ] <- result
+        }
         if(!is.null(R))
         {
           Sinv <- qr.solve(s0)

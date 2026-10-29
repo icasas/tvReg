@@ -25,7 +25,7 @@ tvOLS <- function(x, ...) UseMethod("tvOLS", x)
 #' @examples
 #' tau <- seq(1:500)/500
 #' beta <- data.frame(beta1 = sin(2*pi*tau), beta2 = 2*tau)
-#' X <- data.frame(X1 = rnorm(500), X2 = rchisq(500, df = 4))
+#' X <- data.frame(X1 = stats::rnorm(500), X2 = rchisq(500, df = 4))
 #' error <- rt(500, df = 10)
 #' y <- apply(X*beta, 1, sum) + error
 #' coef.lm <- stats::lm(y~0+X1+X2, data = X)$coef
@@ -125,7 +125,8 @@ tvOLS.tvvar <- function(x, ...)
 #' @rdname tvReg-internals
 #' @keywords internal
 .tvOLS.cv <- function(bw, x, y, z = NULL, cv.block = 0, est = c("lc", "ll"), 
-                      tkernel = c("Triweight", "Epa", "Gaussian"), singular.ok = TRUE)
+                      tkernel = c("Triweight", "Epa", "Gaussian"), weights = NULL, 
+                      singular.ok = TRUE)
 {
   x <- as.matrix(x)
   obs <- NROW(x)
@@ -162,7 +163,14 @@ tvOLS.tvvar <- function(x, ...)
     theta[t,] <- result$coefficients[1:nvar]
     fitted[t] <- crossprod(x[t, !is.na(theta[t,])], theta[t, !is.na(theta[t,])])
   }
-  mse <- mean((y - fitted)^2)
+  if (!is.null(weights)) 
+  {
+    mse <- sum(weights * (y - fitted)^2)
+  } 
+  else 
+  {
+    mse <- mean((y - fitted)^2)
+  }
   return(mse)
 }
 

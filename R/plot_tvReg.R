@@ -363,15 +363,39 @@ plot.tvirf <- function (x, obs.index = NULL, impulse = NULL, response = NULL,
                      x$runs, " runs")
     ylabel = rnames
     impulses <- x$irf[[iname]][obs.index2, rnames, ,drop = FALSE]
-    impulses <- apply (impulses, 2:3, mean)
+    if (length(obs.index2) > 1) 
+    {
+      impulses <- apply (impulses, 2:3, mean)
+    } 
+    else 
+    {
+      dim_names <- dimnames(impulses)[2:3]
+      impulses <- impulses[1, , , drop = FALSE]
+      dim(impulses) <- dim(impulses)[2:3]
+      dimnames(impulses) <- dim_names
+    }
     upper <- NULL
     lower <- NULL
     if (x$level != 0) 
     {
       upper <- x$Upper[[iname]][obs.index2, rnames, , drop = FALSE]
       lower <- x$Lower[[iname]][obs.index2, rnames, , drop = FALSE]
-      upper <- apply (upper, 2:3, mean)
-      lower <- apply (lower, 2:3, mean)
+      
+      if (length(obs.index2) > 1) 
+      {
+        upper <- apply (upper, 2:3, mean)
+        lower <- apply (lower, 2:3, mean)
+      } 
+      else 
+      {
+        dim_names <- dimnames(upper)[2:3]
+        upper <- upper[1, , , drop = FALSE]
+        dim(upper) <- dim(upper)[2:3]
+        dimnames(upper) <- dim_names
+        lower <- lower[1, , , drop = FALSE]
+        dim(lower) <- dim(lower)[2:3]
+        dimnames(lower) <- dim_names
+      }
     }
     nresponse <- length(rnames)
     nplots <- ceiling (nresponse/4)

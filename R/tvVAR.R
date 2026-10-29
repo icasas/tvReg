@@ -11,8 +11,7 @@
 #' @param exogen A matrix or data.frame with the exogenous variables (optional)
 #' @inheritParams tvSURE
 #' @param singular.ok	Logical. If FALSE, a singular model is an error.
-#' @return An object of class 'tvvar'
-#' The object of class \code{tvvar} have the following components:
+#' @return An object of class \code{tvvar} with the following components:
 #' \item{coefficients}{An array of dimension obs x neq (obs = number of observations,
 #' neq = number of equations in the system) with the time-varying coefficients estimates.}
 #' \item{fitted}{The fitted values.}
@@ -21,14 +20,21 @@
 #' \item{y}{A matrix with the dependent variable data.}
 #' \item{z}{A vector with the smoothing variable.}
 #' \item{ez}{A vector with the smoothing estimation values.}
+#' \item{y.orig}{A vector with the original variable y.}
 #' \item{bw}{Bandwidth of mean estimation.}
+#' \item{cv.block}{A positive integer with the block size for cross-validation.}
+#' \item{lmcv}{Logical. If \code{TRUE}, local modified cross-validation (LMCV) was used to select the bandwidth.}
+#' \item{local.bw}{Numeric. The bandwidth used to calculate local weights in LMCV.}
 #' \item{type}{Whether the model has a constant or not.}
 #' \item{exogen}{A matrix or data.frame with other exogenous variables.}
-#' \item{p}{Number of lags}
-#' \item{neq}{Number of equations}
+#' \item{p}{Number of lags.}
+#' \item{neq}{Number of equations.}
 #' \item{obs}{Number of observations in estimation.}
 #' \item{totobs}{Number of observations in the original set.}
-#' \item{call}{Matched call.}
+#' \item{est}{Nonparametric estimation methodology.}
+#' \item{tkernel}{Kernel used in estimation.}
+#' \item{singular.ok}{Logical. If \code{FALSE}, the function stops if the design matrix is singular.}
+#' \item{call}{The matched call.}
 #' 
 #' @seealso \code{\link{bw}}, \code{\link{tvIRF}}, \code{\link{plot}}, 
 #' \code{\link{print}} and \code{\link{summary}}
@@ -51,7 +57,8 @@
 #' 
 #' @export
 
-tvVAR <- function (y, p = 1, z = NULL, ez = NULL, bw = NULL, cv.block = 0, type = c("const", "none"), 
+tvVAR <- function (y, p = 1, z = NULL, ez = NULL, bw = NULL, lmcv = FALSE, local.bw = NULL,
+                   cv.block = 0, type = c("const", "none"), 
                    exogen = NULL, est = c("lc", "ll"), tkernel = c("Triweight", "Epa", "Gaussian"), 
                    singular.ok = TRUE)
 {
@@ -83,7 +90,6 @@ tvVAR <- function (y, p = 1, z = NULL, ez = NULL, bw = NULL, cv.block = 0, type 
   colnames(y) <- var.names
   y.orig <- y
   type <- match.arg(type)
-  
   rhs <- stats::embed(y, dimension = p + 1)[, -(1:neq)]
   colnames(rhs) <- paste0(colnames(y), paste0(".l", rep(1:p, each=length(var.names))))
   yend <- y[-c(1:p), ]
@@ -111,8 +117,8 @@ tvVAR <- function (y, p = 1, z = NULL, ez = NULL, bw = NULL, cv.block = 0, type 
   if(is.null(bw))
   {
     cat("Calculating regression bandwidths... ")
-    bw <- bw(y = yend, x = rhs, z = z, cv.block = cv.block, tkernel = tkernel, 
-             est = est, singular = singular.ok)
+    bw <- bw(y = yend, x = rhs, z = z, cv.block = cv.block,  lmcv = lmcv, local.bw = local.bw, 
+             tkernel = tkernel, est = est, singular = singular.ok)
     cat("bandwidth(s) ", bw, "\n")
   }
   resid = fitted <- matrix(0, nrow = obs, ncol = neq)
@@ -135,7 +141,8 @@ tvVAR <- function (y, p = 1, z = NULL, ez = NULL, bw = NULL, cv.block = 0, type 
     names(bw) <- paste0("bw.", names(equation))
   result <- list(coefficients = equation, Lower = NULL, Upper = NULL,  fitted = fitted,
                  residuals = resid, y = yend, x = rhs, z = z, ez = ez, y.orig = y.orig,
-                 bw = bw, cv.block = cv.block, exogen = exogen, p = p, type = type, obs = obs, 
+                 bw = bw, cv.block = cv.block,  lmcv = lmcv, local.bw = local.bw, 
+                 exogen = exogen, p = p, type = type, obs = obs, 
                  totobs = toobs, neq = neq, est = est, tkernel = tkernel, 
                  singular.ok = singular.ok, call = match.call())
   class(result) <- "tvvar"

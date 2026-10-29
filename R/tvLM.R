@@ -26,14 +26,18 @@
 #' the estimation of trend coefficients. If NULL, it is selected by cross validation. 
 #' @param cv.block A positive scalar with the size of the block in leave one block out cross-validation.
 #' By default 'cv.block=0' meaning leave one out cross-validation.
+#' @param lmcv. Logical. If \code{FALSE} (default), general cross-validation is used. 
+#' If \code{TRUE}, local modified cross-validation (LMCV) is applied.
+#' @param local.bw A numeric value or \code{NULL}. The window size used to weight 
+#' the local modified cross-validation. If \code{NULL}, it is automatically calculated.
 #' @param est The nonparametric estimation method, one of "lc" (default) for linear constant
 #'  or "ll" for local linear.
 #' @param tkernel A character, either "Triweight" (default), "Epa" or "Gaussian" kernel function.
 #' @param singular.ok	Logical. If FALSE, a singular model is an error.
 #'
 #' @return An object of class \code{tvlm}
-#' The object of class \code{tvlm} have the following components:
-#' \item{coefficients}{A matrix of dimensions}
+#' The object of class \code{tvlm} has the following components:
+#' \item{coefficients}{A matrix of dimensions.}
 #' \item{fitted}{The fitted values.}
 #' \item{residuals}{Estimation residuals.}
 #' \item{x}{A matrix with the regressors data.}
@@ -41,6 +45,9 @@
 #' \item{z}{A vector with the smoothing variable.}
 #' \item{ez}{A vector with the smoothing estimation variable.}
 #' \item{bw}{Bandwidth of mean estimation.}
+#' \item{cv.block}{A positive integer with the block size for cross-validation.}
+#' \item{lmcv}{Logical. If \code{TRUE}, local modified cross-validation (LMCV) was used to select the bandwidth.}
+#' \item{local.bw}{Numeric. The bandwidth used to calculate local weights in LMCV.}
 #' \item{est}{Nonparametric estimation methodology.}
 #' \item{tkernel}{Kernel used in estimation.}
 #' \item{level}{Confidence interval range.}
@@ -56,7 +63,7 @@
 #' set.seed(42)
 #' tau <- seq(1:200)/200
 #' beta <- data.frame(beta1 = sin(2*pi*tau), beta2= 2*tau)
-#' X1 <- rnorm(200)
+#' X1 <- stats::rnorm(200)
 #' X2 <- rchisq(200, df = 4)
 #' error <- rt(200, df = 10)
 #' y <- apply(cbind(X1, X2)*beta, 1, sum) + error
@@ -91,8 +98,9 @@
 #' 
 #' @export
 
-tvLM<-function (formula, z = NULL, ez = NULL, data, bw = NULL, cv.block = 0, est = c("lc", "ll"), 
-                tkernel = c("Triweight", "Epa", "Gaussian"), singular.ok = TRUE)
+tvLM<-function (formula, z = NULL, ez = NULL, data, bw = NULL, cv.block = 0, lmcv = FALSE,
+                local.bw = NULL, est = c("lc", "ll"), tkernel = c("Triweight", "Epa", "Gaussian"), 
+                singular.ok = TRUE)
 {
   tkernel <- match.arg(tkernel)
   est <- match.arg(est)
@@ -112,8 +120,8 @@ tvLM<-function (formula, z = NULL, ez = NULL, data, bw = NULL, cv.block = 0, est
     if(is.null(bw))
     {
       cat("Calculating regression bandwidth... ")
-      bw <- bw(x = x, y = y, z = z, cv.block = cv.block, est = est, tkernel = tkernel, 
-               singular.ok = singular.ok)
+      bw <- bw(x = x, y = y, z = z, cv.block = cv.block, lmcv = lmcv, local.bw = local.bw, 
+               est = est, tkernel = tkernel, singular.ok = singular.ok)
       cat("bw = ", bw, "\n")
     }
     results <- tvOLS (x = x, y = y, z = z, ez = ez, bw = bw, tkernel = tkernel, est = est,
@@ -128,7 +136,8 @@ tvLM<-function (formula, z = NULL, ez = NULL, data, bw = NULL, cv.block = 0, est
   colnames(coefficients) <- xnames
   result <- list(coefficients = coefficients, Lower = NULL, Upper = NULL, fitted = results$fitted,
                  residuals = results$resid, x = x, y = y, z = z, ez = ez, bw = bw, 
-                 cv.block = cv.block, obs = length(y), est = est, tkernel = tkernel,
+                 cv.block = cv.block, lmcv = lmcv, local.bw = local.bw, 
+                 obs = length(y), est = est, tkernel = tkernel,
                  singular.ok = singular.ok, level = 0, runs = 0, 
                  tboot = NULL, BOOT = NULL, call = match.call())
   class(result) <- "tvlm"
