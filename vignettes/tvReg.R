@@ -117,8 +117,8 @@ summary(model.tvAR.80)
 print(model.tvAR.80)
 
 ## ----tvAR2, eval = FALSE------------------------------------------------------
-#   ##Estimate only coefficient from odd lags and the intercept
-#   tvAR.6p <- tvAR(y, p = 6, type = "const", fixed = c(NA, NA, 0, NA, 0, NA, 0), est = "ll")
+#  ##Estimate only coefficient from odd lags and the intercept
+#  tvAR.6p <- tvAR(y, p = 6, type = "const", fixed = c(NA, NA, 0, NA, 0, NA, 0), est = "ll")
 
 ## ----tvOLS--------------------------------------------------------------------
 data("Kmenta", package = "systemfit")
@@ -157,14 +157,14 @@ tvfgls2.fit <- tvSURE(system, data = Kmenta, method = "tvFGLS",
 control = list(tol = 0.001, maxiter = 100))
 
 ## ----tvFGLS.rest,  eval = FALSE-----------------------------------------------
-#  ##Estimation with 2 restrictions
-#  Rrestr <- matrix(0, 2, 7)
-#  Rrestr[1, 7] <- 1
-#  Rrestr[2, 2] <- 1
-#  Rrestr[2, 5] <- -1
-#  qrestr <- c(0, 0.5)
-#  tvfgls.rest <- tvSURE(system, data = Kmenta, method = "tvFGLS",
-#  R = Rrestr, r = qrestr, bw = tvfgls1.fit$bw, bw.cov = tvfgls1.fit$bw.cov)
+# ##Estimation with 2 restrictions
+# Rrestr <- matrix(0, 2, 7)
+# Rrestr[1, 7] <- 1
+# Rrestr[2, 2] <- 1
+# Rrestr[2, 5] <- -1
+# qrestr <- c(0, 0.5)
+# tvfgls.rest <- tvSURE(system, data = Kmenta, method = "tvFGLS",
+# R = Rrestr, r = qrestr, bw = tvfgls1.fit$bw, bw.cov = tvfgls1.fit$bw.cov)
 
 ## ----tvPLM,  eval = TRUE------------------------------------------------------
 data("OECD")
@@ -212,18 +212,25 @@ model.tvIRF <- confint(model.tvIRF, runs = 30)
 ##Plot the mean all tvIRF over time
 plot(model.tvIRF)
 
-##Plot the effect of a shock in the interest rates (tbi) on the inflation (inf)
+##Plot the effect of a standard deviation shock in the interest rates (tbi) on the inflation (inf)
 ##at time 100
 plot(model.tvIRF, obs.index = 100, impulse = "tbi", response = "inf")
 
+## ----tvIRF2.1-----------------------------------------------------------------
+##Estimate a the impulse response functions with irf and tvIRF to interpret unit shocks from
+set.seed(42)
+model.tvIRF2 <- tvIRF(model.tvVAR, unit.shock = TRUE)
+
+##Plot the mean all tvIRF over time
+plot(confint(model.tvIRF2))
+
 ## ----tvIRF3-------------------------------------------------------------------
 ##Estimate a the tvIRF with time-varying covariance function
-model.tvIRF2 <- tvIRF(model.tvVAR, cumulative = TRUE)
+model.tvIRF3 <- tvIRF(model.tvVAR, cumulative = TRUE)
 
 ##Plot the cumulative effect on a shock in short term interest rates (tbi) 
 ##on the inflation (inf)
-plot <- plot(model.tvIRF2, impulse ="tbi", response = "inf")
-
+plot(model.tvIRF3, impulse ="tbi", response = "inf")
 
 
 ## ----Sigma--------------------------------------------------------------------

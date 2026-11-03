@@ -1,3 +1,7 @@
+# tvReg 0.5.12
+
+* Fixed YAML metadata in vignette for compatibility with Pandoc >= 3.13.
+
 # tvReg 0.5.11
 
 * Fixed a bug in plot methods where non-finite values caused a crash on arm64 architectures

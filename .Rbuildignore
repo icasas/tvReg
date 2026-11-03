@@ -1,6 +1,2 @@
-^_pkgdown\.yml$
-^README\.md$
 ^.*\.Rproj$
 ^\.Rproj\.user$
-^docs$
-^index\.Rmd$

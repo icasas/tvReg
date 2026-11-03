@@ -8,21 +8,21 @@ author:
 date: '`r Sys.Date()`'
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Introduction to the tvReg R package} 
+  %\VignetteIndexEntry{tvReg: Time-Varying Coefficient Linear Regression for Single and Multi-Equations in R} 
   %\VignetteEngine{knitr::rmarkdown} 
   %\usepackage[UTF-8]{inputenc}
-  
-abstract: "The source code of the *tvReg* package is publicly available
-for download from the Comprehensive *R* Archive Network (CRAN,
-https://CRAN.R-project.org/). The five basic functions in this package are *tvLM*, *tvAR*, *tvSURE*, *tvVAR* and *tvIRF*. Moreover, this package provides the *confint*, *fitted*, *forecast*, *plot*, *predict*, *print*, *resid* and *summary* methods adapted to the class attributes of the *tvReg*. In addition, it includes a bandwidth selection method, a time-varying variance-covariance estimator and two estimation procedures: the time-varying ordinary least squares, which is implemented in the *tvOLS* method and the time-varying generalised least squares, which is implemented in the *tvGLS* method."
 
+abstract: >
+  The source code of the *tvReg* package is publicly available
+  for download from the Comprehensive *R* Archive Network (CRAN,
+  https://CRAN.R-project.org/). The five basic functions in this package are *tvLM*, *tvAR*, *tvSURE*, *tvVAR* and *tvIRF*. Moreover, this package provides the *confint*, *fitted*, *forecast*, *plot*, *predict*, *print*, *resid* and *summary* methods adapted to the class attributes of the *tvReg*. In addition, it includes a bandwidth selection method, a time-varying variance-covariance estimator and two estimation procedures: the time-varying ordinary least squares, which is implemented in the *tvOLS* method and the time-varying generalised least squares, which is implemented in the *tvGLS* method.
 ---
 
 
 
 
 ```{r setup, include = FALSE}
-knitr::opts_chunk$set(echo = TRUE, tidy = TRUE, fig.width = 6,
+knitr::opts_chunk$set(echo = TRUE, fig.width = 6,
                       fig.height = 4, fig.align = "center")
 library(tvReg)
 ```
